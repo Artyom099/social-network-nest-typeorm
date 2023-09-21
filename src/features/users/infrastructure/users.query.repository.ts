@@ -37,9 +37,7 @@ export class UsersQueryRepository {
     } : null
   }
 
-
-
-  async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
+  async getUserByIdSA1(id: string): Promise<SAUserViewModel | null> {
     const [user] = await this.dataSource.query(`
     select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
     from "users"
@@ -58,7 +56,7 @@ export class UsersQueryRepository {
       },
     } : null
   }
-  async getUserByIdSA2(id: string): Promise<SAUserViewModel | null> {
+  async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
     const user = await this.usersRepo
       .createQueryBuilder("user")
       .where("user.id = :id", { id: id })
@@ -71,7 +69,7 @@ export class UsersQueryRepository {
       createdAt: user.createdAt.toISOString(),
       banInfo: {
         isBanned: user.isBanned,
-        banDate: user.banDate.toISOString(),
+        banDate: user.banDate ? user.banDate.toISOString() : null,
         banReason: user.banReason,
       },
     } : null
