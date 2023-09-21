@@ -38,6 +38,7 @@ export class UsersQueryRepository {
   }
 
 
+
   async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
     const [user] = await this.dataSource.query(`
     select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
