@@ -75,7 +75,7 @@ export class UsersQueryRepository {
     } : null
   }
 
-  async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
+  async getUserByLoginOrEmail1(logOrMail: string): Promise<any | null> {
     const user = await this.dataSource.query(`
     select *
     from "users"
@@ -99,8 +99,32 @@ export class UsersQueryRepository {
         banReason: user[0].banReason,
       },
     } : null
-
   }
+  async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
+    const user = await this.usersRepo
+      .createQueryBuilder("user")
+      .where("user.login = :logOrMail OR user.email = :logOrMail", { logOrMail })
+      .getOne()
+
+    return user ? {
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      salt: user.passwordSalt,
+      hash: user.passwordHash,
+      createdAt: user.createdAt,
+      isConfirmed: user.isConfirmed,
+      confirmationCode: user.confirmationCode,
+      passwordSalt: user.passwordSalt,
+      passwordHash: user.passwordHash,
+      banInfo: {
+        isBanned: user.isBanned,
+        banDate: user.banDate,
+        banReason: user.banReason,
+      },
+    } : null
+  }
+
   async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
     const user = await this.dataSource.query(`
     select *
