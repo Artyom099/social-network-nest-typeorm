@@ -125,25 +125,44 @@ export class UsersQueryRepository {
     } : null
   }
 
-  async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
-    const user = await this.dataSource.query(`
+  async getUserByRecoveryCode1(code: string): Promise<SAUserViewModel | null> {
+    const [user] = await this.dataSource.query(`
     select *
     from "users"
     where "recoveryCode" = $1
     `, [code])
 
     return user.length ? {
-      id: user[0].id,
-      login: user[0].login,
-      email: user[0].email,
-      createdAt: user[0].createdAt,
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.createdAt,
       banInfo: {
-        isBanned: user[0].isBanned,
-        banDate: user[0].banDate,
-        banReason: user[0].banReason,
+        isBanned: user.isBanned,
+        banDate: user.banDate,
+        banReason: user.banReason,
       },
     } :null
   }
+  async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
+    const user = await this.usersRepo
+      .createQueryBuilder("user")
+      .where("user.recoveryCode = :code", { code })
+      .getOne()
+
+    return user ? {
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.createdAt.toISOString(),
+      banInfo: {
+        isBanned: user.isBanned,
+        banDate: user.banDate ? user.banDate.toISOString() : null,
+        banReason: user.banReason,
+      },
+    } :null
+  }
+
   async getUserByConfirmationCode(code: string): Promise<any | null> {
     const user = await this.dataSource.query(`
     select *
