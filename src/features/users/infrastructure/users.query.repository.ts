@@ -4,7 +4,7 @@ import {SAUserViewModel} from '../api/models/view/sa.user.view.model';
 import {UserViewModel} from '../api/models/view/user.view.model';
 import {PaginationViewModel} from '../../../infrastructure/models/pagination.view.model';
 import {InjectDataSource, InjectRepository} from '@nestjs/typeorm';
-import {DataSource, Repository} from 'typeorm';
+import {Brackets, DataSource, Repository} from 'typeorm';
 import {Users} from '../entity/user.entity';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class UsersQueryRepository {
     } : null
   }
 
-  async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
+  async getUserByIdSA1(id: string): Promise<SAUserViewModel | null> {
     const [user] = await this.dataSource.query(`
     select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
     from "users"
@@ -56,7 +56,7 @@ export class UsersQueryRepository {
       },
     } : null
   }
-  async getUserByIdSA2(id: string): Promise<SAUserViewModel | null> {
+  async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
     const user = await this.usersRepo
       .createQueryBuilder("user")
       .where("user.id = :id", { id: id })
@@ -75,7 +75,7 @@ export class UsersQueryRepository {
     } : null
   }
 
-  async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
+  async getUserByLoginOrEmail1(logOrMail: string): Promise<any | null> {
     const user = await this.dataSource.query(`
     select *
     from "users"
@@ -100,7 +100,7 @@ export class UsersQueryRepository {
       },
     } : null
   }
-  async getUserByLoginOrEmail2(logOrMail: string): Promise<any | null> {
+  async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder("user")
       .where("user.login = :logOrMail OR user.email = :logOrMail", { logOrMail })
@@ -125,14 +125,14 @@ export class UsersQueryRepository {
     } : null
   }
 
-  async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
+  async getUserByRecoveryCode1(code: string): Promise<SAUserViewModel | null> {
     const [user] = await this.dataSource.query(`
     select *
     from "users"
     where "recoveryCode" = $1
     `, [code])
 
-    return user.length ? {
+    return user ? {
       id: user.id,
       login: user.login,
       email: user.email,
@@ -144,7 +144,7 @@ export class UsersQueryRepository {
       },
     } :null
   }
-  async getUserByRecoveryCode2(code: string): Promise<SAUserViewModel | null> {
+  async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
     const user = await this.usersRepo
       .createQueryBuilder("user")
       .where("user.recoveryCode = :code", { code })
@@ -163,7 +163,7 @@ export class UsersQueryRepository {
     } :null
   }
 
-  async getUserByConfirmationCode(code: string): Promise<any | null> {
+  async getUserByConfirmationCode1(code: string): Promise<any | null> {
     const user = await this.dataSource.query(`
     select *
     from "users"
@@ -182,6 +182,27 @@ export class UsersQueryRepository {
         isBanned: user[0].isBanned,
         banDate: user[0].banDate,
         banReason: user[0].banReason,
+      },
+    } : null
+  }
+  async getUserByConfirmationCode(code: string): Promise<any | null> {
+    const user = await this.usersRepo
+      .createQueryBuilder("user")
+      .where("user.confirmationCode = :code", { code })
+      .getOne()
+
+    return user ? {
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.createdAt,
+      isConfirmed: user.isConfirmed,
+      confirmationCode: user.confirmationCode,
+      expirationDate: user.expirationDate,
+      banInfo: {
+        isBanned: user.isBanned,
+        banDate: user.banDate,
+        banReason: user.banReason,
       },
     } : null
   }
@@ -208,35 +229,80 @@ export class UsersQueryRepository {
   offset $5
   `
 
-    const sortedUsers = await this.dataSource.query(queryString, [
-      `%${query.searchLoginTerm}%`,
-      `%${query.searchEmailTerm}%`,
-      query.banStatus,
-      query.pageSize,
-      query.offset(),
-    ])
+  const sortedUsers = await this.dataSource.query(queryString, [
+    `%${query.searchLoginTerm}%`,
+    `%${query.searchEmailTerm}%`,
+    query.banStatus,
+    query.pageSize,
+    query.offset(),
+  ])
+
+  const items = sortedUsers.map((u) => {
+    return {
+      id: u.id,
+      login: u.login,
+      email: u.email,
+      createdAt: u.createdAt,
+      banInfo: {
+        isBanned: u.isBanned,
+        banDate: u.banDate,
+        banReason: u.banReason,
+      },
+    };
+  });
+
+  return {
+    pagesCount: query.pagesCountSql(totalCount), // общее количество страниц
+    page: query.pageNumber, // текущая страница
+    pageSize: query.pageSize, // количество пользователей на странице
+    totalCount: query.totalCountSql(totalCount), // общее количество пользователей
+    items,
+  };
+  }
+  async getSortedUsersToSA2(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
+  const totalCount = await this.usersRepo
+    .createQueryBuilder("user")
+    .where("user.isBanned = :isBanned OR user.isBanned = :null", { isBanned: query.banStatus })
+    .andWhere(new Brackets((qb) => {
+      qb
+        .where("user.login = :login", { login: query.searchLoginTerm })
+        .orWhere("user.email = :email", { email: query.searchEmailTerm })
+    }))
+    .printSql()
+    .getCount()
+
+  const sortedUsers = await this.usersRepo
+    .createQueryBuilder("user")
+    .where("user.isBanned = :isBanned OR user.isBanned = :null", { isBanned: query.banStatus })
+    .andWhere(new Brackets((qb) => {
+      qb
+        .where("user.login = :login", { login: query.searchLoginTerm })
+        .orWhere("user.email = :email", { email: query.searchEmailTerm })
+    }))
+    .limit(query.pageSize)
+    .offset(query.offset())
+    .getMany()
 
     const items = sortedUsers.map((u) => {
       return {
         id: u.id,
         login: u.login,
         email: u.email,
-        createdAt: u.createdAt,
+        createdAt: u.createdAt.toISOString(),
         banInfo: {
           isBanned: u.isBanned,
-          banDate: u.banDate,
+          banDate: u.banDate ? u.banDate.toISOString() : null,
           banReason: u.banReason,
         },
       };
     });
 
     return {
-      pagesCount: query.pagesCountSql(totalCount), // общее количество страниц
+      pagesCount: query.pagesCountSql2(totalCount), // общее количество страниц
       page: query.pageNumber, // текущая страница
       pageSize: query.pageSize, // количество пользователей на странице
-      totalCount: query.totalCountSql(totalCount), // общее количество пользователей
+      totalCount, // общее количество пользователей
       items,
     };
-
   }
 }

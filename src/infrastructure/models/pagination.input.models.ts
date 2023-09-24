@@ -29,8 +29,12 @@ export class DefaultPaginationInput {
   offset(): number {
     return (this.pageNumber - 1) * this.pageSize;
   }
+
   pagesCountSql(totalCount: { count: string }): number {
     return Math.ceil(parseInt(totalCount.count, 10) / this.pageSize);
+  }
+  pagesCountSql2(totalCount: number): number {
+    return Math.ceil(totalCount / this.pageSize);
   }
   totalCountSql(tCount: { count: string }): number {
     return parseInt(tCount.count, 10)
