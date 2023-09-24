@@ -37,7 +37,7 @@ export class UsersQueryRepository {
     } : null
   }
 
-  async getUserByIdSA1(id: string): Promise<SAUserViewModel | null> {
+  async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
     const [user] = await this.dataSource.query(`
     select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
     from "users"
@@ -56,7 +56,7 @@ export class UsersQueryRepository {
       },
     } : null
   }
-  async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
+  async getUserByIdSA2(id: string): Promise<SAUserViewModel | null> {
     const user = await this.usersRepo
       .createQueryBuilder("user")
       .where("user.id = :id", { id: id })
@@ -75,7 +75,7 @@ export class UsersQueryRepository {
     } : null
   }
 
-  async getUserByLoginOrEmail1(logOrMail: string): Promise<any | null> {
+  async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
     const user = await this.dataSource.query(`
     select *
     from "users"
@@ -100,7 +100,7 @@ export class UsersQueryRepository {
       },
     } : null
   }
-  async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
+  async getUserByLoginOrEmail2(logOrMail: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder("user")
       .where("user.login = :logOrMail OR user.email = :logOrMail", { logOrMail })
@@ -125,7 +125,7 @@ export class UsersQueryRepository {
     } : null
   }
 
-  async getUserByRecoveryCode1(code: string): Promise<SAUserViewModel | null> {
+  async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
     const [user] = await this.dataSource.query(`
     select *
     from "users"
@@ -144,7 +144,7 @@ export class UsersQueryRepository {
       },
     } :null
   }
-  async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
+  async getUserByRecoveryCode2(code: string): Promise<SAUserViewModel | null> {
     const user = await this.usersRepo
       .createQueryBuilder("user")
       .where("user.recoveryCode = :code", { code })

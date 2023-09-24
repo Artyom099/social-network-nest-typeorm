@@ -34,12 +34,10 @@ import {RefreshTokenCommand} from '../application/use.cases/refresh.token.use.ca
 @Controller('auth')
 export class AuthController {
   constructor(
+    private commandBus: CommandBus,
     private tokensService: TokensService,
     private devicesService: DevicesService,
-    // private usersRepository: UsersRepository,
     private usersQueryRepository: UsersQueryRepository,
-
-    private commandBus: CommandBus,
   ) {}
 
   @Get('me')
