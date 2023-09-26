@@ -13,7 +13,7 @@ export class UsersRepository {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
 
-  async createUserByAdmin(dto: CreateUserDTO): Promise<SAUserViewModel> {
+  async createUserByAdmin1(dto: CreateUserDTO): Promise<SAUserViewModel> {
     await this.dataSource.query(`
     insert into "users"
     ("id", "login", "email", "passwordSalt", "passwordHash", "createdAt", "isBanned", "banDate", 
@@ -53,7 +53,47 @@ export class UsersRepository {
       },
     };
   }
-  async createUserBySelf(dto: CreateUserDTO): Promise<UserViewModel> {
+  async createUserByAdmin(dto: CreateUserDTO): Promise<SAUserViewModel> {
+    await this.dataSource
+      .createQueryBuilder()
+      .insert()
+      .into(Users)
+      .values({
+        login: dto.InputModel.login,
+        email: dto.InputModel.email,
+        passwordSalt: dto.salt,
+        passwordHash: dto.hash,
+        createdAt: dto.expirationDate,
+        isBanned: false,
+        // banDate: null,
+        // banReason: null,
+        confirmationCode: dto.confirmationCode,
+        // expirationDate: null,
+        isConfirmed: dto.isConfirmed,
+        // recoveryCode: null,
+      })
+      .execute()
+
+    const [user] = await this.dataSource.query(`
+    select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+    from "users"
+    where "login" = $1
+    `, [dto.InputModel.login])
+
+    return {
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.createdAt,
+      banInfo: {
+        isBanned: user.isBanned,
+        banDate: user.banDate,
+        banReason: user.banReason,
+      },
+    };
+  }
+
+  async createUserBySelf1(dto: CreateUserDTO): Promise<UserViewModel> {
     await this.dataSource.query(`
     insert into "users"
     ("id", "login", "email", "passwordSalt", "passwordHash", "createdAt", "isBanned", "banDate", 
@@ -74,6 +114,40 @@ export class UsersRepository {
       dto.isConfirmed,
       null,
     ])
+
+    const [user] = await this.dataSource.query(`
+    select "id", "login", "email", "createdAt"
+    from "users"
+    where "login" = $1
+    `, [dto.InputModel.login])
+
+    return {
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.createdAt,
+    };
+  }
+  async createUserBySelf(dto: CreateUserDTO): Promise<UserViewModel> {
+    await this.dataSource
+      .createQueryBuilder()
+      .insert()
+      .into(Users)
+      .values({
+        login: dto.InputModel.login,
+        email: dto.InputModel.email,
+        passwordSalt: dto.salt,
+        passwordHash: dto.hash,
+        createdAt: dto.expirationDate,
+        isBanned: false,
+        // banDate: null,
+        // banReason: null,
+        confirmationCode: dto.confirmationCode,
+        // expirationDate: null,
+        isConfirmed: dto.isConfirmed,
+        // recoveryCode: null,
+      })
+      .execute()
 
     const [user] = await this.dataSource.query(`
     select "id", "login", "email", "createdAt"

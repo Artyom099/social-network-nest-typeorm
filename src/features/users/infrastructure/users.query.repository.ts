@@ -4,7 +4,7 @@ import {SAUserViewModel} from '../api/models/view/sa.user.view.model';
 import {UserViewModel} from '../api/models/view/user.view.model';
 import {PaginationViewModel} from '../../../infrastructure/models/pagination.view.model';
 import {InjectDataSource, InjectRepository} from '@nestjs/typeorm';
-import {Brackets, DataSource, Repository} from 'typeorm';
+import {DataSource, Repository,} from 'typeorm';
 import {Users} from '../entity/user.entity';
 
 @Injectable()
@@ -12,29 +12,31 @@ export class UsersQueryRepository {
   constructor(
     @InjectDataSource() private dataSource: DataSource,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
-  ) {}
+  ) {
+  }
 
   async getUserById1(id: string): Promise<UserViewModel | null> {
     const [user] = await this.dataSource.query(`
     select "id", "login", "email", "createdAt"
     from "users"
     where "id" = $1
-    `, [id])
+    `, [id]);
 
-    return user ? user : null
+    return user ? user : null;
   }
+
   async getUserById(id: string): Promise<UserViewModel | null> {
     const user = await this.usersRepo
-      .createQueryBuilder("user")
-      .where("user.id = :id", { id: id })
-      .getOne()
+      .createQueryBuilder('user')
+      .where('user.id = :id', {id: id})
+      .getOne();
 
     return user ? {
       id: user.id,
       login: user.login,
       email: user.email,
       createdAt: user.createdAt.toISOString(),
-    } : null
+    } : null;
   }
 
   async getUserByIdSA1(id: string): Promise<SAUserViewModel | null> {
@@ -42,7 +44,7 @@ export class UsersQueryRepository {
     select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
     from "users"
     where "id" = $1
-    `, [id])
+    `, [id]);
 
     return user ? {
       id: user.id,
@@ -54,13 +56,14 @@ export class UsersQueryRepository {
         banDate: user.banDate,
         banReason: user.banReason,
       },
-    } : null
+    } : null;
   }
+
   async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
     const user = await this.usersRepo
-      .createQueryBuilder("user")
-      .where("user.id = :id", { id: id })
-      .getOne()
+      .createQueryBuilder('user')
+      .where('user.id = :id', {id: id})
+      .getOne();
 
     return user ? {
       id: user.id,
@@ -72,7 +75,7 @@ export class UsersQueryRepository {
         banDate: user.banDate ? user.banDate.toISOString() : null,
         banReason: user.banReason,
       },
-    } : null
+    } : null;
   }
 
   async getUserByLoginOrEmail1(logOrMail: string): Promise<any | null> {
@@ -80,7 +83,7 @@ export class UsersQueryRepository {
     select *
     from "users"
     where "login" like $1 or "email" like $1
-    `, [ `%${logOrMail}%` ])
+    `, [`%${logOrMail}%`]);
 
     return user.length ? {
       id: user[0].id,
@@ -98,13 +101,14 @@ export class UsersQueryRepository {
         banDate: user[0].banDate,
         banReason: user[0].banReason,
       },
-    } : null
+    } : null;
   }
+
   async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
     const user = await this.usersRepo
-      .createQueryBuilder("user")
-      .where("user.login = :logOrMail OR user.email = :logOrMail", { logOrMail })
-      .getOne()
+      .createQueryBuilder('user')
+      .where('user.login = :logOrMail OR user.email = :logOrMail', {logOrMail})
+      .getOne();
 
     return user ? {
       id: user.id,
@@ -122,7 +126,7 @@ export class UsersQueryRepository {
         banDate: user.banDate,
         banReason: user.banReason,
       },
-    } : null
+    } : null;
   }
 
   async getUserByRecoveryCode1(code: string): Promise<SAUserViewModel | null> {
@@ -130,7 +134,7 @@ export class UsersQueryRepository {
     select *
     from "users"
     where "recoveryCode" = $1
-    `, [code])
+    `, [code]);
 
     return user ? {
       id: user.id,
@@ -142,13 +146,14 @@ export class UsersQueryRepository {
         banDate: user.banDate,
         banReason: user.banReason,
       },
-    } :null
+    } : null;
   }
+
   async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
     const user = await this.usersRepo
-      .createQueryBuilder("user")
-      .where("user.recoveryCode = :code", { code })
-      .getOne()
+      .createQueryBuilder('user')
+      .where('user.recoveryCode = :code', {code})
+      .getOne();
 
     return user ? {
       id: user.id,
@@ -160,7 +165,7 @@ export class UsersQueryRepository {
         banDate: user.banDate ? user.banDate.toISOString() : null,
         banReason: user.banReason,
       },
-    } :null
+    } : null;
   }
 
   async getUserByConfirmationCode1(code: string): Promise<any | null> {
@@ -168,7 +173,7 @@ export class UsersQueryRepository {
     select *
     from "users"
     where "confirmationCode" = $1
-    `, [code])
+    `, [code]);
 
     return user.length ? {
       id: user[0].id,
@@ -183,13 +188,14 @@ export class UsersQueryRepository {
         banDate: user[0].banDate,
         banReason: user[0].banReason,
       },
-    } : null
+    } : null;
   }
+
   async getUserByConfirmationCode(code: string): Promise<any | null> {
     const user = await this.usersRepo
-      .createQueryBuilder("user")
-      .where("user.confirmationCode = :code", { code })
-      .getOne()
+      .createQueryBuilder('user')
+      .where('user.confirmationCode = :code', {code})
+      .getOne();
 
     return user ? {
       id: user.id,
@@ -204,22 +210,23 @@ export class UsersQueryRepository {
         banDate: user.banDate,
         banReason: user.banReason,
       },
-    } : null
+    } : null;
   }
 
-  async getSortedUsersToSA(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
-  const [totalCount] = await this.dataSource.query(`
-  select count(*)
-  from "users"
-  where ("login" ilike $1 or "email" ilike $2)
-  and ("isBanned" = $3 or $3 is null)
-  `, [
-    `%${query.searchLoginTerm}%`,
-    `%${query.searchEmailTerm}%`,
-    query.banStatus,
-  ])
 
-  const queryString = `
+  async getSortedUsersToSA(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
+    const [totalCount] = await this.dataSource.query(`
+      select count(*)
+      from "users"
+      where ("login" ilike $1 or "email" ilike $2)
+      and ("isBanned" = $3 or $3 is null)
+    `, [
+      `%${query.searchLoginTerm}%`,
+      `%${query.searchEmailTerm}%`,
+      query.banStatus,
+    ]);
+
+    const queryString = `
   select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
   from "users"
   where ("login" ilike $1 or "email" ilike $2)
@@ -227,82 +234,56 @@ export class UsersQueryRepository {
   order by "${query.sortBy}" ${query.sortDirection}
   limit $4
   offset $5
-  `
-
-  const sortedUsers = await this.dataSource.query(queryString, [
-    `%${query.searchLoginTerm}%`,
-    `%${query.searchEmailTerm}%`,
-    query.banStatus,
-    query.pageSize,
-    query.offset(),
-  ])
-
-  const items = sortedUsers.map((u) => {
-    return {
-      id: u.id,
-      login: u.login,
-      email: u.email,
-      createdAt: u.createdAt,
-      banInfo: {
-        isBanned: u.isBanned,
-        banDate: u.banDate,
-        banReason: u.banReason,
-      },
-    };
-  });
-
-  return {
-    pagesCount: query.pagesCountSql(totalCount), // общее количество страниц
-    page: query.pageNumber, // текущая страница
-    pageSize: query.pageSize, // количество пользователей на странице
-    totalCount: query.totalCountSql(totalCount), // общее количество пользователей
-    items,
-  };
-  }
-  async getSortedUsersToSA2(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
-  const totalCount = await this.usersRepo
-    .createQueryBuilder("user")
-    .where("user.isBanned = :isBanned OR user.isBanned = :null", { isBanned: query.banStatus })
-    .andWhere(new Brackets((qb) => {
-      qb
-        .where("user.login = :login", { login: query.searchLoginTerm })
-        .orWhere("user.email = :email", { email: query.searchEmailTerm })
-    }))
-    .printSql()
-    .getCount()
-
-  const sortedUsers = await this.usersRepo
-    .createQueryBuilder("user")
-    .where("user.isBanned = :isBanned OR user.isBanned = :null", { isBanned: query.banStatus })
-    .andWhere(new Brackets((qb) => {
-      qb
-        .where("user.login = :login", { login: query.searchLoginTerm })
-        .orWhere("user.email = :email", { email: query.searchEmailTerm })
-    }))
-    .limit(query.pageSize)
-    .offset(query.offset())
-    .getMany()
+  `;
+    const sortedUsers = await this.dataSource.query(queryString, [
+      `%${query.searchLoginTerm}%`,
+      `%${query.searchEmailTerm}%`,
+      query.banStatus,
+      query.pageSize,
+      query.offset(),
+    ]);
 
     const items = sortedUsers.map((u) => {
       return {
         id: u.id,
         login: u.login,
         email: u.email,
-        createdAt: u.createdAt.toISOString(),
+        createdAt: u.createdAt,
         banInfo: {
           isBanned: u.isBanned,
-          banDate: u.banDate ? u.banDate.toISOString() : null,
+          banDate: u.banDate,
           banReason: u.banReason,
         },
       };
     });
 
     return {
-      pagesCount: query.pagesCountSql2(totalCount), // общее количество страниц
+      pagesCount: query.pagesCountSql(totalCount), // общее количество страниц
       page: query.pageNumber, // текущая страница
       pageSize: query.pageSize, // количество пользователей на странице
-      totalCount, // общее количество пользователей
+      totalCount: query.totalCountSql(totalCount), // общее количество пользователей
       items,
     };
+  }
+
+
+  async getSortedUsersToSA2(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
+
+    const sortedUsers = this.dataSource.getRepository(Users)
+      .createQueryBuilder("u")
+      .where("u.login = :login", { login: query.searchLoginTerm })
+      .orWhere("u.email = :email", { email: query.searchEmailTerm })
+      .limit(query.pageSize)
+      .offset(query.offset())
+      .getSql()
+
+    return {
+      pagesCount: 1, // общее количество страниц
+      page: 1, // текущая страница
+      pageSize: 1, // количество пользователей на странице
+      totalCount: 1, // общее количество пользователей
+      items: [],
+    };
+
   }
 }
