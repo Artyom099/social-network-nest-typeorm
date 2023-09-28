@@ -46,11 +46,11 @@ export class UsersRepository {
       login: user.login,
       email: user.email,
       createdAt: user.createdAt,
-      banInfo: {
-        isBanned: user.isBanned,
-        banDate: user.banDate,
-        banReason: user.banReason,
-      },
+      // banInfo: {
+      //   isBanned: user.isBanned,
+      //   banDate: user.banDate,
+      //   banReason: user.banReason,
+      // },
     };
   }
   async createUserByAdmin(dto: CreateUserDTO): Promise<SAUserViewModel> {
@@ -85,11 +85,11 @@ export class UsersRepository {
       login: user.login,
       email: user.email,
       createdAt: user.createdAt,
-      banInfo: {
-        isBanned: user.isBanned,
-        banDate: user.banDate,
-        banReason: user.banReason,
-      },
+      // banInfo: {
+      //   isBanned: user.isBanned,
+      //   banDate: user.banDate,
+      //   banReason: user.banReason,
+      // },
     };
   }
 
@@ -163,54 +163,115 @@ export class UsersRepository {
     };
   }
 
-  async banUser(id: string, banReason: string) {
+  async banUser1(id: string, banReason: string) {
     return this.dataSource.query(`
     update "users"
     set "isBanned" = true, "banReason" = $1,  "banDate" = $2
     where "id" = $3
     `, [banReason, new Date(), id])
   }
-  async unbanUser(id: string) {
+  async banUser(id: string, banReason: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Users)
+      .set({ isBanned: true, banReason: banReason,  banDate: new Date()})
+      .where("id = :id", { id })
+      .execute()
+  }
+
+  async unbanUser1(id: string) {
     return this.dataSource.query(`
     update "users"
     set "isBanned" = false, "banReason" = null,  "banDate" = null
     where "id" = $1
     `, [id])
   }
+  async unbanUser(id: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Users)
+      .set({ isBanned: false, banReason: null,  banDate: null})
+      .where("id = :id", { id })
+      .execute()
+  }
 
-  async confirmEmail(id: string) {
+  async confirmEmail1(id: string) {
     return this.dataSource.query(`
     update "users"
     set "isConfirmed" = true
     where "id" = $1
     `, [id])
   }
-  async updateSaltAndHash(id: string, salt: string, hash: string) {
+  async confirmEmail(id: string) {
+    const result = await this.dataSource
+      .createQueryBuilder()
+      .update(Users)
+      .set({ isConfirmed: true})
+      .where("id = :id", { id })
+      .execute()
+    return !!result
+  }
+
+  async updateSaltAndHash1(id: string, salt: string, hash: string) {
     return this.dataSource.query(`
     update "users"
     set "passwordSalt" = $1, "passwordHash" = $2
     where "id" = $3
     `, [salt, hash, id])
   }
-  async updateRecoveryCode(id: string, code: string) {
+  async updateSaltAndHash(id: string, salt: string, hash: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Users)
+      .set({ passwordSalt: salt, passwordHash: hash})
+      .where("id = :id", { salt, hash })
+      .execute()
+  }
+
+  async updateRecoveryCode1(id: string, code: string) {
     return this.dataSource.query(`
     update "users"
     set "recoveryCode" = $1
     where "id" = $2
     `, [code, id])
   }
-  async updateConfirmationCode(id: string, code: string) {
+  async updateRecoveryCode(id: string, code: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Users)
+      .set({ recoveryCode: code})
+      .where("id = :id", { code })
+      .execute()
+  }
+
+  async updateConfirmationCode1(id: string, code: string) {
     return this.dataSource.query(`
     update "users"
     set "confirmationCode" = $1
     where "id" = $2
     `, [code, id])
   }
+  async updateConfirmationCode(id: string, code: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Users)
+      .set({ confirmationCode: code})
+      .where("id = :id", { code })
+      .execute()
+  }
 
-  async deleteUser(id: string) {
+  async deleteUser1(id: string) {
     return this.dataSource.query(`
     delete from "users"
     where "id" = $1
     `, [id])
+  }
+  async deleteUser(id: string) {
+    await this.dataSource
+      .createQueryBuilder()
+      .delete()
+      .from(Users)
+      .where("id = :id", { id })
+      .execute()
   }
 }

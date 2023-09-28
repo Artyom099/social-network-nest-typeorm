@@ -92,8 +92,8 @@ export class AuthController {
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
-    const { deviceId, lastActiveDate, token } =
-    await this.commandBus.execute(new RefreshTokenCommand(req.cookies.refreshToken))
+    const { deviceId, lastActiveDate, token } = await this.commandBus.execute(
+      new RefreshTokenCommand(req.cookies.refreshToken))
 
     await this.devicesService.updateLastActiveDate(deviceId, lastActiveDate);
 

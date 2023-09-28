@@ -252,8 +252,8 @@ describe('AuthController (e2e)', () => {
     console.log(`refreshToken=${firstRefreshToken}`);
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/refresh-token')
-      // .set('cookie', `refreshToken=${firstRefreshToken}`);
-      .set('cookie', `${firstRefreshToken}`);
+      .set('cookie', `refreshToken=${firstRefreshToken}`);
+      // .set('cookie', `${firstRefreshToken}`);
 
     expect(goodRefreshTokenResponse).toBeDefined();
     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.OK);

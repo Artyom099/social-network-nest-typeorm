@@ -51,15 +51,16 @@ export class UsersQueryRepository {
       login: user.login,
       email: user.email,
       createdAt: user.createdAt,
-      banInfo: {
-        isBanned: user.isBanned,
-        banDate: user.banDate,
-        banReason: user.banReason,
-      },
+      // banInfo: {
+      //   isBanned: user.isBanned,
+      //   banDate: user.banDate,
+      //   banReason: user.banReason,
+      // },
     } : null;
   }
 
-  async getUserByIdSA(id: string): Promise<SAUserViewModel | null> {
+  //todo: any!!
+  async getUserByIdSA(id: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
       .where('user.id = :id', {id: id})
@@ -129,7 +130,7 @@ export class UsersQueryRepository {
     } : null;
   }
 
-  async getUserByRecoveryCode1(code: string): Promise<SAUserViewModel | null> {
+  async getUserByRecoveryCode1(code: string): Promise<any | null> {
     const [user] = await this.dataSource.query(`
     select *
     from "users"
@@ -149,7 +150,8 @@ export class UsersQueryRepository {
     } : null;
   }
 
-  async getUserByRecoveryCode(code: string): Promise<SAUserViewModel | null> {
+  //todo any!!
+  async getUserByRecoveryCode(code: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
       .where('user.recoveryCode = :code', {code})
@@ -249,11 +251,11 @@ export class UsersQueryRepository {
         login: u.login,
         email: u.email,
         createdAt: u.createdAt,
-        banInfo: {
-          isBanned: u.isBanned,
-          banDate: u.banDate,
-          banReason: u.banReason,
-        },
+        // banInfo: {
+        //   isBanned: u.isBanned,
+        //   banDate: u.banDate,
+        //   banReason: u.banReason,
+        // },
       };
     });
 
@@ -268,7 +270,6 @@ export class UsersQueryRepository {
 
 
   async getSortedUsersToSA2(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
-
     const sortedUsers = this.dataSource.getRepository(Users)
       .createQueryBuilder("u")
       .where("u.login = :login", { login: query.searchLoginTerm })
@@ -284,6 +285,5 @@ export class UsersQueryRepository {
       totalCount: 1, // общее количество пользователей
       items: [],
     };
-
   }
 }
