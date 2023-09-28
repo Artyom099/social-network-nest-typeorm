@@ -15,7 +15,7 @@ export class UsersQueryRepository {
   ) {
   }
 
-  async getUserById1(id: string): Promise<UserViewModel | null> {
+  async getUserById(id: string): Promise<UserViewModel | null> {
     const [user] = await this.dataSource.query(`
     select "id", "login", "email", "createdAt"
     from "users"
@@ -25,7 +25,7 @@ export class UsersQueryRepository {
     return user ? user : null;
   }
 
-  async getUserById(id: string): Promise<UserViewModel | null> {
+  async getUserById2(id: string): Promise<UserViewModel | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
       .where('user.id = :id', {id: id})
@@ -39,7 +39,7 @@ export class UsersQueryRepository {
     } : null;
   }
 
-  async getUserByIdSA1(id: string): Promise<SAUserViewModel | null> {
+  async getUserByIdSA(id: string): Promise<any | null> {
     const [user] = await this.dataSource.query(`
     select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
     from "users"
@@ -51,16 +51,16 @@ export class UsersQueryRepository {
       login: user.login,
       email: user.email,
       createdAt: user.createdAt,
-      // banInfo: {
-      //   isBanned: user.isBanned,
-      //   banDate: user.banDate,
-      //   banReason: user.banReason,
-      // },
+      banInfo: {
+        isBanned: user.isBanned,
+        banDate: user.banDate,
+        banReason: user.banReason,
+      },
     } : null;
   }
 
   //todo: any!!
-  async getUserByIdSA(id: string): Promise<any | null> {
+  async getUserByIdSA2(id: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
       .where('user.id = :id', {id: id})
@@ -79,7 +79,7 @@ export class UsersQueryRepository {
     } : null;
   }
 
-  async getUserByLoginOrEmail1(logOrMail: string): Promise<any | null> {
+  async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
     const user = await this.dataSource.query(`
     select *
     from "users"
@@ -105,7 +105,7 @@ export class UsersQueryRepository {
     } : null;
   }
 
-  async getUserByLoginOrEmail(logOrMail: string): Promise<any | null> {
+  async getUserByLoginOrEmail2(logOrMail: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
       .where('user.login = :logOrMail OR user.email = :logOrMail', {logOrMail})
@@ -170,7 +170,7 @@ export class UsersQueryRepository {
     } : null;
   }
 
-  async getUserByConfirmationCode1(code: string): Promise<any | null> {
+  async getUserByConfirmationCode(code: string): Promise<any | null> {
     const user = await this.dataSource.query(`
     select *
     from "users"
@@ -193,7 +193,7 @@ export class UsersQueryRepository {
     } : null;
   }
 
-  async getUserByConfirmationCode(code: string): Promise<any | null> {
+  async getUserByConfirmationCode2(code: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
       .where('user.confirmationCode = :code', {code})
@@ -214,7 +214,6 @@ export class UsersQueryRepository {
       },
     } : null;
   }
-
 
   async getSortedUsersToSA(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
     const [totalCount] = await this.dataSource.query(`
@@ -267,7 +266,6 @@ export class UsersQueryRepository {
       items,
     };
   }
-
 
   async getSortedUsersToSA2(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
     const sortedUsers = this.dataSource.getRepository(Users)

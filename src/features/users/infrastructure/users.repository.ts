@@ -224,7 +224,7 @@ export class UsersRepository {
       .createQueryBuilder()
       .update(Users)
       .set({ passwordSalt: salt, passwordHash: hash})
-      .where("id = :id", { salt, hash })
+      .where("id = :id", { id })
       .execute()
   }
 
@@ -240,7 +240,7 @@ export class UsersRepository {
       .createQueryBuilder()
       .update(Users)
       .set({ recoveryCode: code})
-      .where("id = :id", { code })
+      .where("id = :id", { id })
       .execute()
   }
 
@@ -256,7 +256,7 @@ export class UsersRepository {
       .createQueryBuilder()
       .update(Users)
       .set({ confirmationCode: code})
-      .where("id = :id", { code })
+      .where("id = :id", { id })
       .execute()
   }
 
@@ -267,7 +267,7 @@ export class UsersRepository {
     `, [id])
   }
   async deleteUser(id: string) {
-    await this.dataSource
+    return this.dataSource
       .createQueryBuilder()
       .delete()
       .from(Users)

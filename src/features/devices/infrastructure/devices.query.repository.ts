@@ -8,13 +8,11 @@ export class DevicesQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async getDevice(deviceId: string): Promise<DeviceViewModel | null> {
-    console.log('666');
     const device = await this.dataSource.query(`
     select "ip", "title", "lastActiveDate", "deviceId"
     from "Devices"
     where "deviceId" = $1
     `, [deviceId])
-    console.log({device: device});
 
     return device.length ? device[0] : null
   }

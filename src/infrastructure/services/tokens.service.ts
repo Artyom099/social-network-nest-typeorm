@@ -23,7 +23,7 @@ export class TokensService {
     return {
       accessToken: await this.jwtService.signAsync(payload, {
         secret: jwtConstants.accessSecret,
-        expiresIn: '5m',
+        expiresIn: '10s',
       }),
       refreshToken: await this.jwtService.signAsync(payload, {
         secret: jwtConstants.refreshSecret,
@@ -36,7 +36,7 @@ export class TokensService {
     return {
       accessToken: await this.jwtService.signAsync(newPayload, {
         secret: jwtConstants.accessSecret,
-        expiresIn: '5m',
+        expiresIn: '10s',
       }),
       refreshToken: await this.jwtService.signAsync(newPayload, {
         secret: jwtConstants.refreshSecret,

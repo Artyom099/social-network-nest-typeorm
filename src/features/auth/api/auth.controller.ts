@@ -30,6 +30,7 @@ import {ResendConfirmationCommand} from '../application/use.cases/resend.confirm
 import {CreateDeviceDTO} from '../../devices/api/models/create.device.dto';
 import {CheckCredentialsCommand} from '../application/use.cases/check.credentials.use.case';
 import {RefreshTokenCommand} from '../application/use.cases/refresh.token.use.case';
+import {RateLimitGuard} from '../../../infrastructure/guards/rate.limit/rate.limit.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -53,7 +54,7 @@ export class AuthController {
   }
 
   @Post('login')
-  // @UseGuards(RateLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   async login(
     @Req() req,
@@ -110,7 +111,7 @@ export class AuthController {
   }
 
   @Post('new-password')
-  // @UseGuards(RateLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(@Body() InputModel: SetNewPasswordInputModel) {
     const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(InputModel.recoveryCode);
@@ -124,7 +125,7 @@ export class AuthController {
   }
 
   @Post('password-recovery')
-  // @UseGuards(RateLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   //todo -> для моих тестов статус OK, по документации NO_CONTENT
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
@@ -134,7 +135,7 @@ export class AuthController {
   }
 
   @Post('registration')
-  // @UseGuards(RateLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() inputModel: CreateUserInputModel) {
     const emailExist = await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.email);
@@ -149,7 +150,7 @@ export class AuthController {
   }
 
   @Post('registration-confirmation')
-  // @UseGuards(RateLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   //todo - add validation to code
   async sendConfirmationEmail(@Body() body: { code: string }) {
@@ -162,7 +163,7 @@ export class AuthController {
   }
 
   @Post('registration-email-resending')
-  // @UseGuards(RateLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: { email: string }) {
     const user = await this.usersQueryRepository.getUserByLoginOrEmail(body.email);
