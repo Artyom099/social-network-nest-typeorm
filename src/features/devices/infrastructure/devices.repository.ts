@@ -3,6 +3,7 @@ import {DeviceViewModel} from '../api/models/device.view.model';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {CreateDeviceDTO} from '../api/models/create.device.dto';
+import {Users} from '../../users/entity/user.entity';
 
 @Injectable()
 export class DevicesRepository {
@@ -29,6 +30,14 @@ export class DevicesRepository {
     set "lastActiveDate" = $1
     where "deviceId" = $2
     `, [date, deviceId])
+  }
+  async updateLastActiveDate2(deviceId: string, date: Date) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Users)
+      .set({ lastActiveDate: date})
+      .where("id = :id", { deviceId })
+      .execute()
   }
 
   async deleteCurrentDevice(deviceId: string) {

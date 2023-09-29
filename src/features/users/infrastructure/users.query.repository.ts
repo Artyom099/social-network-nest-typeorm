@@ -24,7 +24,6 @@ export class UsersQueryRepository {
 
     return user ? user : null;
   }
-
   async getUserById2(id: string): Promise<UserViewModel | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
@@ -58,7 +57,6 @@ export class UsersQueryRepository {
       },
     } : null;
   }
-
   //todo: any!!
   async getUserByIdSA2(id: string): Promise<any | null> {
     const user = await this.usersRepo
@@ -104,7 +102,6 @@ export class UsersQueryRepository {
       },
     } : null;
   }
-
   async getUserByLoginOrEmail2(logOrMail: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
@@ -149,7 +146,6 @@ export class UsersQueryRepository {
       },
     } : null;
   }
-
   //todo any!!
   async getUserByRecoveryCode(code: string): Promise<any | null> {
     const user = await this.usersRepo
@@ -192,7 +188,6 @@ export class UsersQueryRepository {
       },
     } : null;
   }
-
   async getUserByConfirmationCode2(code: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
@@ -264,24 +259,6 @@ export class UsersQueryRepository {
       pageSize: query.pageSize, // количество пользователей на странице
       totalCount: query.totalCountSql(totalCount), // общее количество пользователей
       items,
-    };
-  }
-
-  async getSortedUsersToSA2(query: UsersPaginationInput): Promise<PaginationViewModel<SAUserViewModel[]>> {
-    const sortedUsers = this.dataSource.getRepository(Users)
-      .createQueryBuilder("u")
-      .where("u.login = :login", { login: query.searchLoginTerm })
-      .orWhere("u.email = :email", { email: query.searchEmailTerm })
-      .limit(query.pageSize)
-      .offset(query.offset())
-      .getSql()
-
-    return {
-      pagesCount: 1, // общее количество страниц
-      page: 1, // текущая страница
-      pageSize: 1, // количество пользователей на странице
-      totalCount: 1, // общее количество пользователей
-      items: [],
     };
   }
 }

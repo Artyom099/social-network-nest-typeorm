@@ -8,10 +8,7 @@ import {Users} from '../entity/user.entity';
 
 @Injectable()
 export class UsersRepository {
-  constructor(
-    @InjectDataSource() private dataSource: DataSource,
-    @InjectRepository(Users) private usersRepo: Repository<Users>,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async createUserByAdmin1(dto: CreateUserDTO): Promise<SAUserViewModel> {
     await this.dataSource.query(`
