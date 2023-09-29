@@ -75,7 +75,6 @@ export class AuthController {
     } else {
       const payload = await this.tokensService.getTokenPayload(token.refreshToken);
       const dto: CreateDeviceDTO = {
-        // id: randomUUID(),
         ip: req.ip,
         title: req.headers.host,
         lastActiveDate: new Date(payload.iat * 1000),

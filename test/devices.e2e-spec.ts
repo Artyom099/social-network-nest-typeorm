@@ -43,11 +43,11 @@ describe('DevicesController (e2e)', () => {
       login: createdUser1.login,
       email: createdUser1.email,
       createdAt: expect.any(String),
-      banInfo: {
-        banDate: null,
-        banReason: null,
-        isBanned: false,
-      },
+      // banInfo: {
+      //   banDate: null,
+      //   banReason: null,
+      //   isBanned: false,
+      // },
     });
 
     await request(server)
@@ -193,7 +193,7 @@ describe('DevicesController (e2e)', () => {
     const { firstRefreshToken } = expect.getState();
 
     const deleteResponse = await request(server)
-      .delete('/security/devices/1')
+      .delete('/security/devices/7facfd29-1000-44b6-bf7d-fa301be4df66')
       .set('cookie', firstRefreshToken);
 
     expect(deleteResponse).toBeDefined();

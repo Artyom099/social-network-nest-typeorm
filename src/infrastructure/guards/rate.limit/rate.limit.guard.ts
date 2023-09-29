@@ -22,4 +22,4 @@ export class RateLimitGuard implements CanActivate {
     }
   }
 }
-//этот гард можно заменить этот гард декоратором throttle
+//этот гард можно заменить декоратором throttle

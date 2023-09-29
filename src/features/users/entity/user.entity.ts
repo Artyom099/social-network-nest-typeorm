@@ -38,7 +38,7 @@ export class Users {
   @OneToMany(() => BannedUsersForBlog, b => b.user)
   bannedUsersForBlog: BannedUsersForBlog[];
 
-  @OneToMany(() => Devices, d => d.user)
+  @OneToMany(() => Devices, d => d.userId)
   devices: Devices[];
 
   @OneToMany(() => Blogs, b => b.user)
