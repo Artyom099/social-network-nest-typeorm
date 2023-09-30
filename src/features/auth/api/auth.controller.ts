@@ -96,7 +96,6 @@ export class AuthController {
       new RefreshTokenCommand(req.cookies.refreshToken))
 
     await this.devicesService.updateLastActiveDate(deviceId, lastActiveDate);
-
     res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure: true });
     return { accessToken: token.accessToken };
   }
