@@ -278,7 +278,7 @@ describe('DevicesController (e2e)', () => {
     expect(newFirstRefreshToken).not.toBe(firstRefreshToken);
     expect.setState({ newFirstRefreshToken });
   });
-  // ???
+  // ?
   it('11 – GET:/security/devices – return all login devices 1st user – other lastActiveDate 1st device', async () => {
     const { newFirstRefreshToken, firstLastActiveDateFirstUser } =
       expect.getState();
