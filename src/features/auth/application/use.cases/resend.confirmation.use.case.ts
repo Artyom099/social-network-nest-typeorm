@@ -17,7 +17,7 @@ export class ResendConfirmationUseCase implements ICommandHandler<ResendConfirma
   async execute(command: ResendConfirmationCommand) {
     const newCode = randomUUID()
     try {
-      //await
+      // await
       this.emailManager.sendEmailConfirmationCode(command.email, newCode)
     } catch (e) {
       return null;
