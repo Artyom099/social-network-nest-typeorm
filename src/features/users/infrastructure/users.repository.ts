@@ -171,7 +171,7 @@ export class UsersRepository {
     return this.dataSource
       .createQueryBuilder()
       .update(Users)
-      .set({ isBanned: true, banReason: banReason,  banDate: new Date()})
+      .set({ isBanned: true, banReason: banReason, banDate: new Date()})
       .where("id = :id", { id })
       .execute()
   }

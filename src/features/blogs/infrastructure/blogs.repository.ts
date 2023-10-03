@@ -4,6 +4,8 @@ import {BlogInputModel} from '../api/models/input/blog.input.model';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {CreateBlogModel} from '../api/models/dto/create.blog.model';
+import {Users} from '../../users/entity/user.entity';
+import {Blogs} from '../entity/blog.entity';
 
 @Injectable()
 export class BlogsRepository {
@@ -81,6 +83,14 @@ export class BlogsRepository {
     set "isBanned" = true, "banDate" = $2
     where "id" = $1
     `, [id, new Date()])
+  }
+  async banBlog2(id: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Blogs)
+      .set({ isBanned: true, banDate: new Date()})
+      .where("id = :id", { id })
+      .execute()
   }
   async unbanBlog(id: string) {
     return this.dataSource.query(`
