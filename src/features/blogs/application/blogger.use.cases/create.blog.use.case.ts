@@ -4,6 +4,7 @@ import {UsersQueryRepository} from '../../../users/infrastructure/users.query.re
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {BlogViewModel} from '../../api/models/view/blog.view.model';
 import {randomUUID} from 'crypto';
+import {CreateBlogModel} from '../../api/models/dto/create.blog.model';
 
 export class CreateBlogCommand {
   constructor(public userId: string, public inputModel: BlogInputModel) {}
@@ -21,7 +22,7 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
     const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) return null;
 
-    const createBlogModel = {
+    const dto: CreateBlogModel = {
       id: randomUUID(),
       inputModel,
       createdAt: new Date(),
@@ -31,6 +32,6 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
       isBanned: false,
       banDate: null,
     };
-    return this.blogsRepository.createBlog(createBlogModel);
+    return this.blogsRepository.createBlog(dto);
   }
 }

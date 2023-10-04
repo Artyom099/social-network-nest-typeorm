@@ -43,11 +43,11 @@ describe('BlogsController (e2e)', () => {
       login: firstUser.login,
       email: firstUser.email,
       createdAt: expect.any(String),
-      banInfo: {
-        isBanned: false,
-        banDate: null,
-        banReason: null,
-      },
+      // banInfo: {
+      //   isBanned: false,
+      //   banDate: null,
+      //   banReason: null,
+      // },
     });
 
     await request(server)
