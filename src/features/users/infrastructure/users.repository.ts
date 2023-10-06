@@ -209,13 +209,6 @@ export class UsersRepository {
     return !!result
   }
 
-  async updateSaltAndHash1(id: string, salt: string, hash: string) {
-    return this.dataSource.query(`
-    update "users"
-    set "passwordSalt" = $1, "passwordHash" = $2
-    where "id" = $3
-    `, [salt, hash, id])
-  }
   async updateSaltAndHash(id: string, salt: string, hash: string) {
     return this.dataSource
       .createQueryBuilder()
@@ -224,14 +217,6 @@ export class UsersRepository {
       .where("id = :id", { id })
       .execute()
   }
-
-  async updateRecoveryCode1(id: string, code: string) {
-    return this.dataSource.query(`
-    update "users"
-    set "recoveryCode" = $1
-    where "id" = $2
-    `, [code, id])
-  }
   async updateRecoveryCode(id: string, code: string) {
     return this.dataSource
       .createQueryBuilder()
@@ -239,14 +224,6 @@ export class UsersRepository {
       .set({ recoveryCode: code})
       .where("id = :id", { id })
       .execute()
-  }
-
-  async updateConfirmationCode1(id: string, code: string) {
-    return this.dataSource.query(`
-    update "users"
-    set "confirmationCode" = $1
-    where "id" = $2
-    `, [code, id])
   }
   async updateConfirmationCode(id: string, code: string) {
     return this.dataSource
@@ -257,12 +234,6 @@ export class UsersRepository {
       .execute()
   }
 
-  async deleteUser1(id: string) {
-    return this.dataSource.query(`
-    delete from "users"
-    where "id" = $1
-    `, [id])
-  }
   async deleteUser(id: string) {
     return this.dataSource
       .createQueryBuilder()
