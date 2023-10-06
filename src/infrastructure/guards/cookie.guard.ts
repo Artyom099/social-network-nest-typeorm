@@ -18,13 +18,8 @@ export class CookieGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken, {secret: jwtConstants.refreshSecret});
-      console.log({payload_1: payload});
       const tokenIssuedAt = new Date(payload.iat * 1000).toString();
-      console.log({tokenIssuedAt_2: tokenIssuedAt});
       const lastActiveSession = await this.devicesQueryRepository.getDevice(payload.deviceId);
-      console.log({lastActiveSession_3: lastActiveSession});
-
-      console.log({ yyyy_4: !lastActiveSession || tokenIssuedAt !== lastActiveSession.lastActiveDate.toString() });
 
       if (!lastActiveSession || tokenIssuedAt !== lastActiveSession.lastActiveDate.toString()) {
         throw new UnauthorizedException();
@@ -34,7 +29,6 @@ export class CookieGuard implements CanActivate {
       }
 
     } catch (e) {
-      console.log('error', e);
       throw new UnauthorizedException();
     }
   }

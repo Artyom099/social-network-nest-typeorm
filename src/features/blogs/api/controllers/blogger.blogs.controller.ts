@@ -182,9 +182,6 @@ export class BloggerBlogsController {
     @Req() req,
     @Query() query: DefaultPaginationInput,
   ) {
-    return this.commentsQueryRepository.getCommentsCurrentBlogger(
-      req.userId,
-      query,
-    );
+    return this.commentsQueryRepository.getCommentsCurrentBlogger(req.userId, query);
   }
 }

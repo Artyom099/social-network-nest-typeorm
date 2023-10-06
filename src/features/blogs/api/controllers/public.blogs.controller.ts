@@ -20,11 +20,11 @@ export class PublicBlogsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getBlog(@Param('id') blogId: string) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!foundBlog) {
+    const blog = await this.blogsQueryRepository.getBlog(blogId);
+    if (!blog) {
       throw new NotFoundException('blog not found');
     } else {
-      return foundBlog;
+      return blog;
     }
   }
 
@@ -36,8 +36,8 @@ export class PublicBlogsController {
     @Param('id') blogId: string,
     @Query() query: DefaultPaginationInput,
   ) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!foundBlog) {
+    const blog = await this.blogsQueryRepository.getBlog(blogId);
+    if (!blog) {
       throw new NotFoundException('blog not found');
     } else {
       return this.postsQueryRepository.getPostsCurrentBlog(

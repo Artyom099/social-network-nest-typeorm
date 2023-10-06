@@ -160,13 +160,6 @@ export class UsersRepository {
     };
   }
 
-  async banUser1(id: string, banReason: string) {
-    return this.dataSource.query(`
-    update "users"
-    set "isBanned" = true, "banReason" = $1,  "banDate" = $2
-    where "id" = $3
-    `, [banReason, new Date(), id])
-  }
   async banUser(id: string, banReason: string) {
     return this.dataSource
       .createQueryBuilder()
@@ -175,14 +168,6 @@ export class UsersRepository {
       .where("id = :id", { id })
       .execute()
   }
-
-  async unbanUser1(id: string) {
-    return this.dataSource.query(`
-    update "users"
-    set "isBanned" = false, "banReason" = null,  "banDate" = null
-    where "id" = $1
-    `, [id])
-  }
   async unbanUser(id: string) {
     return this.dataSource
       .createQueryBuilder()
@@ -190,14 +175,6 @@ export class UsersRepository {
       .set({ isBanned: false, banReason: null,  banDate: null})
       .where("id = :id", { id })
       .execute()
-  }
-
-  async confirmEmail1(id: string) {
-    return this.dataSource.query(`
-    update "users"
-    set "isConfirmed" = true
-    where "id" = $1
-    `, [id])
   }
   async confirmEmail(id: string) {
     const result = await this.dataSource
