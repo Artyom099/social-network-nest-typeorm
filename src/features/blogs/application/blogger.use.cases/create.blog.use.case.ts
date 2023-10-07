@@ -7,7 +7,7 @@ import {randomUUID} from 'crypto';
 import {CreateBlogModel} from '../../api/models/dto/create.blog.model';
 
 export class CreateBlogCommand {
-  constructor(public userId: string, public inputModel: BlogInputModel) {}
+  constructor(public inputModel: BlogInputModel) {}
 }
 
 @CommandHandler(CreateBlogCommand)
@@ -18,17 +18,14 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
   ) {}
 
   async execute(command: CreateBlogCommand): Promise<BlogViewModel | null> {
-    const { userId, inputModel } = command;
-    const user = await this.usersQueryRepository.getUserById(userId);
-    if (!user) return null;
-
+    const { inputModel } = command;
     const dto: CreateBlogModel = {
       id: randomUUID(),
       inputModel,
       createdAt: new Date(),
       isMembership: false,
-      userId: user.id,
-      userLogin: user.login,
+      userId: '',
+      userLogin: '',
       isBanned: false,
       banDate: null,
     };

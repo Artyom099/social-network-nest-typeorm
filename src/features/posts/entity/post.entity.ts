@@ -19,6 +19,8 @@ export class Posts {
   @ManyToOne(() => Blogs, b => b.posts)
   @JoinColumn()
   blog: Blogs;
+  @Column({ nullable: true })
+  blogId: string;
   @Column()
   blogName: string;
 

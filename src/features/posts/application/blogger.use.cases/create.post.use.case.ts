@@ -27,7 +27,6 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       createdAt: new Date(),
       extendedLikesInfo: [],
     }
-
     return this.postsRepository.createPost(createdPostModel);
   }
 }

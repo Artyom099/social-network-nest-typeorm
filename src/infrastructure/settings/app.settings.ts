@@ -19,6 +19,7 @@ export const appSettings = (app: INestApplication) => {
       transform: true,
       stopAtFirstError: true,
       // forbidUnknownValues: false,
+      // в exceptionFactory передаем массив ошибок errors
       exceptionFactory: (errors) => {
         const errorsForResponse: any = [];
 

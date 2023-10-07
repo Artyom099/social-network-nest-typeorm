@@ -6,25 +6,29 @@ import {CreatePostModel} from '../api/models/dto/create.post.model';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {UpdatePostLikesModel} from '../api/models/dto/update.post.likes.model';
+import {Blogs} from '../../blogs/entity/blog.entity';
+import {Posts} from '../entity/post.entity';
+import {PostLikes} from '../entity/post.likes.entity';
 
 @Injectable()
 export class PostsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async createPost(dto: CreatePostModel): Promise<PostViewModel> {
-    await this.dataSource.query(`
-    insert into "posts"
-    ("id", "title", "shortDescription", "content", "blogId", "blogName", "createdAt")
-    values ($1, $2, $3, $4, $5, $6, $7)
-    `, [
-      dto.id,
-      dto.title,
-      dto.shortDescription,
-      dto.content,
-      dto.blogId,
-      dto.blogName,
-      dto.createdAt,
-    ])
+    await this.dataSource
+      .createQueryBuilder()
+      .insert()
+      .into(Posts)
+      .values({
+        id: dto.id,
+        title: dto.title,
+        shortDescription: dto.shortDescription,
+        content: dto.content,
+        blogId: dto.blogId,
+        blogName: dto.blogName,
+        createdAt: dto.createdAt,
+      })
+      .execute()
 
     const [post] = await this.dataSource.query(`
     select *
@@ -49,25 +53,23 @@ export class PostsRepository {
     }
   }
   async updatePost(id: string, inputModel: PostInputModel) {
-    return this.dataSource.query(`
-    update "posts"
-    set "title" = $1, "shortDescription" = $2, "content" = $3
-    where "id" = $4
-    `, [
-      inputModel.title,
-      inputModel.shortDescription,
-      inputModel.content,
-      id,
-    ])
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Posts)
+      .set({ title: inputModel.title, shortDescription: inputModel.shortDescription, content: inputModel.content})
+      .where("id = :id", { id, inputModel })
+      .execute()
   }
   async deletePost(id: string) {
-    return this.dataSource.query(`
-    delete from "posts"
-    where "id" = $1
-    `, [id])
+    return this.dataSource
+      .createQueryBuilder()
+      .delete()
+      .from(Posts)
+      .where("id = :id", { id })
+      .execute()
   }
 
-  async setPostNone(dto: UpdatePostLikesModel) {
+  async setPostNone1(dto: UpdatePostLikesModel) {
     const [postLikes] = await this.dataSource.query(`
     select *
     from "post_likes"
@@ -82,7 +84,24 @@ export class PostsRepository {
       `, ['None', dto.postId, dto.userId])
     }
   }
-  async setPostReaction(dto: UpdatePostLikesModel) {
+  async setPostNone(dto: UpdatePostLikesModel) {
+    const [postLikes] = await this.dataSource.query(`
+    select *
+    from "post_likes"
+    where "postId" = $1 and "userId" = $2
+    `, [dto.postId, dto.userId])
+
+    if (postLikes && (postLikes.status === LikeStatus.Like || postLikes.status === LikeStatus.Dislike)) {
+      return this.dataSource
+        .createQueryBuilder()
+        .update(PostLikes)
+        .set({ status: 'None' })
+        .where("postId = :dto.postId and userId = :dto.userId", { dto })
+        .execute()
+    }
+  }
+
+  async setPostReaction1(dto: UpdatePostLikesModel) {
     const [postLikes] = await this.dataSource.query(`
     select *
     from "post_likes"
@@ -109,7 +128,7 @@ export class PostsRepository {
       ])
     }
   }
-  async setPostDislike(dto: UpdatePostLikesModel) {
+  async setPostReaction(dto: UpdatePostLikesModel) {
     const [postLikes] = await this.dataSource.query(`
     select *
     from "post_likes"
