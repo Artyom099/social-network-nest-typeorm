@@ -5,12 +5,16 @@ import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {UpdateCommentLikeModel} from '../api/models/dto/update.comment.like.model';
 import {CommentViewModel} from '../api/models/view/comment.view.model';
+import {Blogs} from '../../blogs/entity/blog.entity';
+import {Comments} from '../entity/сomment.entity';
+import {PostLikes} from '../../posts/entity/post.likes.entity';
+import {CommentLikes} from '../entity/comment.likes.entity';
 
 @Injectable()
 export class CommentsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createComment(dto: CreateCommentModel): Promise<CommentViewModel> {
+  async createComment1(dto: CreateCommentModel): Promise<CommentViewModel> {
     await this.dataSource.query(`
     insert into "comments"
     ("id", "content", "createdAt", "userId", "userLogin", "postId", "postTitle", "blogId", "blogName")
@@ -48,21 +52,78 @@ export class CommentsRepository {
       },
     }
   }
-  async updateComment(id: string, content: string) {
+  async createComment(dto: CreateCommentModel): Promise<CommentViewModel> {
+    await this.dataSource
+      .createQueryBuilder()
+      .insert()
+      .into(Comments)
+      .values({
+        id: dto.id,
+        content: dto.content,
+        createdAt: dto.createdAt,
+        userId: dto.userId,
+        userLogin: dto.userLogin,
+        postId: dto.postId,
+        postTitle: dto.postTitle,
+        blogId: dto.blogId,
+        blogName: dto.blogName,
+      })
+      .execute()
+
+    const [comment] = await this.dataSource.query(`
+    select *
+    from "comments"
+    where "id" = $1
+    `, [dto.id])
+
+    return {
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt,
+      commentatorInfo: {
+        userId: comment.userId,
+        userLogin: comment.userLogin,
+      },
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: LikeStatus.None,
+      },
+    }
+  }
+
+  async updateComment1(id: string, content: string) {
     return this.dataSource.query(`
     update "comments"
     set "content" = $1
     where "id" = $2
     `, [content, id])
   }
-  async deleteComment(id: string) {
+  async updateComment(id: string, content: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Comments)
+      .set({ content: content })
+      .where("id = :id", { id, content })
+      .execute()
+  }
+
+  async deleteComment1(id: string) {
     return this.dataSource.query(`
     delete from "comments"
     where "id" = $1
     `, [id])
   }
+  async deleteComment(id: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .delete()
+      .from(Comments)
+      .where("id = :id", { id })
+      .execute()
+  }
 
-  async setCommentNone(dto: UpdateCommentLikeModel) {
+  async setCommentNone1(dto: UpdateCommentLikeModel) {
     const [commentLikes] = await this.dataSource.query(`
     select *
     from "comment_likes"
@@ -76,9 +137,25 @@ export class CommentsRepository {
       where "commentId" = $2 and "userId" = $3
       `, ['None', dto.commentId, dto.userId])
     }
-
   }
-  async setCommentReaction(dto: UpdateCommentLikeModel) {
+  async setCommentNone(dto: UpdateCommentLikeModel) {
+    const [commentLikes] = await this.dataSource.query(`
+    select *
+    from "comment_likes"
+    where "commentId" = $1 and "userId" = $2
+    `, [dto.commentId, dto.userId])
+
+    if (commentLikes && (commentLikes.status === LikeStatus.Like || commentLikes.status === LikeStatus.Dislike)) {
+      return this.dataSource
+        .createQueryBuilder()
+        .update(CommentLikes)
+        .set({ status: 'None' })
+        .where("commentId = :dto.commentId and userId = :dto.userId", { dto })
+        .execute()
+    }
+  }
+
+  async setCommentReaction1(dto: UpdateCommentLikeModel) {
     const [commentLikes] = await this.dataSource.query(`
     select *
     from "comment_likes"
@@ -99,7 +176,7 @@ export class CommentsRepository {
       `, [dto.commentId, dto.userId, dto.likeStatus])
     }
   }
-  async setCommentDislike(dto: UpdateCommentLikeModel) {
+  async setCommentReaction(dto: UpdateCommentLikeModel) {
     const [commentLikes] = await this.dataSource.query(`
     select *
     from "comment_likes"
@@ -107,11 +184,12 @@ export class CommentsRepository {
     `, [dto.commentId, dto.userId])
 
     if (commentLikes) {
-      return this.dataSource.query(`
-      update "comment_likes"
-      set "status" = $1
-      where "commentId" = $2 and "userId" = $3
-      `, [dto.likeStatus, dto.commentId, dto.userId])
+      return this.dataSource
+        .createQueryBuilder()
+        .update(CommentLikes)
+        .set({ status: dto.likeStatus })
+        .where("commentId = :dto.commentId and userId = :dto.userId", { dto })
+        .execute()
     } else {
       return this.dataSource.query(`
       insert into "comment_likes"

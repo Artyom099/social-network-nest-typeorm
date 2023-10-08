@@ -69,21 +69,6 @@ export class PostsRepository {
       .execute()
   }
 
-  async setPostNone1(dto: UpdatePostLikesModel) {
-    const [postLikes] = await this.dataSource.query(`
-    select *
-    from "post_likes"
-    where "postId" = $1 and "userId" = $2
-    `, [dto.postId, dto.userId])
-
-    if (postLikes && (postLikes.status === LikeStatus.Like || postLikes.status === LikeStatus.Dislike)) {
-      return this.dataSource.query(`
-      update "post_likes"
-      set "status" = $1
-      where "postId" = $2 and "userId" = $3
-      `, ['None', dto.postId, dto.userId])
-    }
-  }
   async setPostNone(dto: UpdatePostLikesModel) {
     const [postLikes] = await this.dataSource.query(`
     select *
@@ -95,39 +80,13 @@ export class PostsRepository {
       return this.dataSource
         .createQueryBuilder()
         .update(PostLikes)
-        .set({ status: 'None' })
-        .where("postId = :dto.postId and userId = :dto.userId", { dto })
+        .set({ status: "None" })
+        .where("postId = :postId", { postId: dto.postId })
+        .andWhere("userId = :userId", { userId: dto.userId })
         .execute()
     }
   }
 
-  async setPostReaction1(dto: UpdatePostLikesModel) {
-    const [postLikes] = await this.dataSource.query(`
-    select *
-    from "post_likes"
-    where "postId" = $1 and "userId" = $2
-    `, [dto.postId, dto.userId])
-
-    if (postLikes) {
-      return this.dataSource.query(`
-      update "post_likes"
-      set "status" = $1
-      where "postId" = $2 and "userId" = $3
-      `, [dto.likeStatus, dto.postId, dto.userId])
-    } else {
-      return this.dataSource.query(`
-      insert into "post_likes"
-      ("postId", "userId", "status", "addedAt", "login")
-      values ($1, $2, $3, $4, $5)
-      `, [
-        dto.postId,
-        dto.userId,
-        dto.likeStatus,
-        dto.addedAt,
-        dto.login,
-      ])
-    }
-  }
   async setPostReaction(dto: UpdatePostLikesModel) {
     const [postLikes] = await this.dataSource.query(`
     select *
@@ -136,23 +95,26 @@ export class PostsRepository {
     `, [dto.postId, dto.userId])
 
     if (postLikes) {
-      return this.dataSource.query(`
-      update "post_likes"
-      set "status" = $1
-      where "postId" = $2 and "userId" = $3
-      `, [dto.likeStatus, dto.postId, dto.userId])
+      return this.dataSource
+        .createQueryBuilder()
+        .update(PostLikes)
+        .set({ status: dto.likeStatus })
+        .where("postId = :postId", { postId: dto.postId })
+        .andWhere("userId = :userId", { userId: dto.userId })
+        .execute()
     } else {
-      return this.dataSource.query(`
-      insert into "post_likes"
-      ("postId", "userId", "status", "addedAt", "login")
-      values ($1, $2, $3, $4, $5)
-      `, [
-        dto.postId,
-        dto.userId,
-        dto.likeStatus,
-        dto.addedAt,
-        dto.login,
-      ])
+      return this.dataSource
+        .createQueryBuilder()
+        .insert()
+        .into(PostLikes)
+        .values({
+          postId: dto.postId,
+          userId: dto.userId,
+          status: dto.likeStatus,
+          addedAt: dto.addedAt,
+          login: dto.login,
+        })
+        .execute()
     }
   }
 }

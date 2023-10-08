@@ -51,7 +51,6 @@ export class SABlogsController {
     return this.commandBus.execute(new CreateBlogCommand( inputModel));
   }
 
-
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
@@ -71,8 +70,6 @@ export class SABlogsController {
     if (!blog) throw new NotFoundException('blog not found');
     return this.blogsService.deleteBlog(blogId);
   }
-
-
 
 
   @Get(':id/posts')
@@ -102,8 +99,11 @@ export class SABlogsController {
     @Body() inputModel: PostInputModel,
   ) {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
-    if (!blog) throw new NotFoundException('blog not found');
-    return this.commandBus.execute(new CreatePostCommand(blog, inputModel));
+    if (!blog) {
+      throw new NotFoundException('blog not found');
+    } else {
+      return this.commandBus.execute(new CreatePostCommand(blog, inputModel));
+    }
   }
 
   @Put(':id/posts/:postId')

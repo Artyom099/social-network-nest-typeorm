@@ -15,10 +15,14 @@ export class PostLikes {
   @ManyToOne(() => Posts, p => p.likes)
   @JoinColumn()
   post: Posts;
+  @Column()
+  postId: string;
 
   @ManyToOne(() => Users, u => u.post_likes)
   @JoinColumn()
   user: Users
+  @Column()
+  userId: string;
   @Column()
   login: string;
 }
