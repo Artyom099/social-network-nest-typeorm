@@ -86,7 +86,6 @@ export class PostsRepository {
         .execute()
     }
   }
-
   async setPostReaction(dto: UpdatePostLikesModel) {
     const [postLikes] = await this.dataSource.query(`
     select *

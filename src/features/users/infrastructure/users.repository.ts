@@ -10,46 +10,6 @@ import {Users} from '../entity/user.entity';
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createUserByAdmin1(dto: CreateUserDTO): Promise<SAUserViewModel> {
-    await this.dataSource.query(`
-    insert into "users"
-    ("id", "login", "email", "passwordSalt", "passwordHash", "createdAt", "isBanned", "banDate", 
-    "banReason", "confirmationCode", "expirationDate", "isConfirmed", "recoveryCode")
-    values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-    `, [
-      dto.id,
-      dto.InputModel.login,
-      dto.InputModel.email,
-      dto.salt,
-      dto.hash,
-      dto.expirationDate,
-      false,
-      null,
-      null,
-      dto.confirmationCode,
-      null,
-      dto.isConfirmed,
-      null,
-    ])
-
-    const [user] = await this.dataSource.query(`
-    select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
-    from "users"
-    where "login" = $1
-    `, [dto.InputModel.login])
-
-    return {
-      id: user.id,
-      login: user.login,
-      email: user.email,
-      createdAt: user.createdAt,
-      // banInfo: {
-      //   isBanned: user.isBanned,
-      //   banDate: user.banDate,
-      //   banReason: user.banReason,
-      // },
-    };
-  }
   async createUserByAdmin(dto: CreateUserDTO): Promise<SAUserViewModel> {
     await this.dataSource
       .createQueryBuilder()
@@ -87,42 +47,6 @@ export class UsersRepository {
       //   banDate: user.banDate,
       //   banReason: user.banReason,
       // },
-    };
-  }
-
-  async createUserBySelf1(dto: CreateUserDTO): Promise<UserViewModel> {
-    await this.dataSource.query(`
-    insert into "users"
-    ("id", "login", "email", "passwordSalt", "passwordHash", "createdAt", "isBanned", "banDate", 
-    "banReason", "confirmationCode", "expirationDate", "isConfirmed", "recoveryCode")
-    values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-    `, [
-      dto.id,
-      dto.InputModel.login,
-      dto.InputModel.email,
-      dto.salt,
-      dto.hash,
-      dto.expirationDate,
-      false,
-      null,
-      null,
-      dto.confirmationCode,
-      null,
-      dto.isConfirmed,
-      null,
-    ])
-
-    const [user] = await this.dataSource.query(`
-    select "id", "login", "email", "createdAt"
-    from "users"
-    where "login" = $1
-    `, [dto.InputModel.login])
-
-    return {
-      id: user.id,
-      login: user.login,
-      email: user.email,
-      createdAt: user.createdAt,
     };
   }
   async createUserBySelf(dto: CreateUserDTO): Promise<UserViewModel> {

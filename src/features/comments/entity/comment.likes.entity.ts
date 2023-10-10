@@ -13,8 +13,12 @@ export class CommentLikes {
   @ManyToOne(() => Comments, c => c.likes)
   @JoinColumn()
   comment: Comments;
+  @Column()
+  commentId: string;
 
   @ManyToOne(() => Users, u => u.comment_likes)
   @JoinColumn()
   user: Users;
+  @Column()
+  userId: string;
 }
