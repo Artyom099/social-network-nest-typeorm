@@ -5,9 +5,7 @@ import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {UpdateCommentLikeModel} from '../api/models/dto/update.comment.like.model';
 import {CommentViewModel} from '../api/models/view/comment.view.model';
-import {Blogs} from '../../blogs/entity/blog.entity';
 import {Comments} from '../entity/сomment.entity';
-import {PostLikes} from '../../posts/entity/post.likes.entity';
 import {CommentLikes} from '../entity/comment.likes.entity';
 
 @Injectable()
@@ -82,30 +80,9 @@ export class CommentsRepository {
         .createQueryBuilder()
         .update(CommentLikes)
         .set({ status: 'None' })
-        .where("commentId = :dto.commentId and userId = :dto.userId", { dto })
+        .where("commentId = :commentId", { commentId: dto.commentId })
+        .andWhere("userId = :userId", { userId: dto.userId })
         .execute()
-    }
-  }
-
-  async setCommentReaction1(dto: UpdateCommentLikeModel) {
-    const [commentLikes] = await this.dataSource.query(`
-    select *
-    from "comment_likes"
-    where "commentId" = $1 and "userId" = $2
-    `, [dto.commentId, dto.userId])
-
-    if (commentLikes) {
-      return this.dataSource.query(`
-      update "comment_likes"
-      set "status" = $1
-      where "commentId" = $2 and "userId" = $3
-      `, [dto.likeStatus, dto.commentId, dto.userId])
-    } else {
-      return this.dataSource.query(`
-      insert into "comment_likes"
-      ("commentId", "userId", "status")
-      values ($1, $2, $3)
-      `, [dto.commentId, dto.userId, dto.likeStatus])
     }
   }
   async setCommentReaction(dto: UpdateCommentLikeModel) {
@@ -120,7 +97,8 @@ export class CommentsRepository {
         .createQueryBuilder()
         .update(CommentLikes)
         .set({ status: dto.likeStatus })
-        .where("commentId = :dto.commentId and userId = :dto.userId", { dto })
+        .where("commentId = :commentId", { commentId: dto.commentId })
+        .andWhere("userId = :userId", { userId: dto.userId })
         .execute()
     } else {
       return this.dataSource

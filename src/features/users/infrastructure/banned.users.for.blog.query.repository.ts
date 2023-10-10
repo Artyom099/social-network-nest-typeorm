@@ -8,7 +8,7 @@ import {BannedUserForBlogViewModel} from '../api/models/view/banned.user.for.blo
 @Injectable()
 export class BannedUsersForBlogQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
-// and "isBanned" = true
+
   async getBannedUserForBlog(id: string, blogId: string) {
     const [user] = await this.dataSource.query(`
     select "userId" as "id", "login", "blogId", "isBanned", "banDate", "banReason"
