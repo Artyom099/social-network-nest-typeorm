@@ -21,7 +21,7 @@ describe('BlogsController (e2e)', () => {
     await request(server).delete('/testing/all-data');
   });
 
-  it('0 – POST:/sa/users – create 1st user by admin', async () => {
+  it('1-1 – POST:/sa/users – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-1111',
       password: 'qwerty1',
@@ -66,7 +66,7 @@ describe('BlogsController (e2e)', () => {
       firstCreateResponse: firstCreateResponse,
     });
   });
-  it('0 – POST:/auth/login – return 200 & login 1st user', async () => {
+  it('1-2 – POST:/auth/login – return 200 & login 1st user', async () => {
     const { firstUser } = expect.getState();
     const loginResponse = await request(server).post('/auth/login').send({
       loginOrEmail: firstUser.login,
@@ -84,8 +84,7 @@ describe('BlogsController (e2e)', () => {
 
     expect.setState({ accessToken, firstRefreshToken: refreshToken });
   });
-
-  it('1 – GET:/blogger/blogs – return 200 and empty array', async () => {
+  it('1-3 – GET:/blogger/blogs – return 200 and empty array', async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)

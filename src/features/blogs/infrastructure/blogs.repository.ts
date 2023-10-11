@@ -45,12 +45,12 @@ export class BlogsRepository {
       isMembership: blog.isMembership,
     }
   }
-  async updateBlog(id: string, InputModel: BlogInputModel) {
+  async updateBlog(id: string, dto: BlogInputModel) {
     return this.dataSource
       .createQueryBuilder()
       .update(Blogs)
-      .set({ name: InputModel.name, description: InputModel.description, websiteUrl: InputModel.websiteUrl})
-      .where("id = :id", { id, InputModel })
+      .set({ name: dto.name, description: dto.description, websiteUrl: dto.websiteUrl})
+      .where("id = :id", { id, InputModel: dto })
       .execute()
   }
   async deleteBlog(id: string) {

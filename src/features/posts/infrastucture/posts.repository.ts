@@ -52,12 +52,12 @@ export class PostsRepository {
       },
     }
   }
-  async updatePost(id: string, inputModel: PostInputModel) {
+  async updatePost(id: string, dto: PostInputModel) {
     return this.dataSource
       .createQueryBuilder()
       .update(Posts)
-      .set({ title: inputModel.title, shortDescription: inputModel.shortDescription, content: inputModel.content})
-      .where("id = :id", { id, inputModel })
+      .set({ title: dto.title, shortDescription: dto.shortDescription, content: dto.content})
+      .where("id = :id", { id, inputModel: dto })
       .execute()
   }
   async deletePost(id: string) {

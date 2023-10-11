@@ -9,7 +9,7 @@ export class BannedUsersForBlogRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async banUserForBlog(dto: BanUserForBlogModel) {
-    await this.dataSource
+    return this.dataSource
       .createQueryBuilder()
       .insert()
       .into(BannedUsersForBlog)
