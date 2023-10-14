@@ -6,7 +6,6 @@ import {CreatePostModel} from '../api/models/dto/create.post.model';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {UpdatePostLikesModel} from '../api/models/dto/update.post.likes.model';
-import {Blogs} from '../../blogs/entity/blog.entity';
 import {Posts} from '../entity/post.entity';
 import {PostLikes} from '../entity/post.likes.entity';
 

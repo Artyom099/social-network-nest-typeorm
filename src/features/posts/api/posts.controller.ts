@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import {PostsService} from '../application/posts.service';
 import {DefaultPaginationInput} from '../../../infrastructure/models/pagination.input.models';
-import {PostsQueryRepository} from '../infrastucture/posts.query.repository';
+import {PostsQueryRepository} from '../infrastructure/posts.query.repository';
 import {CommentsQueryRepository} from '../../comments/infrastructure/comments.query.repository';
 import {BearerAuthGuard} from '../../../infrastructure/guards/bearer-auth.guard';
 import {CommentInputModel} from '../../comments/api/models/input/comment.input.model';

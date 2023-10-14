@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {PostsRepository} from '../infrastucture/posts.repository';
+import {PostsRepository} from '../infrastructure/posts.repository';
 import {PostInputModel} from '../api/models/input/post.input.model';
 import {LikeStatus} from '../../../infrastructure/utils/constants';
 import {UsersQueryRepository} from '../../users/infrastructure/users.query.repository';

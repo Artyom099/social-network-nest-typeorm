@@ -2,7 +2,7 @@ import {Controller, Get, HttpCode, HttpStatus, NotFoundException, Param, Query, 
 import {BlogsQueryRepository} from '../../infrastructure/blogs.query.repository';
 import {BlogsPaginationInput, DefaultPaginationInput,} from '../../../../infrastructure/models/pagination.input.models';
 import {CheckUserIdGuard} from '../../../../infrastructure/guards/check-userId.guard';
-import {PostsQueryRepository} from '../../../posts/infrastucture/posts.query.repository';
+import {PostsQueryRepository} from '../../../posts/infrastructure/posts.query.repository';
 
 @Controller('blogs')
 export class PublicBlogsController {

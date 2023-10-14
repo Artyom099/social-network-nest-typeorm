@@ -1,6 +1,6 @@
 import {PostInputModel} from '../../api/models/input/post.input.model';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {PostsRepository} from '../../infrastucture/posts.repository';
+import {PostsRepository} from '../../infrastructure/posts.repository';
 import {SABlogViewModel} from '../../../blogs/api/models/view/sa.blog.view.model';
 import {PostViewModel} from '../../api/models/view/post.view.model';
 import {randomUUID} from 'crypto';

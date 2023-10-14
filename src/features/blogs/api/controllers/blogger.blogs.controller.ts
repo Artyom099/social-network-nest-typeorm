@@ -20,8 +20,7 @@ import {BlogsPaginationInput, DefaultPaginationInput,} from '../../../../infrast
 import {PostsService} from '../../../posts/application/posts.service';
 import {PostInputModel} from '../../../posts/api/models/input/post.input.model';
 import {BlogsQueryRepository} from '../../infrastructure/blogs.query.repository';
-import {PostsQueryRepository} from '../../../posts/infrastucture/posts.query.repository';
-import {CreateBlogCommand} from '../../application/blogger.use.cases/create.blog.use.case';
+import {PostsQueryRepository} from '../../../posts/infrastructure/posts.query.repository';
 import {BearerAuthGuard} from '../../../../infrastructure/guards/bearer-auth.guard';
 import {CommandBus} from '@nestjs/cqrs';
 import {CreatePostCommand} from '../../../posts/application/blogger.use.cases/create.post.use.case';

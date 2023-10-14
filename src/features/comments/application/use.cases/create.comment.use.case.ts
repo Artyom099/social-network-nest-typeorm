@@ -2,7 +2,7 @@ import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {CommentsRepository} from '../../infrastructure/comments.repository';
 import {CommentViewModel} from '../../api/models/view/comment.view.model';
 import {randomUUID} from 'crypto';
-import {PostsQueryRepository} from '../../../posts/infrastucture/posts.query.repository';
+import {PostsQueryRepository} from '../../../posts/infrastructure/posts.query.repository';
 import {UsersQueryRepository} from '../../../users/infrastructure/users.query.repository';
 import {CreateCommentDto} from '../../api/models/dto/create.comment.dto';
 

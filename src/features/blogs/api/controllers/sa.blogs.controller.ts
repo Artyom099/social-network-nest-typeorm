@@ -1,7 +1,6 @@
 import {
-  BadRequestException,
   Body,
-  Controller, Delete, ForbiddenException,
+  Controller, Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -26,7 +25,7 @@ import {BlogsService} from '../../application/blogs.service';
 import {PostsService} from '../../../posts/application/posts.service';
 import {PostInputModel} from '../../../posts/api/models/input/post.input.model';
 import {CreatePostCommand} from '../../../posts/application/blogger.use.cases/create.post.use.case';
-import {PostsQueryRepository} from '../../../posts/infrastucture/posts.query.repository';
+import {PostsQueryRepository} from '../../../posts/infrastructure/posts.query.repository';
 
 @Controller('sa/blogs')
 @UseGuards(BasicAuthGuard)
