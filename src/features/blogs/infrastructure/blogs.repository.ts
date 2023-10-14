@@ -70,7 +70,6 @@ export class BlogsRepository {
       .where("id = :id", { id, userId, login })
       .execute()
   }
-
   async banBlog(id: string) {
     return this.dataSource
       .createQueryBuilder()

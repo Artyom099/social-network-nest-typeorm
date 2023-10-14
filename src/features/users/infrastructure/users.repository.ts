@@ -22,12 +22,8 @@ export class UsersRepository {
         passwordHash: dto.hash,
         createdAt: dto.expirationDate,
         isBanned: false,
-        // banDate: null,
-        // banReason: null,
         confirmationCode: dto.confirmationCode,
-        // expirationDate: null,
         isConfirmed: dto.isConfirmed,
-        // recoveryCode: null,
       })
       .execute()
 
@@ -61,12 +57,8 @@ export class UsersRepository {
         passwordHash: dto.hash,
         createdAt: dto.expirationDate,
         isBanned: false,
-        // banDate: null,
-        // banReason: null,
         confirmationCode: dto.confirmationCode,
-        // expirationDate: null,
         isConfirmed: dto.isConfirmed,
-        // recoveryCode: null,
       })
       .execute()
 
