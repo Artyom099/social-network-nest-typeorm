@@ -17,3 +17,12 @@ export enum BanStatus {
   banned = 'banned',
   notBanned = 'notBanned',
 }
+export enum AnswerStatus {
+  correct = 'Correct',
+  incorrect = 'Incorrect',
+}
+export enum GamePairStatus {
+  pending = 'PendingSecondPlayer',
+  active = 'Active',
+  finished = 'Finished',
+}
