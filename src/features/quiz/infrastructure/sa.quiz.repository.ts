@@ -3,13 +3,15 @@ import {InjectDataSource} from '@nestjs/typeorm';
 import {Column, DataSource} from 'typeorm';
 import {Users} from '../../users/entity/user.entity';
 import {Question} from '../entity/question.entity';
+import {CreateQuestionInputModel} from '../api/models/input/create.question.input.model';
+import {CreateQuestionDTO} from '../api/models/dto/create.question.dto';
 
 @Injectable()
 export class SAQuizRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async getQuestions() {}
-  async createQuestion(dto) {
+  async createQuestion(dto: CreateQuestionDTO) {
     await this.dataSource
       .createQueryBuilder()
       .insert()
@@ -24,12 +26,19 @@ export class SAQuizRepository {
       })
       .execute()
   }
-  async updateQuestion() {}
   async deleteQuestion(id: string) {
     return this.dataSource
       .createQueryBuilder()
       .delete()
       .from(Question)
+      .where("id = :id", { id })
+      .execute()
+  }
+  async updateQuestion(id: string, dto: CreateQuestionInputModel) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Question)
+      .set({ passwordSalt: dto })
       .where("id = :id", { id })
       .execute()
   }

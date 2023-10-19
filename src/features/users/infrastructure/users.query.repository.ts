@@ -12,8 +12,7 @@ export class UsersQueryRepository {
   constructor(
     @InjectDataSource() private dataSource: DataSource,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
-  ) {
-  }
+  ) {}
 
   async getUserById(id: string): Promise<UserViewModel | null> {
     const [user] = await this.dataSource.query(`

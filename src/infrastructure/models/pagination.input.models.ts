@@ -29,7 +29,6 @@ export class DefaultPaginationInput {
   offset(): number {
     return (this.pageNumber - 1) * this.pageSize;
   }
-
   pagesCountSql(totalCount: { count: string }): number {
     return Math.ceil(parseInt(totalCount.count, 10) / this.pageSize);
   }
@@ -78,4 +77,8 @@ export class BannedUsersPaginationInput extends DefaultPaginationInput {
     return !isNil(value) ? value : '';
   })
   searchLoginTerm: string = '';
+}
+
+export class GamePairPaginationInput extends DefaultPaginationInput {
+
 }

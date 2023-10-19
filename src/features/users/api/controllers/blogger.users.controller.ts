@@ -72,7 +72,6 @@ export class BloggerUsersController {
     }
 
     try {
-      console.log('execute_1');
       return this.commandBus.execute(
         new BanUserForCurrentBlogCommand(userId, inputModel),
       );

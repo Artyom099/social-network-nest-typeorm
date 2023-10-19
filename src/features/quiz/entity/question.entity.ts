@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {GamePair} from './game.pair.entity';
 
 @Entity()
 export class Question {
@@ -14,4 +15,7 @@ export class Question {
   createdAt: Date;
   @Column()
   updatedAt: Date;
+
+  @ManyToMany(() => GamePair, g => g.questions)
+  gamePairs: GamePair[];
 }
