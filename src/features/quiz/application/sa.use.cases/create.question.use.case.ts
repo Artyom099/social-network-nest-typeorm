@@ -2,6 +2,7 @@ import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {CreateQuestionInputModel} from '../../api/models/input/create.question.input.model';
 import {SAQuizRepository} from '../../infrastructure/sa.quiz.repository';
 import {randomUUID} from 'crypto';
+import {CreateQuestionDTO} from '../../api/models/dto/create.question.dto';
 
 export class CreateQuestionCommand {
   constructor(public inputModel: CreateQuestionInputModel) {}
@@ -13,7 +14,7 @@ export class CreateQuestionUseCase implements ICommandHandler<CreateQuestionComm
   }
 
   async execute(command: CreateQuestionCommand) {
-    const dto = {
+    const dto: CreateQuestionDTO = {
       id: randomUUID(),
       body: command.inputModel.body,
       correctAnswers: command.inputModel.correctAnswers,
