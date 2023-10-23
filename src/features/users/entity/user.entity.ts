@@ -24,17 +24,17 @@ export class Users {
   createdAt: Date;
   @Column()
   isBanned: boolean;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   banDate: Date;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   banReason: string;
   @Column()
   confirmationCode: string;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   expirationDate: Date;
   @Column()
   isConfirmed: boolean;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   recoveryCode: string;
 
   @OneToMany(() => BannedUsersForBlog, bu => bu.user)

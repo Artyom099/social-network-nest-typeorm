@@ -13,9 +13,9 @@ export class GamePair {
   status: GamePairStatus;
   @Column()
   pairCreatedDate: Date;
-  @Column()
+  @Column({ nullable: true })
   startGameDate: Date;
-  @Column()
+  @Column({ nullable: true })
   finishGameDate: Date;
 
   // @ManyToMany(() => Answer, a => a.game_pairs)
@@ -25,8 +25,8 @@ export class GamePair {
   @ManyToMany(() => Question, q => q.game_pairs)
   @JoinColumn()
   questions: Question[];
-  @Column()
-  questionId: string;
+  @Column({ nullable: true, type: 'character varying', array: true })
+  questionsId: string[];
 
   @OneToOne(() => Player, pl => pl.game_pair)
   @JoinColumn()
@@ -37,6 +37,6 @@ export class GamePair {
   @OneToOne(() => Player, pl => pl.game_pair)
   @JoinColumn()
   second_player: Player[];
-  @Column()
+  @Column({ nullable: true })
   secondPlayerId: string;
 }

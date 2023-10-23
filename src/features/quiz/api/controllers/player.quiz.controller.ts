@@ -58,7 +58,7 @@ export class PlayerQuizController {
     if (currentGame) {
       throw new ForbiddenException();
     } else {
-      return this.commandBus.execute(new CreatePairCommand())
+      return this.commandBus.execute(new CreatePairCommand(req.userId))
     }
   }
 

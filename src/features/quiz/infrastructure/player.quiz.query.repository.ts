@@ -13,6 +13,16 @@ export class PlayerQuizQueryRepository {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
 
+  async getPendingGame() {
+    const game = await this.dataSource.query(`
+    select *
+    from "game_pair"
+    where "status" = $1
+    `, [GamePairStatus.pending]);
+
+    return game ? game : null;
+  }
+
   async getCurrentGame(id: string) {
     const game = await this.dataSource.query(`
     select *
@@ -120,4 +130,5 @@ export class PlayerQuizQueryRepository {
       finishGameDate: game.finishGameDate,
     }
   }
+
 }
