@@ -28,5 +28,6 @@ export class Answer {
   playerId: string;
 
   // @ManyToMany(() => GamePair, g => g.answers)
+  // @JoinColumn()
   // game_pairs: GamePair[];
 }

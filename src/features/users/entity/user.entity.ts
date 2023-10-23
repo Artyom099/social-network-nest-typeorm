@@ -55,9 +55,6 @@ export class Users {
   @OneToMany(() => CommentLikes, cl => cl.user)
   comment_likes: CommentLikes[];
 
-  // @OneToOne(() => Player, p => p.user)
-  // player: Player;
-
-  // @ManyToMany(() => GamePair, g => g.users)
-  // game_pairs: GamePair[];
+  @OneToMany(() => Player, p => p.user)
+  players: Player[];
 }

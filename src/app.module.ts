@@ -74,8 +74,32 @@ import {
 import {DevicesService} from './features/devices/application/devices.service';
 import {DevicesRepository} from './features/devices/infrastructure/devices.repository';
 import {DevicesQueryRepository} from './features/devices/infrastructure/devices.query.repository';
+import {Question} from './features/quiz/entity/question.entity';
+import {Answer} from './features/quiz/entity/answer.entity';
+import {GamePair} from './features/quiz/entity/game.pair.entity';
+import {Player} from './features/quiz/entity/player.entity';
+import {SAQuizController} from './features/quiz/api/controllers/sa.quiz.controller';
+import {PlayerQuizController} from './features/quiz/api/controllers/player.quiz.controller';
+import {PlayerQuizQueryRepository} from './features/quiz/infrastructure/player.quiz.query.repository';
+import {PlayerQuizRepository} from './features/quiz/infrastructure/player.quiz.repository';
+import {SAQuizRepository} from './features/quiz/infrastructure/sa.quiz.repository';
+import {SAQuizQueryRepository} from './features/quiz/infrastructure/sa.quiz.query.repository';
+import {CreateAnswerUseCase} from './features/quiz/application/player.use.cases/create.answer.use.case';
+import {CreatePairUseCase} from './features/quiz/application/player.use.cases/create.pair.use.case';
+import {CreateQuestionUseCase} from './features/quiz/application/sa.use.cases/create.question.use.case';
+import {UpdateQuestionUseCase} from './features/quiz/application/sa.use.cases/update.question.use.case';
+import {DeleteQuestionUseCase} from './features/quiz/application/sa.use.cases/delete.question.use.case';
+import {PublishQuestionUseCase} from './features/quiz/application/sa.use.cases/publish.question.use.case';
 
 const useCases = [
+  CreatePairUseCase,
+  CreateAnswerUseCase,
+
+  CreateQuestionUseCase,
+  UpdateQuestionUseCase,
+  DeleteQuestionUseCase,
+  PublishQuestionUseCase,
+
   CreateBlogUseCase,
   BindBlogUseCase,
   BanBlogUseCase,
@@ -126,9 +150,16 @@ const useCases = [
       PostLikes,
       Comments,
       CommentLikes,
+      Question,
+      Answer,
+      GamePair,
+      Player,
     ])
   ],
   controllers: [
+    SAQuizController,
+    PlayerQuizController,
+
     AppController,
     TestController,
     AuthController,
@@ -146,6 +177,11 @@ const useCases = [
   ],
   providers: [
     ...useCases,
+
+    SAQuizRepository,
+    SAQuizQueryRepository,
+    PlayerQuizRepository,
+    PlayerQuizQueryRepository,
 
     AppService,
     TestRepository,

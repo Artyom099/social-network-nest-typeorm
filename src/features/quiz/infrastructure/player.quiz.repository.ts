@@ -3,7 +3,7 @@ import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 
 @Injectable()
-export class PlayerRepository {
+export class PlayerQuizRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async createAnswer() {}

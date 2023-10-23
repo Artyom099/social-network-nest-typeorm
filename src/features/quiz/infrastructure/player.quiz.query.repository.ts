@@ -7,7 +7,7 @@ import {GamePairStatus} from '../../../infrastructure/utils/constants';
 import {Question} from '../entity/question.entity';
 
 @Injectable()
-export class PlayerQueryRepository {
+export class PlayerQuizQueryRepository {
   constructor(
     @InjectDataSource() private dataSource: DataSource,
     @InjectRepository(Users) private usersRepo: Repository<Users>,

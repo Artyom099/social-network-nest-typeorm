@@ -1,5 +1,5 @@
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {PlayerRepository} from '../../infrastructure/player.repository';
+import {PlayerQuizRepository} from '../../infrastructure/player.quiz.repository';
 
 export class CreatePairCommand {
   constructor() {}
@@ -7,7 +7,7 @@ export class CreatePairCommand {
 
 @CommandHandler(CreatePairCommand)
 export class CreatePairUseCase implements ICommandHandler<CreatePairCommand> {
-  constructor(private playerRepository: PlayerRepository) {}
+  constructor(private playerRepository: PlayerQuizRepository) {}
 
   async execute(command: CreatePairCommand) {
     // смотрим, ждет ли кто-то пару

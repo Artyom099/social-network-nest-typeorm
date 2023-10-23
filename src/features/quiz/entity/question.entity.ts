@@ -1,4 +1,4 @@
-import {Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {GamePair} from './game.pair.entity';
 import {Answer} from './answer.entity';
 
@@ -8,7 +8,7 @@ export class Question {
   id: string;
   @Column()
   body: string;
-  @Column()
+  @Column({ type: 'character varying', array: true })
   correctAnswers: string[];
   @Column()
   published: boolean;
@@ -18,7 +18,10 @@ export class Question {
   updatedAt: Date;
 
   @ManyToMany(() => GamePair, g => g.questions)
+  @JoinColumn()
   game_pairs: GamePair[];
+  @Column()
+  game_pair_id: string;
 
   @OneToMany(() => Answer, a => a.question)
   answers: Answer[];

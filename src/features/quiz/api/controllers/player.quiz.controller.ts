@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import {CommandBus} from '@nestjs/cqrs';
 import {BearerAuthGuard} from '../../../../infrastructure/guards/bearer-auth.guard';
-import {PlayerQueryRepository} from '../../infrastructure/player.query.repository';
+import {PlayerQuizQueryRepository} from '../../infrastructure/player.quiz.query.repository';
 import {AnswerInputModel} from '../models/input/answer.input.model';
 import {CreatePairCommand} from '../../application/player.use.cases/create.pair.use.case';
 import {CreateAnswerCommand} from '../../application/player.use.cases/create.answer.use.case';
@@ -22,7 +22,7 @@ import {CreateAnswerCommand} from '../../application/player.use.cases/create.ans
 export class PlayerQuizController {
   constructor(
     private commandBus: CommandBus,
-    private playerQueryRepository: PlayerQueryRepository,
+    private playerQueryRepository: PlayerQuizQueryRepository,
     ) {}
 
   @Get('my-current')

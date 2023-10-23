@@ -1,5 +1,5 @@
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {PlayerRepository} from '../../infrastructure/player.repository';
+import {PlayerQuizRepository} from '../../infrastructure/player.quiz.repository';
 
 export class CreateAnswerCommand {
   constructor(
@@ -10,7 +10,7 @@ export class CreateAnswerCommand {
 
 @CommandHandler(CreateAnswerCommand)
 export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand> {
-  constructor(private playerRepository: PlayerRepository) {}
+  constructor(private playerRepository: PlayerQuizRepository) {}
 
   async execute(command: CreateAnswerCommand) {
     // todo - здесь мы проверяет правильность ответа игрока на вопрос
