@@ -1,15 +1,13 @@
-import {Column, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {GamePairStatus} from '../../../infrastructure/utils/constants';
 import {Question} from './question.entity';
+import {Users} from '../../users/entity/user.entity';
 
 @Entity()
 export class GamePair {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column()
-  firstPlayerId: string;
-  @Column()
-  secondPlayerId: string;
+
   @Column()
   status: GamePairStatus;
   @Column()
@@ -19,6 +17,21 @@ export class GamePair {
   @Column()
   finishGameDate: Date;
 
-  @ManyToMany(() => Question, q => q.gamePairs)
+  @ManyToMany(() => Question, q => q.game_pairs)
+  @JoinColumn()
   questions: Question[];
+  @Column()
+  questionId: string;
+
+  // @ManyToMany(() => Users, u => u.game_pairs)
+  // @JoinColumn()
+  // users: Users[];
+  @Column()
+  firstPlayerId: string;
+
+  // @ManyToMany(() => Users, u => u.game_pair)
+  // @JoinColumn()
+  // users: Users[];
+  @Column()
+  secondPlayerId: string;
 }

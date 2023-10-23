@@ -3,6 +3,7 @@ import {CreateQuestionInputModel} from '../../api/models/input/create.question.i
 import {SAQuizRepository} from '../../infrastructure/sa.quiz.repository';
 import {randomUUID} from 'crypto';
 import {CreateQuestionDTO} from '../../api/models/dto/create.question.dto';
+import {SAQuizQueryRepository} from '../../infrastructure/sa.quiz.query.repository';
 
 export class CreateQuestionCommand {
   constructor(public inputModel: CreateQuestionInputModel) {}
@@ -10,8 +11,10 @@ export class CreateQuestionCommand {
 
 @CommandHandler(CreateQuestionCommand)
 export class CreateQuestionUseCase implements ICommandHandler<CreateQuestionCommand> {
-  constructor(private saQueryRepository: SAQuizRepository) {
-  }
+  constructor(
+    private saQuizRepository: SAQuizRepository,
+    private saQuizQueryRepository: SAQuizQueryRepository,
+  ) {}
 
   async execute(command: CreateQuestionCommand) {
     const dto: CreateQuestionDTO = {
@@ -22,6 +25,7 @@ export class CreateQuestionUseCase implements ICommandHandler<CreateQuestionComm
       createdAt: new Date(),
       updatedAt: new Date(),
     }
-    await this.saQueryRepository.createQuestion(dto)
+    await this.saQuizRepository.createQuestion(dto)
+    return this.saQuizQueryRepository.getQuestion(dto.id)
   }
 }

@@ -222,14 +222,14 @@ export class UsersQueryRepository {
     ]);
 
     const queryString = `
-  select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
-  from "users"
-  where ("login" ilike $1 or "email" ilike $2)
-  and ("isBanned" = $3 or $3 is null)
-  order by "${query.sortBy}" ${query.sortDirection}
-  limit $4
-  offset $5
-  `;
+    select "id", "login", "email", "createdAt", "isBanned", "banDate", "banReason"
+    from "users"
+    where ("login" ilike $1 or "email" ilike $2)
+    and ("isBanned" = $3 or $3 is null)
+    order by "${query.sortBy}" ${query.sortDirection}
+    limit $4
+    offset $5
+    `;
     const sortedUsers = await this.dataSource.query(queryString, [
       `%${query.searchLoginTerm}%`,
       `%${query.searchEmailTerm}%`,

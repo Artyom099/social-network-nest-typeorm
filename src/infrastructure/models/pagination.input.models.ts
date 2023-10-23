@@ -55,8 +55,8 @@ export class UsersPaginationInput extends DefaultPaginationInput {
     return value === BanStatus.banned
       ? true
       : value === BanStatus.notBanned
-      ? false
-      : null;
+        ? false
+        : null;
   })
   banStatus: boolean | null = null;
   @IsOptional()
@@ -80,5 +80,19 @@ export class BannedUsersPaginationInput extends DefaultPaginationInput {
 }
 
 export class GamePairPaginationInput extends DefaultPaginationInput {
-
+  @IsOptional()
+  @Transform(({ value }) => {
+    return !isNil(value) ? value : '';
+  })
+  bodySearchTerm: string = '';
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    return value === BanStatus.banned
+      ? true
+      : value === BanStatus.notBanned
+        ? false
+        : null;
+  })
+  publishedStatus: boolean | null = null;
 }

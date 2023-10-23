@@ -59,7 +59,7 @@ export class SAQuizController {
   async updateQuestion(
     @Param('id') questionId: string,
     @Body() inputModel: CreateQuestionInputModel,
-    ) {
+  ) {
     const question = this.saQuizQueryRepository.getQuestion(questionId)
     if (!question) {
       throw new NotFoundException();
@@ -73,7 +73,7 @@ export class SAQuizController {
   async publishQuestion(
     @Param('id') questionId: string,
     @Body() inputModel: PublishQuestionInputModel,
-    ) {
+  ) {
     const question = this.saQuizQueryRepository.getQuestion(questionId)
     if (!question) {
       throw new NotFoundException();

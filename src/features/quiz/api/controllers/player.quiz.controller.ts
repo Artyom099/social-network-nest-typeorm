@@ -14,6 +14,8 @@ import {CommandBus} from '@nestjs/cqrs';
 import {BearerAuthGuard} from '../../../../infrastructure/guards/bearer-auth.guard';
 import {PlayerQueryRepository} from '../../infrastructure/player.query.repository';
 import {AnswerInputModel} from '../models/input/answer.input.model';
+import {CreatePairCommand} from '../../application/player.use.cases/create.pair.use.case';
+import {CreateAnswerCommand} from '../../application/player.use.cases/create.answer.use.case';
 
 @Controller('pair-game-quiz/pairs')
 @UseGuards(BearerAuthGuard)
@@ -48,6 +50,7 @@ export class PlayerQuizController {
     }
   }
 
+
   @Post('connection')
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req) {
@@ -55,7 +58,7 @@ export class PlayerQuizController {
     if (currentGame) {
       throw new ForbiddenException();
     } else {
-      // todo - useCase
+      return this.commandBus.execute(new CreatePairCommand())
     }
   }
 
@@ -63,11 +66,11 @@ export class PlayerQuizController {
   @HttpCode(HttpStatus.OK)
   async sendAnswer(@Req() req, @Body() inputModel: AnswerInputModel) {
     const currentGame = await this.playerQueryRepository.getCurrentGame(req.userId)
-    if (!currentGame) { //todo - добавить кейс, что игрок ответил на все вопросы
+    //todo - добавить кейс, что игрок ответил на все вопросы и ждет ответов другого игрока
+    if (!currentGame || (currentGame && 1 !== 1)) {
       throw new ForbiddenException();
     } else {
-      // todo - useCase
-      // return this.commandBus.execute(new CreateAnswerCommand())
+      return this.commandBus.execute(new CreateAnswerCommand(req.userId, inputModel.answer))
     }
   }
 }

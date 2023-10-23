@@ -4,6 +4,7 @@ import {DataSource, Repository} from 'typeorm';
 import {Users} from '../../users/entity/user.entity';
 import {GamePairPaginationInput} from '../../../infrastructure/models/pagination.input.models';
 import {GamePairStatus} from '../../../infrastructure/utils/constants';
+import {Question} from '../entity/question.entity';
 
 @Injectable()
 export class PlayerQueryRepository {
@@ -13,8 +14,23 @@ export class PlayerQueryRepository {
   ) {}
 
   async getCurrentGame(id: string) {
+    const game = await this.dataSource.query(`
+    select *
+    
+      (select * as "firstPlayerProgress"
+      from player pl
+      left join question q
+      on pl."id" = ans."playerId"
+      where pl."id" = $1)
+    
+    from game_pair gp
+    left join question q
+    where q."id" = gp."questionId"
+    andWhere "status" = $2
+    `, [id, GamePairStatus.active]);
+
     return {
-      id: 'string',
+      id: game.id,
       firstPlayerProgress: {
         answers: [
           {
@@ -49,15 +65,21 @@ export class PlayerQueryRepository {
           body: 'string',
         }
       ],
-      status: GamePairStatus.active,
-      pairCreatedDate: 'data',
-      startGameDate: 'data',
-      finishGameDate: 'data',
+      status: game.status,
+      pairCreatedDate: game.pairCreatedDate,
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
     }
   }
   async getGameById(id: string) {
+    const game = await this.dataSource.query(`
+    select *
+    from "game_pair"
+    where "id" = $1
+    `, [id]);
+
     return {
-      id: 'string',
+      id: game.id,
       firstPlayerProgress: {
         answers: [
           {
@@ -92,10 +114,10 @@ export class PlayerQueryRepository {
           body: 'string',
         }
       ],
-      status: GamePairStatus.active,
-      pairCreatedDate: 'data',
-      startGameDate: 'data',
-      finishGameDate: 'data',
+      status: game.status,
+      pairCreatedDate: game.pairCreatedDate,
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
     }
   }
 }

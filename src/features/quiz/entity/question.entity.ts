@@ -1,5 +1,6 @@
-import {Column, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {GamePair} from './game.pair.entity';
+import {Answer} from './answer.entity';
 
 @Entity()
 export class Question {
@@ -17,5 +18,8 @@ export class Question {
   updatedAt: Date;
 
   @ManyToMany(() => GamePair, g => g.questions)
-  gamePairs: GamePair[];
+  game_pairs: GamePair[];
+
+  @OneToMany(() => Answer, a => a.question)
+  answers: Answer[];
 }

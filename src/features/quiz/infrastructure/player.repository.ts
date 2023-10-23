@@ -4,6 +4,7 @@ import {DataSource} from 'typeorm';
 
 @Injectable()
 export class PlayerRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {
-  }
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
+
+  async createAnswer() {}
 }

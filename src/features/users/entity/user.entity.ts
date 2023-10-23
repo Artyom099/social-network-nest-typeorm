@@ -1,10 +1,12 @@
-import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {BannedUsersForBlog} from './banned.user.for.blog.entity';
 import {Devices} from '../../devices/entity/device.entity';
 import {Blogs} from '../../blogs/entity/blog.entity';
 import {CommentLikes} from '../../comments/entity/comment.likes.entity';
 import {PostLikes} from '../../posts/entity/post.likes.entity';
 import {Comments} from '../../comments/entity/сomment.entity';
+import {Player} from '../../quiz/entity/player.entity';
+import {GamePair} from '../../quiz/entity/game.pair.entity';
 
 @Entity()
 export class Users {
@@ -35,7 +37,7 @@ export class Users {
   @Column({nullable: true})
   recoveryCode: string;
 
-  @OneToMany(() => BannedUsersForBlog, b => b.user)
+  @OneToMany(() => BannedUsersForBlog, bu => bu.user)
   bannedUsersForBlog: BannedUsersForBlog[];
 
   @OneToMany(() => Devices, d => d.userId)
@@ -50,6 +52,12 @@ export class Users {
   @OneToMany(() => Comments, c => c.user)
   comments: Comments[];
 
-  @OneToMany(() => CommentLikes, c => c.user)
+  @OneToMany(() => CommentLikes, cl => cl.user)
   comment_likes: CommentLikes[];
+
+  // @OneToOne(() => Player, p => p.user)
+  // player: Player;
+
+  // @ManyToMany(() => GamePair, g => g.users)
+  // game_pairs: GamePair[];
 }

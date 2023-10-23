@@ -26,6 +26,6 @@ export class BannedUsersForBlog {
   @OneToOne(() => Blogs, b => b.bannedUsersForBlog)
   @JoinColumn()
   blog: Blogs;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   blogId: string;
 }

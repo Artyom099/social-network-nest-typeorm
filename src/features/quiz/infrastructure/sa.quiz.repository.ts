@@ -10,7 +10,6 @@ import {CreateQuestionDTO} from '../api/models/dto/create.question.dto';
 export class SAQuizRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async getQuestions() {}
   async createQuestion(dto: CreateQuestionDTO) {
     await this.dataSource
       .createQueryBuilder()
