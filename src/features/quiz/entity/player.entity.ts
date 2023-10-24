@@ -15,6 +15,8 @@ export class Player {
   user: Users;
   @Column()
   userId: string;
+  @Column()
+  login: string;
 
   @ManyToOne(() => Answer, a => a.player)
   @JoinColumn()
@@ -23,5 +25,5 @@ export class Player {
   @OneToOne(() => GamePair)
   game_pair: GamePair;
   @Column()
-  game_pair_id: string;
+  gamePairId: string;
 }

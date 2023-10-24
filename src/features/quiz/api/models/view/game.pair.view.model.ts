@@ -2,9 +2,9 @@ import {AnswerStatus, GamePairStatus} from '../../../../../infrastructure/utils/
 
 export type GamePairViewModel = {
   id: string;
-  firstPlayerProgress: PlayerProgressType,
-  secondPlayerProgress: PlayerProgressType,
-  questions: questionsType[],
+  firstPlayerProgress: firstPlayerProgressType,
+  secondPlayerProgress: secondPlayerProgressType,
+  questions: questionsType[] | null,
   status: GamePairStatus;
   pairCreatedDate: Date;
   startGameDate: Date;
@@ -16,15 +16,26 @@ type questionsType = {
   body: string;
 }
 
-type PlayerProgressType = {
+type firstPlayerProgressType = {
   answers: AnswersType[],
-  player: PlayerType,
+  player: firstPlayerType,
   score: number;
 }
-type PlayerType = {
+type firstPlayerType = {
   id: string;
   login: string;
 }
+
+type secondPlayerProgressType = {
+  answers: AnswersType[],
+  player: secondPlayerType,
+  score: number;
+}
+type secondPlayerType = {
+  id: string | null;
+  login: string | null;
+}
+
 type AnswersType = {
   questionId: string;
   answerStatus: AnswerStatus;

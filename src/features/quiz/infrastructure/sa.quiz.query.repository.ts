@@ -4,6 +4,8 @@ import {DataSource, Repository} from 'typeorm';
 import {GamePairPaginationInput} from '../../../infrastructure/models/pagination.input.models';
 import {Users} from '../../users/entity/user.entity';
 import {Question} from '../entity/question.entity';
+import {PaginationViewModel} from '../../../infrastructure/models/pagination.view.model';
+import {QuestionViewModel} from '../api/models/view/question.view.model';
 
 @Injectable()
 export class SAQuizQueryRepository {
@@ -12,16 +14,16 @@ export class SAQuizQueryRepository {
     @InjectRepository(Users) private questionRepo: Repository<Question>,
   ) {}
 
-  async getQuestion(id: string) {
+  async getQuestion(id: string): Promise<Question | null> {
     const question = await this.questionRepo
       .createQueryBuilder('question')
-      .where('question.id = :id', {id: id})
+      .where('question.id = :id', { id })
       .getOne();
 
     return question ? question : null
   }
 
-  async getQuestions(query: GamePairPaginationInput) {
+  async getQuestions(query: GamePairPaginationInput): Promise<PaginationViewModel<QuestionViewModel>> {
     const [totalCount] = await this.dataSource.query(`
       select count(*)
       from question

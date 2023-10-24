@@ -22,7 +22,19 @@ export class PlayerQuizQueryRepository {
     return game ? game : null;
   }
 
+  async getPlayer(userId: string, gamePairId: string) {
+    const player = await this.dataSource.query(`
+    select *
+    from player
+    where "userId" = $1 and "game_pair_id" = $2
+    `, [userId, gamePairId]);
+
+    return player ? player.id : null;
+  }
+
   // todo - заджоинить правильно таблицы, чтобы получать view model
+  // надо как-то подтянуть ответы текущего игрока и сложить их в массив
+  // вопросы тоже надо заджоинить к игре и сложить в массив
   async getCurrentGame(id: string): Promise<GamePairViewModel | null> {
     const game = await this.dataSource.query(`
     select *
@@ -30,7 +42,13 @@ export class PlayerQuizQueryRepository {
       (select * as "firstPlayerProgress"
       from player pl
       left join answer ans
-      on pl."id" = ans."playerId"
+      on pl."answerId" = ans."id"
+      where pl."id" = gp."firstPlayerId")
+      
+      (select * as "secondPlayerProgress"
+      from player pl
+      left join answer ans
+      on pl."answerId" = ans."id"
       where pl."id" = gp."firstPlayerId")
     
     from game_pair gp
@@ -64,10 +82,10 @@ export class PlayerQuizQueryRepository {
           }
         ],
         player: {
-          id: 'uuid',
-          login: 'string',
+          id: game.secondPlayerProgress.player.id,
+          login: game.secondPlayerProgress.player.login,
         },
-        score: 0,
+        score: game.secondPlayerProgress.score,
       },
       questions: game.questions,
       status: game.status,

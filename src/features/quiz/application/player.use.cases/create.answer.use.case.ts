@@ -25,25 +25,27 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
     // здесь мы проверяем правильность ответа игрока на вопрос
     // достаем игру по юзеру,
     const currentGame = await this.playerQuizQueryRepository.getCurrentGame(command.userId)
-    if (!currentGame) return null;
+    if (!currentGame || !currentGame.questions) return null;
+
+    const playerId = await this.playerQuizQueryRepository.getPlayer(command.userId, currentGame.id)
 
     // узнаем номер текущего вопроса
-    // todo - как понять, у какого игрока считаем ответы?
     const questionNumber = currentGame.firstPlayerProgress.answers.length
 
     // достаем вопрос по айди,
     const question = await this.saQuizQueryRepository.getQuestion(currentGame.questions[questionNumber].id)
 
     // проверяем правильность ответа,
-    const answerStatus = (question && command.answer in question.correctAnswers) ? AnswerStatus.correct : AnswerStatus.incorrect
+    const answerStatus = command.answer in question!.correctAnswers ? AnswerStatus.correct : AnswerStatus.incorrect
 
     // возвращаем игроку ответ
     const dto: CreateAnswerDTO = {
       id: randomUUID(),
       answer: command.answer,
-      questionId: currentGame.questions[0].id,
       answerStatus,
       addedAt: new Date(),
+      questionId: currentGame.questions[questionNumber].id,
+      playerId,
     }
     return this.playerQuizRepository.createAnswer(dto)
   }

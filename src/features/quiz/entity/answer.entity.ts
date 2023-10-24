@@ -7,7 +7,6 @@ import {Player} from './player.entity';
 export class Answer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  // todo - надо ли нам хранить сам answer?
   @Column()
   answer: string;
   @Column()

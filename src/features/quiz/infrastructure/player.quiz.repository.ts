@@ -5,9 +5,13 @@ import {GamePair} from '../entity/game.pair.entity';
 import {GamePairStatus} from '../../../infrastructure/utils/constants';
 import {CreateGamePairDTO} from '../api/models/dto/create.game.pair.dto';
 import {Answer} from '../entity/answer.entity';
-import {addPlayerDTO} from '../api/models/dto/add.player.dto';
+import {addPlayerToGamePairDto} from '../api/models/dto/add.player.to.game.pair.dto';
 import {CreateAnswerDTO} from '../api/models/dto/create.answer.dto';
 import {AnswerViewModel} from '../api/models/view/answer.view.model';
+import {GamePairViewModel} from '../api/models/view/game.pair.view.model';
+import {Users} from '../../users/entity/user.entity';
+import {Player} from '../entity/player.entity';
+import {CreatePlayerDTO} from '../api/models/dto/create.player.dto';
 
 @Injectable()
 export class PlayerQuizRepository {
@@ -40,33 +44,53 @@ export class PlayerQuizRepository {
     } : null;
   }
 
-  async createGamePair(dto: CreateGamePairDTO) {
+  async createPlayer(dto: CreatePlayerDTO) {
+    await this.dataSource
+      .createQueryBuilder()
+      .insert()
+      .into(Player)
+      .values({
+        id: dto.id,
+        score: dto.score,
+        userId: dto.userId,
+        login: dto.login,
+        // answers: dto.answers,
+        gamePairId: dto.gamePairId,
+      })
+      .execute()
+  }
+
+  async createGamePair(dto: CreateGamePairDTO): Promise<GamePairViewModel> {
     await this.dataSource
       .createQueryBuilder()
       .insert()
       .into(GamePair)
       .values({
+        id: dto.id,
         status: dto.status,
         pairCreatedDate: dto.pairCreatedDate,
         firstPlayerId: dto.firstPlayerId,
       })
       .execute()
 
-    const [gamePair] = await this.dataSource.query(`
+    // заджоинил игрока к игре
+    const [game] = await this.dataSource.query(`
     select *
-    from game_pair
-    where "status" = $1
-    `, [GamePairStatus.pending])
+    from game_pair gp
+    left join player pl
+    on gp."firstPlayerId" = pl."id"
+    where gp."id" = $1
+    `, [dto.id])
 
     return {
-      id: gamePair.id,
+      id: game.id,
       firstPlayerProgress: {
         answers: [],
         player: {
-          id: 'id-1',
-          login: 'login-1',
+          id: game.firstPlayerId,
+          login: game.login,
         },
-        score: 0,
+        score: game.score,
       },
       secondPlayerProgress: {
         answers: [],
@@ -77,12 +101,19 @@ export class PlayerQuizRepository {
         score: 0,
       },
       questions: [],
-      status: gamePair.status,
-      pairCreatedDate: gamePair.pairCreatedDate,
-      startGameDate: gamePair.startGameDate,
-      finishGameDate: gamePair.finishGameDate,
+      status: game.status,
+      pairCreatedDate: game.pairCreatedDate,
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
     }
   }
 
-  async addPlayerToGamePair(dto: addPlayerDTO) {}
+  async addPlayerToGamePair(dto: addPlayerToGamePairDto) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(GamePair)
+      .set({ secondPlayerId: dto.secondPlayerId, startGameDate: dto.startGameDate })
+      .where("id = :id", { id: dto.id })
+      .execute()
+  }
 }

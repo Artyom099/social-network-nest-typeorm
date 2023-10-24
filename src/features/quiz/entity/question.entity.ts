@@ -18,10 +18,7 @@ export class Question {
   updatedAt: Date;
 
   @ManyToMany(() => GamePair, g => g.questions)
-  @JoinColumn()
   game_pairs: GamePair[];
-  @Column()
-  game_pair_id: string;
 
   @OneToMany(() => Answer, a => a.question)
   answers: Answer[];

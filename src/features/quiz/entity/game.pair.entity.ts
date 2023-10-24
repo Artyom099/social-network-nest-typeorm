@@ -1,4 +1,4 @@
-import {Column, Entity, JoinColumn, ManyToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {GamePairStatus} from '../../../infrastructure/utils/constants';
 import {Question} from './question.entity';
 import {Users} from '../../users/entity/user.entity';
@@ -23,10 +23,8 @@ export class GamePair {
   // answers: Answer[];
 
   @ManyToMany(() => Question, q => q.game_pairs)
-  @JoinColumn()
+  @JoinTable()
   questions: Question[];
-  @Column({ nullable: true, type: 'character varying', array: true })
-  questionsId: string[];
 
   @OneToOne(() => Player, pl => pl.game_pair)
   @JoinColumn()
