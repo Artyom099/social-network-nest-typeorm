@@ -2,9 +2,8 @@ import {Injectable} from '@nestjs/common';
 import {InjectDataSource, InjectRepository} from '@nestjs/typeorm';
 import {DataSource, Repository} from 'typeorm';
 import {Users} from '../../users/entity/user.entity';
-import {GamePairPaginationInput} from '../../../infrastructure/models/pagination.input.models';
-import {GamePairStatus} from '../../../infrastructure/utils/constants';
-import {Question} from '../entity/question.entity';
+import {AnswerStatus, GamePairStatus} from '../../../infrastructure/utils/constants';
+import {GamePairViewModel} from '../api/models/view/game.pair.view.model';
 
 @Injectable()
 export class PlayerQuizQueryRepository {
@@ -23,15 +22,16 @@ export class PlayerQuizQueryRepository {
     return game ? game : null;
   }
 
-  async getCurrentGame(id: string) {
+  // todo - заджоинить правильно таблицы, чтобы получать view model
+  async getCurrentGame(id: string): Promise<GamePairViewModel | null> {
     const game = await this.dataSource.query(`
     select *
     
       (select * as "firstPlayerProgress"
       from player pl
-      left join question q
+      left join answer ans
       on pl."id" = ans."playerId"
-      where pl."id" = $1)
+      where pl."id" = gp."firstPlayerId")
     
     from game_pair gp
     left join question q
@@ -39,27 +39,27 @@ export class PlayerQuizQueryRepository {
     andWhere "status" = $2
     `, [id, GamePairStatus.active]);
 
-    return {
+    return game ? {
       id: game.id,
       firstPlayerProgress: {
         answers: [
           {
             questionId: 'string',
-            answerStatus: 'string',
-            addedAt: 'data',
+            answerStatus: AnswerStatus.correct,
+            addedAt: '2015-03-25T12:00:00Z',
           }
         ],
         player: {
-          id: 'uuid',
-          login: 'string',
+          id: game.firstPlayerProgress.id,
+          login: game.firstPlayerProgress.login,
         },
-        score: 0,
+        score: game.firstPlayerProgress.score,
       },
       secondPlayerProgress: {
         answers: [
           {
             questionId: 'string',
-            answerStatus: 'string',
+            answerStatus: AnswerStatus.correct,
             addedAt: 'data',
           }
         ],
@@ -69,33 +69,29 @@ export class PlayerQuizQueryRepository {
         },
         score: 0,
       },
-      questions: [
-        {
-          id: 'string',
-          body: 'string',
-        }
-      ],
+      questions: game.questions,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
       finishGameDate: game.finishGameDate,
-    }
+    } : null;
   }
-  async getGameById(id: string) {
+
+  async getGameById(id: string): Promise<GamePairViewModel | null> {
     const game = await this.dataSource.query(`
     select *
-    from "game_pair"
-    where "id" = $1
+    from game_pair gp
+    where gp."id" = $1
     `, [id]);
 
-    return {
+    return game ? {
       id: game.id,
       firstPlayerProgress: {
         answers: [
           {
           questionId: 'string',
-          answerStatus: 'string',
-          addedAt: 'data',
+          answerStatus: AnswerStatus.correct,
+          addedAt: '2015-03-25T12:00:00Z',
           }
         ],
         player: {
@@ -108,8 +104,8 @@ export class PlayerQuizQueryRepository {
         answers: [
           {
             questionId: 'string',
-            answerStatus: 'string',
-            addedAt: 'data',
+            answerStatus: AnswerStatus.correct,
+            addedAt: '2015-03-25T12:00:00Z',
           }
         ],
         player: {
@@ -118,17 +114,11 @@ export class PlayerQuizQueryRepository {
         },
         score: 0,
       },
-      questions: [
-        {
-          id: 'string',
-          body: 'string',
-        }
-      ],
+      questions: game.questions,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
       finishGameDate: game.finishGameDate,
-    }
+    } : null;
   }
-
 }

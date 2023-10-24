@@ -1,13 +1,13 @@
-import {Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {AnswerStatus} from '../../../infrastructure/utils/constants';
 import {Question} from './question.entity';
 import {Player} from './player.entity';
-import {GamePair} from './game.pair.entity';
 
 @Entity()
 export class Answer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+  // todo - надо ли нам хранить сам answer?
   @Column()
   answer: string;
   @Column()

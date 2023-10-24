@@ -16,7 +16,6 @@ import {CommandBus} from '@nestjs/cqrs';
 import {GamePairPaginationInput} from '../../../../infrastructure/models/pagination.input.models';
 import {SAQuizQueryRepository} from '../../infrastructure/sa.quiz.query.repository';
 import {CreateQuestionInputModel} from '../models/input/create.question.input.model';
-import {BanUserInputModel} from '../../../users/api/models/input/ban.user.input.model';
 import {PublishQuestionInputModel} from '../models/input/publish.question.input.model';
 import {PublishQuestionCommand} from '../../application/sa.use.cases/publish.question.use.case';
 import {UpdateQuestionCommand} from '../../application/sa.use.cases/update.question.use.case';
@@ -46,7 +45,7 @@ export class SAQuizController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteQuestion(@Param('id') questionId: string) {
-    const question = this.saQuizQueryRepository.getQuestion(questionId)
+    const question = await this.saQuizQueryRepository.getQuestion(questionId)
     if (!question) {
       throw new NotFoundException();
     } else {
@@ -60,7 +59,7 @@ export class SAQuizController {
     @Param('id') questionId: string,
     @Body() inputModel: CreateQuestionInputModel,
   ) {
-    const question = this.saQuizQueryRepository.getQuestion(questionId)
+    const question = await this.saQuizQueryRepository.getQuestion(questionId)
     if (!question) {
       throw new NotFoundException();
     } else {

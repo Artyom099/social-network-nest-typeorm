@@ -20,6 +20,7 @@ export class SAQuizQueryRepository {
 
     return question ? question : null
   }
+
   async getQuestions(query: GamePairPaginationInput) {
     const [totalCount] = await this.dataSource.query(`
       select count(*)
