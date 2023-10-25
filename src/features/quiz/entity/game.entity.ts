@@ -1,5 +1,5 @@
 import {Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {GamePairStatus} from '../../../infrastructure/utils/constants';
+import {GameStatus} from '../../../infrastructure/utils/constants';
 import {Question} from './question.entity';
 import {Users} from '../../users/entity/user.entity';
 import {Player} from './player.entity';
@@ -11,7 +11,7 @@ export class Game {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()
-  status: GamePairStatus;
+  status: GameStatus;
   @Column()
   pairCreatedDate: Date;
   @Column({ nullable: true })
@@ -33,5 +33,5 @@ export class Game {
 
   @OneToMany(() => GameQuestion, gq => gq.game)
   @JoinTable()
-  GameQuestions: GameQuestion[];
+  gameQuestions: GameQuestion[];
 }

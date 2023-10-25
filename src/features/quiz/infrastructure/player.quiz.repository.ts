@@ -2,16 +2,16 @@ import {Injectable} from '@nestjs/common';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {Game} from '../entity/game.entity';
-import {GamePairStatus} from '../../../infrastructure/utils/constants';
-import {CreateGamePairDTO} from '../api/models/dto/create.game.pair.dto';
+import {GameStatus} from '../../../infrastructure/utils/constants';
+import {CreateGameDto} from '../api/models/dto/create.game.dto';
 import {Answer} from '../entity/answer.entity';
-import {addPlayerToGamePairDto} from '../api/models/dto/add.player.to.game.pair.dto';
 import {CreateAnswerDTO} from '../api/models/dto/create.answer.dto';
 import {AnswerViewModel} from '../api/models/view/answer.view.model';
 import {GamePairViewModel} from '../api/models/view/game.pair.view.model';
-import {Users} from '../../users/entity/user.entity';
 import {Player} from '../entity/player.entity';
 import {CreatePlayerDTO} from '../api/models/dto/create.player.dto';
+import {AddQuestionsToGameDto} from '../api/models/dto/addQuestionsToGameDto';
+import {AddPlayerToGameDto} from '../api/models/dto/add.player.to.game.dto';
 
 @Injectable()
 export class PlayerQuizRepository {
@@ -59,8 +59,16 @@ export class PlayerQuizRepository {
       })
       .execute()
   }
+  async increaseScore(id: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Player)
+      .set({ score: () => "score + 1" })
+      .where("id = :id", { id })
+      .execute()
+  }
 
-  async createGamePair(dto: CreateGamePairDTO): Promise<GamePairViewModel> {
+  async createGame(dto: CreateGameDto): Promise<GamePairViewModel> {
     await this.dataSource
       .createQueryBuilder()
       .insert()
@@ -100,7 +108,7 @@ export class PlayerQuizRepository {
         },
         score: 0,
       },
-      questions: [],
+      gameQuestions: [],
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
@@ -108,12 +116,30 @@ export class PlayerQuizRepository {
     }
   }
 
-  async addPlayerToGamePair(dto: addPlayerToGamePairDto) {
+  async finishGame(id: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Game)
+      .set({ status: GameStatus.finished })
+      .where("id = :id", { id })
+      .execute()
+  }
+
+  async addPlayerToGame(dto: AddPlayerToGameDto) {
     return this.dataSource
       .createQueryBuilder()
       .update(Game)
       .set({ secondPlayerId: dto.secondPlayerId, startGameDate: dto.startGameDate })
       .where("id = :id", { id: dto.id })
+      .execute()
+  }
+
+  async addQuestionsToGame(dto: AddQuestionsToGameDto) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Game)
+      .set({ gameQuestions: dto.questionsId })
+      .where("id = :id", { id: dto.gameId })
       .execute()
   }
 }

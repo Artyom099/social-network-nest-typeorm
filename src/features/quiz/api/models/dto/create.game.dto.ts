@@ -1,8 +1,8 @@
-import {GamePairStatus} from '../../../../../infrastructure/utils/constants';
+import {GameStatus} from '../../../../../infrastructure/utils/constants';
 
-export type CreateGamePairDTO = {
+export type CreateGameDto = {
   id: string;
-  status: GamePairStatus;
+  status: GameStatus;
   pairCreatedDate: Date;
   // startGameDate: Date;
   // finishGameDate: Date;

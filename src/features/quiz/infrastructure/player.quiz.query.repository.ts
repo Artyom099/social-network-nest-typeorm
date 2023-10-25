@@ -2,8 +2,10 @@ import {Injectable} from '@nestjs/common';
 import {InjectDataSource, InjectRepository} from '@nestjs/typeorm';
 import {DataSource, Repository} from 'typeorm';
 import {Users} from '../../users/entity/user.entity';
-import {AnswerStatus, GamePairStatus} from '../../../infrastructure/utils/constants';
+import {AnswerStatus, GameStatus} from '../../../infrastructure/utils/constants';
 import {GamePairViewModel} from '../api/models/view/game.pair.view.model';
+import {AnswerViewModel} from '../api/models/view/answer.view.model';
+import {Question} from '../entity/question.entity';
 
 @Injectable()
 export class PlayerQuizQueryRepository {
@@ -12,22 +14,58 @@ export class PlayerQuizQueryRepository {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
 
+  async getFiveQuestionsId() {
+    const questionsId = await this.dataSource.query(`
+    select "id"
+    from question
+    order by random()
+    limit 5
+    offset random()
+    `,)
+
+    return questionsId ? questionsId : null
+  }
+
   async getPendingGame() {
     const game = await this.dataSource.query(`
     select *
-    from "game_pair"
+    from game
     where "status" = $1
-    `, [GamePairStatus.pending]);
+    `, [GameStatus.pending]);
 
     return game ? game : null;
   }
 
-  async getPlayer(userId: string, gamePairId: string) {
+  // достать вопрос по айди игры, номеру вопроса
+  async getQuestion(gameId: string, questionNumber: number): Promise<Question> {
+    return this.dataSource.query(`
+    select *
+    from question q
+    left join game_question gq
+    on q."id" = gq."questionId"
+    where gq."gameId" = $1 and gq."questionNumber" = $2
+    `, [gameId, questionNumber])
+  }
+
+  // todo - как достать ответы игрока к ТЕКУЩЕЙ ИГРЕ?
+  // если заджоинить игрока с ответами, можно получить его ответы с прошлых игр
+  // надо заждоинить ответы с вопросами по айти вопросов из игры
+  async getPlayerAnswersForGame(playerId: string, gameId: string): Promise<AnswerViewModel[]> {
+    const answers = await this.dataSource.query(`
+    select "questionId", "answerStatus", "addedAt"
+    from answers
+    where "playerId" = $1
+    `, [playerId, gameId])
+
+    return answers ? answers : [];
+  }
+
+  async getPlayerId(userId: string, gameId: string) {
     const player = await this.dataSource.query(`
     select *
     from player
     where "userId" = $1 and "gameId" = $2
-    `, [userId, gamePairId]);
+    `, [userId, gameId]);
 
     return player ? player.id : null;
   }
@@ -43,19 +81,19 @@ export class PlayerQuizQueryRepository {
       from player pl
       left join answer ans
       on pl."answerId" = ans."id"
-      where pl."id" = gp."firstPlayerId")
+      where pl."id" = g."firstPlayerId")
       
       (select * as "secondPlayerProgress"
       from player pl
       left join answer ans
       on pl."answerId" = ans."id"
-      where pl."id" = gp."firstPlayerId")
+      where pl."id" = g."firstPlayerId")
     
-    from game_pair gp
+    from game g
     left join question q
-    where q."id" = gp."questionId"
+    where q."id" = g."questionId"
     andWhere "status" = $2
-    `, [id, GamePairStatus.active]);
+    `, [id, GameStatus.active]);
 
     return game ? {
       id: game.id,
@@ -87,7 +125,7 @@ export class PlayerQuizQueryRepository {
         },
         score: game.secondPlayerProgress.score,
       },
-      questions: game.questions,
+      gameQuestions: game.questions,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
@@ -98,8 +136,8 @@ export class PlayerQuizQueryRepository {
   async getGameById(id: string): Promise<GamePairViewModel | null> {
     const game = await this.dataSource.query(`
     select *
-    from game_pair gp
-    where gp."id" = $1
+    from game g
+    where g."id" = $1
     `, [id]);
 
     return game ? {
@@ -132,7 +170,7 @@ export class PlayerQuizQueryRepository {
         },
         score: 0,
       },
-      questions: game.questions,
+      gameQuestions: game.questions,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,

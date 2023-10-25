@@ -1,4 +1,4 @@
-export type addPlayerToGamePairDto = {
+export type AddPlayerToGameDto = {
   id: string;
   startGameDate: Date;
   secondPlayerId: string;

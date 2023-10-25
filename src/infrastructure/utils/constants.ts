@@ -21,7 +21,7 @@ export enum AnswerStatus {
   correct = 'Correct',
   incorrect = 'Incorrect',
 }
-export enum GamePairStatus {
+export enum GameStatus {
   pending = 'PendingSecondPlayer',
   active = 'Active',
   finished = 'Finished',

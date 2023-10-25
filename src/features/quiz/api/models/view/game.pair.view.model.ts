@@ -1,11 +1,11 @@
-import {AnswerStatus, GamePairStatus} from '../../../../../infrastructure/utils/constants';
+import {AnswerStatus, GameStatus} from '../../../../../infrastructure/utils/constants';
 
 export type GamePairViewModel = {
   id: string;
   firstPlayerProgress: firstPlayerProgressType,
   secondPlayerProgress: secondPlayerProgressType,
-  questions: questionsType[] | null,
-  status: GamePairStatus;
+  gameQuestions: questionsType[] | null,
+  status: GameStatus;
   pairCreatedDate: Date;
   startGameDate: Date;
   finishGameDate: Date;
