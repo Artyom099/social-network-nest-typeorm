@@ -76,7 +76,7 @@ import {DevicesRepository} from './features/devices/infrastructure/devices.repos
 import {DevicesQueryRepository} from './features/devices/infrastructure/devices.query.repository';
 import {Question} from './features/quiz/entity/question.entity';
 import {Answer} from './features/quiz/entity/answer.entity';
-import {GamePair} from './features/quiz/entity/game.pair.entity';
+import {Game} from './features/quiz/entity/game.entity';
 import {Player} from './features/quiz/entity/player.entity';
 import {SAQuizController} from './features/quiz/api/controllers/sa.quiz.controller';
 import {PlayerQuizController} from './features/quiz/api/controllers/player.quiz.controller';
@@ -90,6 +90,7 @@ import {CreateQuestionUseCase} from './features/quiz/application/sa.use.cases/cr
 import {UpdateQuestionUseCase} from './features/quiz/application/sa.use.cases/update.question.use.case';
 import {DeleteQuestionUseCase} from './features/quiz/application/sa.use.cases/delete.question.use.case';
 import {PublishQuestionUseCase} from './features/quiz/application/sa.use.cases/publish.question.use.case';
+import {GameQuestion} from './features/quiz/entity/game.question.entity';
 
 const useCases = [
   CreatePairUseCase,
@@ -150,10 +151,12 @@ const useCases = [
       PostLikes,
       Comments,
       CommentLikes,
-      Question,
-      Answer,
-      GamePair,
+
+      Game,
       Player,
+      Answer,
+      Question,
+      GameQuestion,
     ])
   ],
   controllers: [

@@ -26,7 +26,7 @@ export class PlayerQuizQueryRepository {
     const player = await this.dataSource.query(`
     select *
     from player
-    where "userId" = $1 and "game_pair_id" = $2
+    where "userId" = $1 and "gameId" = $2
     `, [userId, gamePairId]);
 
     return player ? player.id : null;

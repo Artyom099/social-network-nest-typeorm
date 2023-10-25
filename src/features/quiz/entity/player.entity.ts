@@ -1,7 +1,7 @@
 import {Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Users} from '../../users/entity/user.entity';
 import {Answer} from './answer.entity';
-import {GamePair} from './game.pair.entity';
+import {Game} from './game.entity';
 
 @Entity()
 export class Player {
@@ -22,8 +22,8 @@ export class Player {
   @JoinColumn()
   answers: Answer[];
 
-  @OneToOne(() => GamePair)
-  game_pair: GamePair;
+  @OneToOne(() => Game)
+  game: Game;
   @Column()
-  gamePairId: string;
+  gameId: string;
 }

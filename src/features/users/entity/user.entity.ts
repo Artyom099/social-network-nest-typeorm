@@ -6,7 +6,7 @@ import {CommentLikes} from '../../comments/entity/comment.likes.entity';
 import {PostLikes} from '../../posts/entity/post.likes.entity';
 import {Comments} from '../../comments/entity/сomment.entity';
 import {Player} from '../../quiz/entity/player.entity';
-import {GamePair} from '../../quiz/entity/game.pair.entity';
+import {Game} from '../../quiz/entity/game.entity';
 
 @Entity()
 export class Users {

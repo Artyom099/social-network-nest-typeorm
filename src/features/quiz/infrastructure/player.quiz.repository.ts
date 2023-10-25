@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
-import {GamePair} from '../entity/game.pair.entity';
+import {Game} from '../entity/game.entity';
 import {GamePairStatus} from '../../../infrastructure/utils/constants';
 import {CreateGamePairDTO} from '../api/models/dto/create.game.pair.dto';
 import {Answer} from '../entity/answer.entity';
@@ -55,7 +55,7 @@ export class PlayerQuizRepository {
         userId: dto.userId,
         login: dto.login,
         // answers: dto.answers,
-        gamePairId: dto.gamePairId,
+        gameId: dto.gamePairId,
       })
       .execute()
   }
@@ -64,7 +64,7 @@ export class PlayerQuizRepository {
     await this.dataSource
       .createQueryBuilder()
       .insert()
-      .into(GamePair)
+      .into(Game)
       .values({
         id: dto.id,
         status: dto.status,
@@ -111,7 +111,7 @@ export class PlayerQuizRepository {
   async addPlayerToGamePair(dto: addPlayerToGamePairDto) {
     return this.dataSource
       .createQueryBuilder()
-      .update(GamePair)
+      .update(Game)
       .set({ secondPlayerId: dto.secondPlayerId, startGameDate: dto.startGameDate })
       .where("id = :id", { id: dto.id })
       .execute()
