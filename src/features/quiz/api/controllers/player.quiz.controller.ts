@@ -28,7 +28,7 @@ export class PlayerQuizController {
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
   async getCurrentGame(@Req() req) {
-    const currentGame = await this.playerQueryRepository.getCurrentGame(req.userId)
+    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId)
     if (!currentGame) {
       throw new NotFoundException();
     } else {
@@ -54,7 +54,7 @@ export class PlayerQuizController {
   @Post('connection')
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req) {
-    const currentGame = await this.playerQueryRepository.getCurrentGame(req.userId)
+    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId)
     if (currentGame) {
       throw new ForbiddenException();
     } else {
@@ -65,7 +65,7 @@ export class PlayerQuizController {
   @Post('my-current/answers')
   @HttpCode(HttpStatus.OK)
   async sendAnswer(@Req() req, @Body() inputModel: AnswerInputModel) {
-    const currentGame = await this.playerQueryRepository.getCurrentGame(req.userId)
+    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId)
     //todo - добавить кейс, что игрок ответил на все вопросы и ждет ответов другого игрока
     if (!currentGame || (currentGame && 1 !== 1)) {
       throw new ForbiddenException();
