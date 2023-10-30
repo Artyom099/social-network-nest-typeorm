@@ -15,10 +15,11 @@ export class SAQuizQueryRepository {
   ) {}
 
   async getQuestion(id: string): Promise<Question | null> {
-    const question = await this.questionRepo
-      .createQueryBuilder('question')
-      .where('question.id = :id', { id })
-      .getOne();
+    const [question] = await this.dataSource.query(`
+    select * 
+    from question
+    where "id" = $1
+    `, [id])
 
     return question ? question : null
   }
@@ -28,7 +29,7 @@ export class SAQuizQueryRepository {
       select count(*)
       from question
       where ("body" ilike $1)
-      and ("publishedStatus" = $2 or $2 is null)
+      and ("published" = $2 or $2 is null)
     `, [
       `%${query.bodySearchTerm}%`,
       query.publishedStatus,
@@ -55,7 +56,7 @@ export class SAQuizQueryRepository {
         body: q.body,
         correctAnswers: q.correctAnswers,
         published: q.published,
-        crestedAt: q.crestedAt,
+        createdAt: q.createdAt,
         updatedAt: q.updatedAt,
       }
     })

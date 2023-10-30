@@ -1,7 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {InjectDataSource} from '@nestjs/typeorm';
-import {Column, DataSource} from 'typeorm';
-import {Users} from '../../users/entity/user.entity';
+import {DataSource} from 'typeorm';
 import {Question} from '../entity/question.entity';
 import {CreateQuestionInputModel} from '../api/models/input/create.question.input.model';
 import {CreateQuestionDTO} from '../api/models/dto/create.question.dto';
@@ -21,7 +20,6 @@ export class SAQuizRepository {
         correctAnswers: dto.correctAnswers,
         published: dto.published,
         createdAt: dto.createdAt,
-        updatedAt: dto.updatedAt,
       })
       .execute()
   }
@@ -37,7 +35,7 @@ export class SAQuizRepository {
     return this.dataSource
       .createQueryBuilder()
       .update(Question)
-      .set({ passwordSalt: dto })
+      .set({ body: dto.body, correctAnswers: dto.correctAnswers, updatedAt: new Date()})
       .where("id = :id", { id })
       .execute()
   }
@@ -45,7 +43,7 @@ export class SAQuizRepository {
     return this.dataSource
       .createQueryBuilder()
       .update(Question)
-      .set({ published: published})
+      .set({ published: published })
       .where("id = :id", { id })
       .execute()
   }

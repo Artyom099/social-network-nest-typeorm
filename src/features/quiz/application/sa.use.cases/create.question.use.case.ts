@@ -23,7 +23,6 @@ export class CreateQuestionUseCase implements ICommandHandler<CreateQuestionComm
       correctAnswers: command.inputModel.correctAnswers,
       published: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
     }
     await this.saQuizRepository.createQuestion(dto)
     return this.saQuizQueryRepository.getQuestion(dto.id)

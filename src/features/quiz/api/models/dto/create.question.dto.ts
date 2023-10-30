@@ -4,5 +4,4 @@ export type CreateQuestionDTO = {
   correctAnswers: string[];
   published: boolean;
   createdAt: Date;
-  updatedAt: Date;
 }

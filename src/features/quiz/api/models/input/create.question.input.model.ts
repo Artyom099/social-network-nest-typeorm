@@ -9,6 +9,5 @@ export class CreateQuestionInputModel {
   body: string;
   @IsArray()
   @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
   correctAnswers: string[];
 }

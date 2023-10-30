@@ -1,5 +1,4 @@
-import {Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {Game} from './game.entity';
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {Answer} from './answer.entity';
 import {GameQuestion} from './game.question.entity';
 
@@ -15,7 +14,7 @@ export class Question {
   published: boolean;
   @Column()
   createdAt: Date;
-  @Column()
+  @Column({ nullable: true })
   updatedAt: Date;
 
   @OneToMany(() => GameQuestion, gq => gq.question)

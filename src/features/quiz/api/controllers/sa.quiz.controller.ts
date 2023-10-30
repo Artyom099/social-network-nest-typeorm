@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,7 +9,7 @@ import {
   NotFoundException,
   Param,
   Post,
-  Put,
+  Put, Query,
   UseGuards
 } from '@nestjs/common';
 import {BasicAuthGuard} from '../../../../infrastructure/guards/basic-auth.guard';
@@ -32,7 +33,7 @@ export class SAQuizController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getQuestions(query: GamePairPaginationInput) {
+  async getQuestions(@Query() query: GamePairPaginationInput) {
     return this.saQuizQueryRepository.getQuestions(query);
   }
 
@@ -44,21 +45,25 @@ export class SAQuizController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteQuestion(@Param('id') questionId: string) {
-    const question = await this.saQuizQueryRepository.getQuestion(questionId)
+  async deleteQuestion(@Param('id') id: string) {
+    const questionId = (id !== 'undefined') ? id : null;
+    if (!questionId) throw new BadRequestException();
+    const question = await this.saQuizQueryRepository.getQuestion(questionId);
     if (!question) {
       throw new NotFoundException();
     } else {
-      return this.commandBus.execute(new DeleteQuestionCommand(questionId))
+      return this.commandBus.execute(new DeleteQuestionCommand(questionId));
     }
   }
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateQuestion(
-    @Param('id') questionId: string,
+    @Param('id') id: string,
     @Body() inputModel: CreateQuestionInputModel,
   ) {
+    const questionId = (id !== 'undefined') ? id : null;
+    if (!questionId) throw new BadRequestException();
     const question = await this.saQuizQueryRepository.getQuestion(questionId)
     if (!question) {
       throw new NotFoundException();
@@ -70,10 +75,12 @@ export class SAQuizController {
   @Put(':id/publish')
   @HttpCode(HttpStatus.NO_CONTENT)
   async publishQuestion(
-    @Param('id') questionId: string,
+    @Param('id') id: string,
     @Body() inputModel: PublishQuestionInputModel,
   ) {
-    const question = this.saQuizQueryRepository.getQuestion(questionId)
+    const questionId = (id !== 'undefined') ? id : null;
+    if (!questionId) throw new BadRequestException();
+    const question = await this.saQuizQueryRepository.getQuestion(questionId)
     if (!question) {
       throw new NotFoundException();
     } else {

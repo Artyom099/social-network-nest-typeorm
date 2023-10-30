@@ -23,6 +23,6 @@ export class Answer {
   @OneToMany(() => Player, pl => pl.answers)
   @JoinColumn()
   player: Player;
-  @Column()
+  @Column({type: 'uuid'})
   playerId: string;
 }
