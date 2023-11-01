@@ -14,6 +14,6 @@ export class PublishQuestionUseCase implements ICommandHandler<PublishQuestionCo
   constructor(private saQuizRepository: SAQuizRepository) {}
 
   async execute(command: PublishQuestionCommand) {
-    await this.saQuizRepository.publishQuestion(command.questionId, command.inputModel.published);
+    return this.saQuizRepository.publishQuestion(command.questionId, command.inputModel.published);
   }
 }

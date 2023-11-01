@@ -23,28 +23,45 @@ export class CreatePairUseCase implements ICommandHandler<CreatePairCommand> {
 
   // добавлять вопросы в игру когда добавился 2й игрок
   async execute(command: CreatePairCommand) {
+    console.log('333');
     // смотрим, ждет ли кто-то пару
     const pendingGame = await this.playerQuizQueryRepository.getPendingGame();
     const user = await this.usersQueryRepository.getUserById(command.userId)
 
+    console.log('444');
     const playerDTO: CreatePlayerDTO = {
       id: randomUUID(),
       score: 0,
       userId: command.userId,
       login: user!.login,
       answers: [],
-      gamePairId: pendingGame.id,
+      gameId: pendingGame?.id,
     }
     await this.playerQuizRepository.createPlayer(playerDTO)
 
+    console.log({ pendingGame: pendingGame });
+
     if (pendingGame) {
-      // если да, то
-      // добавляем 5 вопросов
+      // если да, то создаем игрока и добавляем 5 вопросов
+      console.log('+++');
       const questionsDto: AddQuestionsToGameDto = {
         gameId: pendingGame.id,
         questionsId: await this.playerQuizQueryRepository.getFiveQuestionsId()
       }
       await this.playerQuizRepository.addQuestionsToGame(questionsDto)
+
+      //gameId
+      // const playerDTO: CreatePlayerDTO = {
+      //   id: randomUUID(),
+      //   score: 0,
+      //   userId: command.userId,
+      //   login: user!.login,
+      //   answers: [],
+      //   gameId: pendingGame.id,
+      // }
+      // await this.playerQuizRepository.createPlayer(playerDTO)
+
+      console.log('666');
       // добавляем игрока в эту пару и начинаем игру
       const dto: AddPlayerToGameDto = {
         id: pendingGame.id,
@@ -54,7 +71,19 @@ export class CreatePairUseCase implements ICommandHandler<CreatePairCommand> {
       return this.playerQuizRepository.addPlayerToGame(dto)
 
     } else {
-      // иначе создаем новую игру и ждем следующего игрока
+      console.log('---');
+      // no gameId
+      // const playerDTO: CreatePlayerDTO = {
+      //   id: randomUUID(),
+      //   score: 0,
+      //   userId: command.userId,
+      //   login: user!.login,
+      //   answers: [],
+      //   gameId: '123',
+      // }
+      // await this.playerQuizRepository.createPlayer(playerDTO)
+
+      // иначе создаем новую игру, первого игрока и ждем следующего игрока
       const dto: CreateGameDto = {
         id: randomUUID(),
         status: GameStatus.pending,

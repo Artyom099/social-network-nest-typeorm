@@ -248,8 +248,6 @@ describe('AuthController (e2e)', () => {
   it('14 – POST:/auth/refresh-token – return 200, new pair of tokens', async () => {
     const {accessToken, firstRefreshToken} = expect.getState();
     await sleep(1.1);
-    console.log('14------14');
-    console.log(`refreshToken=${firstRefreshToken}`);
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/refresh-token')
       .set('cookie', `refreshToken=${firstRefreshToken}`);
@@ -278,9 +276,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it('15 – POST:/auth/refresh-token – return 401 with no token', async () => {
-    const goodRefreshTokenResponse = await request(server).post(
-      '/auth/refresh-token',
-    );
+    const goodRefreshTokenResponse = await request(server).post('/auth/refresh-token');
 
     expect(goodRefreshTokenResponse).toBeDefined();
     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);

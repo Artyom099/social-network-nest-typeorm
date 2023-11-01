@@ -239,6 +239,7 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ firstCreatedBlog: createBlogResponse.body });
   });
+
   it('8 – POST:/blogger/blogs/:id/posts – return 201 & create post by 1st user', async () => {
     const { firstAccessToken, firstCreatedBlog } = expect.getState();
     const firstPost = {

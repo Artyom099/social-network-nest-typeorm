@@ -7,7 +7,7 @@ import {CreateGameDto} from '../api/models/dto/create.game.dto';
 import {Answer} from '../entity/answer.entity';
 import {CreateAnswerDTO} from '../api/models/dto/create.answer.dto';
 import {AnswerViewModel} from '../api/models/view/answer.view.model';
-import {GamePairViewModel} from '../api/models/view/game.pair.view.model';
+import {GameViewModel} from '../api/models/view/game.view.model';
 import {Player} from '../entity/player.entity';
 import {CreatePlayerDTO} from '../api/models/dto/create.player.dto';
 import {AddQuestionsToGameDto} from '../api/models/dto/addQuestionsToGameDto';
@@ -54,8 +54,7 @@ export class PlayerQuizRepository {
         score: dto.score,
         userId: dto.userId,
         login: dto.login,
-        // answers: dto.answers,
-        gameId: dto.gamePairId,
+        // gameId: dto.gameId,
       })
       .execute()
   }
@@ -68,7 +67,7 @@ export class PlayerQuizRepository {
       .execute()
   }
 
-  async createGame(dto: CreateGameDto): Promise<GamePairViewModel> {
+  async createGame(dto: CreateGameDto): Promise<GameViewModel> {
     await this.dataSource
       .createQueryBuilder()
       .insert()
@@ -84,10 +83,10 @@ export class PlayerQuizRepository {
     // заджоинил игрока к игре
     const [game] = await this.dataSource.query(`
     select *
-    from game_pair gp
+    from game g
     left join player pl
-    on gp."firstPlayerId" = pl."id"
-    where gp."id" = $1
+    on g."firstPlayerId" = pl."id"
+    where g."id" = $1
     `, [dto.id])
 
     return {

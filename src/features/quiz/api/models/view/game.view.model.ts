@@ -1,6 +1,6 @@
 import {AnswerStatus, GameStatus} from '../../../../../infrastructure/utils/constants';
 
-export type GamePairViewModel = {
+export type GameViewModel = {
   id: string;
   firstPlayerProgress: firstPlayerProgressType,
   secondPlayerProgress: secondPlayerProgressType,

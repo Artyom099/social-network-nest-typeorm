@@ -1,9 +1,9 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectDataSource, InjectRepository} from '@nestjs/typeorm';
 import {DataSource, Repository} from 'typeorm';
 import {Users} from '../../users/entity/user.entity';
 import {GameStatus} from '../../../infrastructure/utils/constants';
-import {GamePairViewModel} from '../api/models/view/game.pair.view.model';
+import {GameViewModel} from '../api/models/view/game.view.model';
 import {AnswerViewModel} from '../api/models/view/answer.view.model';
 import {Question} from '../entity/question.entity';
 
@@ -63,7 +63,7 @@ export class PlayerQuizQueryRepository {
   }
 
   async getPendingGame() {
-    const game = await this.dataSource.query(`
+    const [game] = await this.dataSource.query(`
     select *
     from game
     where "status" = $1
@@ -73,7 +73,7 @@ export class PlayerQuizQueryRepository {
   }
 
   //todo - дописать джоин или подзапрос для айди и логина игрока
-  async getGameById(id: string): Promise<GamePairViewModel | null> {
+  async getGameById(id: string): Promise<GameViewModel | null> {
     const [game] = await this.dataSource.query(`
     select *,
            
@@ -89,7 +89,7 @@ export class PlayerQuizQueryRepository {
     where g."id" = $1
     `, [id]);
 
-    if (!game) throw new Error();
+    if (!game) throw new NotFoundException();
 
     const questions = await this.dataSource.query(`
     select q."id", q."body"
@@ -135,7 +135,9 @@ export class PlayerQuizQueryRepository {
       finishGameDate: game.finishGameDate,
     } : null;
   }
-  async getActiveGame(id: string): Promise<GamePairViewModel | null> {
+
+  async getActiveGame(id: string): Promise<GameViewModel | null> {
+    console.log('1----1');
     const [game] = await this.dataSource.query(`
     select *,
 
@@ -151,7 +153,9 @@ export class PlayerQuizQueryRepository {
     where g."id" = $1 and "status" = $2
     `, [id, GameStatus.active]);
 
-    if (!game) throw new Error();
+    console.log('2----2');
+    if (!game) return null;
+    console.log('2');
 
     const questions = await this.dataSource.query(`
     select q."id", q."body"
@@ -160,17 +164,20 @@ export class PlayerQuizQueryRepository {
     on q."id" = gq."questionId"
     where gq."gameId" = $1
     order by gq."questionNumber"
-    `, [id])
+    `, [id]);
+    console.log('3----3');
     const firstPlayerAnswers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"
     from answer
     where playerId = $1
-    `, [game.firstPlayerId])
+    `, [game.firstPlayerId]);
+    console.log('4----4');
     const secondPlayerAnswers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"
     from answer
     where playerId = $1
-    `, [game.secondPlayerId])
+    `, [game.secondPlayerId]);
+    console.log('5----5');
 
     return game ? {
       id: game.id,

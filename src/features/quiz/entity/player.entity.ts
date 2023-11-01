@@ -22,8 +22,8 @@ export class Player {
   @JoinColumn()
   answers: Answer[];
 
-  @OneToOne(() => Game)
+  @OneToOne(() => Game, { nullable: true })
   game: Game;
-  @Column()
-  gameId: string;
+  // @Column({ nullable: true })
+  // gameId: string;
 }

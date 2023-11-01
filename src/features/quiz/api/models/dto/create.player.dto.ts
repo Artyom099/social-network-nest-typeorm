@@ -4,5 +4,5 @@ export type CreatePlayerDTO = {
   userId: string;
   login: string;
   answers: string[],
-  gamePairId: string;
+  gameId: string;
 }

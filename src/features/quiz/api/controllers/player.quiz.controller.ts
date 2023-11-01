@@ -28,7 +28,7 @@ export class PlayerQuizController {
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
   async getCurrentGame(@Req() req) {
-    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId)
+    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId);
     if (!currentGame) {
       throw new NotFoundException();
     } else {
@@ -54,10 +54,13 @@ export class PlayerQuizController {
   @Post('connection')
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req) {
-    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId)
+    console.log('000');
+    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId);
+    console.log('111');
     if (currentGame) {
       throw new ForbiddenException();
     } else {
+      console.log('222');
       return this.commandBus.execute(new CreatePairCommand(req.userId))
     }
   }

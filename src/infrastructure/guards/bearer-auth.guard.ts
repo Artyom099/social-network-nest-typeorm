@@ -14,7 +14,9 @@ export class BearerAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    // console.log({ request_1: request.headers.authorization });
     const accessToken = this.extractTokenFromHeader(request);
+    // console.log({ accessToken_1: accessToken });
     if (!accessToken) throw new UnauthorizedException();
 
     try {

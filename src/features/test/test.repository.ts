@@ -17,11 +17,12 @@ export class TestRepository {
       this.requestModel.deleteMany(),
 
       this.dataSource.query(`
-      delete from "question";
-      delete from "answer";
-      delete from "player";
-      delete from "game_question";
-      delete from "game";
+      delete from "question" cascade;
+      delete from "answer" cascade;
+      delete from "player" cascade;
+      delete from "game_question" cascade;
+      delete from "game" cascade;
+
       delete from "comment_likes";
       delete from "post_likes";
       delete from "banned_users_for_blog";
