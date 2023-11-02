@@ -9,12 +9,12 @@ import {UsersQueryRepository} from '../../../users/infrastructure/users.query.re
 import {AddQuestionsToGameDto} from '../../api/models/dto/addQuestionsToGameDto';
 import {AddPlayerToGameDto} from '../../api/models/dto/add.player.to.game.dto';
 
-export class CreatePairCommand {
+export class CreateGameCommand {
   constructor(public userId: string) {}
 }
 
-@CommandHandler(CreatePairCommand)
-export class CreatePairUseCase implements ICommandHandler<CreatePairCommand> {
+@CommandHandler(CreateGameCommand)
+export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
   constructor(
     private playerQuizRepository: PlayerQuizRepository,
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
@@ -22,7 +22,7 @@ export class CreatePairUseCase implements ICommandHandler<CreatePairCommand> {
   ) {}
 
   // добавлять вопросы в игру когда добавился 2й игрок
-  async execute(command: CreatePairCommand) {
+  async execute(command: CreateGameCommand) {
     console.log('333');
     // смотрим, ждет ли кто-то пару
     const pendingGame = await this.playerQuizQueryRepository.getPendingGame();
@@ -42,14 +42,14 @@ export class CreatePairUseCase implements ICommandHandler<CreatePairCommand> {
     console.log({ pendingGame: pendingGame });
 
     if (pendingGame) {
-      // если да, то создаем игрока и добавляем 5 вопросов
-      console.log('+++');
+      // если да, то добавляем 5 вопросов
       const questionsDto: AddQuestionsToGameDto = {
         gameId: pendingGame.id,
         questionsId: await this.playerQuizQueryRepository.getFiveQuestionsId()
       }
       await this.playerQuizRepository.addQuestionsToGame(questionsDto)
 
+      // создаем игрока
       //gameId
       // const playerDTO: CreatePlayerDTO = {
       //   id: randomUUID(),
@@ -61,7 +61,6 @@ export class CreatePairUseCase implements ICommandHandler<CreatePairCommand> {
       // }
       // await this.playerQuizRepository.createPlayer(playerDTO)
 
-      console.log('666');
       // добавляем игрока в эту пару и начинаем игру
       const dto: AddPlayerToGameDto = {
         id: pendingGame.id,
@@ -71,7 +70,7 @@ export class CreatePairUseCase implements ICommandHandler<CreatePairCommand> {
       return this.playerQuizRepository.addPlayerToGame(dto)
 
     } else {
-      console.log('---');
+      // создаем игрока
       // no gameId
       // const playerDTO: CreatePlayerDTO = {
       //   id: randomUUID(),

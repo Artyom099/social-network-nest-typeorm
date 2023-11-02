@@ -85,7 +85,7 @@ import {PlayerQuizRepository} from './features/quiz/infrastructure/player.quiz.r
 import {SAQuizRepository} from './features/quiz/infrastructure/sa.quiz.repository';
 import {SAQuizQueryRepository} from './features/quiz/infrastructure/sa.quiz.query.repository';
 import {CreateAnswerUseCase} from './features/quiz/application/player.use.cases/create.answer.use.case';
-import {CreatePairUseCase} from './features/quiz/application/player.use.cases/create.pair.use.case';
+import {CreateGameUseCase} from './features/quiz/application/player.use.cases/create.game.use.case';
 import {CreateQuestionUseCase} from './features/quiz/application/sa.use.cases/create.question.use.case';
 import {UpdateQuestionUseCase} from './features/quiz/application/sa.use.cases/update.question.use.case';
 import {DeleteQuestionUseCase} from './features/quiz/application/sa.use.cases/delete.question.use.case';
@@ -93,7 +93,7 @@ import {PublishQuestionUseCase} from './features/quiz/application/sa.use.cases/p
 import {GameQuestion} from './features/quiz/entity/game.question.entity';
 
 const useCases = [
-  CreatePairUseCase,
+  CreateGameUseCase,
   CreateAnswerUseCase,
 
   CreateQuestionUseCase,

@@ -14,7 +14,7 @@ import {CommandBus} from '@nestjs/cqrs';
 import {BearerAuthGuard} from '../../../../infrastructure/guards/bearer-auth.guard';
 import {PlayerQuizQueryRepository} from '../../infrastructure/player.quiz.query.repository';
 import {AnswerInputModel} from '../models/input/answer.input.model';
-import {CreatePairCommand} from '../../application/player.use.cases/create.pair.use.case';
+import {CreateGameCommand} from '../../application/player.use.cases/create.game.use.case';
 import {CreateAnswerCommand} from '../../application/player.use.cases/create.answer.use.case';
 
 @Controller('pair-game-quiz/pairs')
@@ -61,7 +61,7 @@ export class PlayerQuizController {
       throw new ForbiddenException();
     } else {
       console.log('222');
-      return this.commandBus.execute(new CreatePairCommand(req.userId))
+      return this.commandBus.execute(new CreateGameCommand(req.userId))
     }
   }
 
