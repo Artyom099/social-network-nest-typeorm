@@ -21,14 +21,13 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  // добавлять вопросы в игру когда добавился 2й игрок
   async execute(command: CreateGameCommand) {
-    console.log('333');
+    console.log('3---3');
     // смотрим, ждет ли кто-то пару
     const pendingGame = await this.playerQuizQueryRepository.getPendingGame();
     const user = await this.usersQueryRepository.getUserById(command.userId)
 
-    console.log('444');
+    console.log('4---4');
     const playerDTO: CreatePlayerDTO = {
       id: randomUUID(),
       score: 0,
@@ -39,7 +38,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     }
     await this.playerQuizRepository.createPlayer(playerDTO)
 
-    console.log({ pendingGame: pendingGame });
+    console.log({ pending___Game: pendingGame });
 
     if (pendingGame) {
       // если да, то добавляем 5 вопросов
