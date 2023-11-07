@@ -32,7 +32,7 @@ export class PlayerQuizController {
     if (!currentGame) {
       throw new NotFoundException();
     } else {
-      return currentGame
+      return currentGame;
     }
   }
 
@@ -54,14 +54,11 @@ export class PlayerQuizController {
   @Post('connection')
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req) {
-    console.log('000');
     const currentGame = await this.playerQueryRepository.getActiveGame(req.userId);
-    console.log('111');
     if (currentGame) {
       throw new ForbiddenException();
     } else {
-      console.log('222');
-      return this.commandBus.execute(new CreateGameCommand(req.userId))
+      return this.commandBus.execute(new CreateGameCommand(req.userId));
     }
   }
 
@@ -73,7 +70,7 @@ export class PlayerQuizController {
     if (!currentGame || (currentGame && 1 !== 1)) {
       throw new ForbiddenException();
     } else {
-      return this.commandBus.execute(new CreateAnswerCommand(req.userId, inputModel.answer))
+      return this.commandBus.execute(new CreateAnswerCommand(req.userId, inputModel.answer));
     }
   }
 }

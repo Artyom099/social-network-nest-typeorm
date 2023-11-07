@@ -49,16 +49,6 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
       await this.playerQuizRepository.addQuestionsToGame(questionsDto)
 
       // создаем игрока
-      //gameId
-      // const playerDTO: CreatePlayerDTO = {
-      //   id: randomUUID(),
-      //   score: 0,
-      //   userId: command.userId,
-      //   login: user!.login,
-      //   answers: [],
-      //   gameId: pendingGame.id,
-      // }
-      // await this.playerQuizRepository.createPlayer(playerDTO)
 
       // добавляем игрока в эту пару и начинаем игру
       const dto: AddPlayerToGameDto = {
@@ -70,16 +60,6 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
 
     } else {
       // создаем игрока
-      // no gameId
-      // const playerDTO: CreatePlayerDTO = {
-      //   id: randomUUID(),
-      //   score: 0,
-      //   userId: command.userId,
-      //   login: user!.login,
-      //   answers: [],
-      //   gameId: '123',
-      // }
-      // await this.playerQuizRepository.createPlayer(playerDTO)
 
       // иначе создаем новую игру, первого игрока и ждем следующего игрока
       const dto: CreateGameDto = {
