@@ -350,13 +350,12 @@ describe('QuizController (e2e)', () => {
     })
   });
 
-  it('8 – POST:sa/users – create 1st user by admin & login user', async () => {
+  it('8 – POST:sa/users – create 1st & 2nd users by admin & login them', async () => {
     const firstUser = {
       login: 'lg-1111',
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };
-
     const firstCreateResponse = await request(server)
       .post('/sa/users')
       .auth('admin', 'qwerty', {type: 'basic'})
@@ -391,7 +390,55 @@ describe('QuizController (e2e)', () => {
     expect(refreshToken).toBeDefined();
     expect(refreshToken).toEqual(expect.any(String));
 
-    expect.setState({ firstAccessToken, firstRefreshToken: refreshToken });
+
+    const secondUser = {
+      login: 'lg-2222',
+      password: 'qwerty2',
+      email: 'artyom22222@gmaill.com',
+    };
+    const secondCreateResponse = await request(server)
+      .post('/sa/users')
+      .auth('admin', 'qwerty', {type: 'basic'})
+      .send({
+        login: secondUser.login,
+        password: secondUser.password,
+        email: secondUser.email,
+      })
+      .expect(HttpStatus.CREATED);
+
+    const secondCreatedUser = secondCreateResponse.body;
+    expect(secondCreatedUser).toEqual({
+      id: expect.any(String),
+      login: secondUser.login,
+      email: secondUser.email,
+      createdAt: expect.any(String),
+    });
+
+    const loginResponse2 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail: secondUser.login,
+        password: secondUser.password,
+      });
+
+    expect(loginResponse2).toBeDefined();
+    expect(loginResponse2.status).toBe(HttpStatus.OK);
+    expect(loginResponse2.body).toEqual({ accessToken: expect.any(String) });
+    const secondAccessToken = loginResponse2.body;
+
+    const refreshToken2 = getRefreshTokenByResponse(loginResponse2);
+    expect(refreshToken2).toBeDefined();
+    expect(refreshToken2).toEqual(expect.any(String));
+
+
+    expect.setState({
+      firstCreatedUser,
+      secondCreatedUser,
+      firstAccessToken,
+      firstRefreshToken: refreshToken,
+      secondAccessToken,
+      secondRefreshToken: refreshToken2,
+    });
   });
 
   it('9 – GET:pair-game-quiz/pairs/my-current – 404 no active game', async () => {
@@ -409,8 +456,8 @@ describe('QuizController (e2e)', () => {
 
   });
 
-  it('10 – GET:pair-game-quiz/pairs/connection – 200', async () => {
-    const { firstAccessToken, firstRefreshToken } = expect.getState();
+  it('10 – GET:pair-game-quiz/pairs/connection – 200 1st player waiting second player', async () => {
+    const { firstAccessToken, firstCreatedUser } = expect.getState();
 
     const connectResponse = await request(server)
       .post(`/pair-game-quiz/pairs/connection`)
@@ -424,8 +471,8 @@ describe('QuizController (e2e)', () => {
       firstPlayerProgress: {
         answers: [],
         player: {
-          id: expect.any(String),
-          login: expect.any(String),
+          id: firstCreatedUser.id,
+          login: firstCreatedUser.login,
         },
         score: 0,
       },
@@ -441,6 +488,42 @@ describe('QuizController (e2e)', () => {
       status: GameStatus.pending,
       pairCreatedDate: expect.any(String),
       startGameDate: null,
+      finishGameDate: null,
+    })
+
+  });
+  it('11 – GET:pair-game-quiz/pairs/connection – 200 connect 2nd player $ start game', async () => {
+    const { secondAccessToken, firstCreatedUser, secondCreatedUser } = expect.getState();
+
+    const connectResponse = await request(server)
+      .post(`/pair-game-quiz/pairs/connection`)
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+
+    expect(connectResponse).toBeDefined();
+    expect(connectResponse.status).toEqual(HttpStatus.OK);
+
+    expect(connectResponse.body).toEqual({
+      id: expect.any(String),
+      firstPlayerProgress: {
+        answers: [],
+        player: {
+          id: firstCreatedUser.id,
+          login: firstCreatedUser.login,
+        },
+        score: 0,
+      },
+      secondPlayerProgress: {
+        answers: [],
+        player: {
+          id: secondCreatedUser.id,
+          login: secondCreatedUser.login,
+        },
+        score: 0,
+      },
+      gameQuestions: [],
+      status: GameStatus.active,
+      pairCreatedDate: expect.any(String),
+      startGameDate: expect.any(String),
       finishGameDate: null,
     })
 
