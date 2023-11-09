@@ -11,7 +11,11 @@ export class GameQuestion {
 
   @ManyToOne(() => Game)
   game: Game;
+  @Column()
+  gameId: string;
 
   @ManyToOne(() => Question)
   question: Question;
+  @Column()
+  questionId: string;
 }

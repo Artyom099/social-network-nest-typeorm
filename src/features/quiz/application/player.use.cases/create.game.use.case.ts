@@ -41,11 +41,13 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     console.log({ pending___Game: pendingGame });
 
     if (pendingGame) {
-      // если да, то добавляем 5 вопросов
+      // если да, то
+      // добавляем рандомных 5 вопросов
       const questionsDto: AddQuestionsToGameDto = {
         gameId: pendingGame.id,
         questionsId: await this.playerQuizQueryRepository.getFiveQuestionsId()
       }
+      await this.playerQuizRepository.crateFiveGameQuestions(questionsDto)
       await this.playerQuizRepository.addQuestionsToGame(questionsDto)
 
       // создаем игрока

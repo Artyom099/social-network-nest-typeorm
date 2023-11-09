@@ -12,6 +12,7 @@ import {Player} from '../entity/player.entity';
 import {CreatePlayerDTO} from '../api/models/dto/create.player.dto';
 import {AddQuestionsToGameDto} from '../api/models/dto/addQuestionsToGameDto';
 import {AddPlayerToGameDto} from '../api/models/dto/add.player.to.game.dto';
+import {GameQuestion} from '../entity/game.question.entity';
 
 @Injectable()
 export class PlayerQuizRepository {
@@ -139,6 +140,20 @@ export class PlayerQuizRepository {
       .update(Game)
       .set({ gameQuestions: dto.questionsId })
       .where("id = :id", { id: dto.gameId })
+      .execute()
+  }
+
+  // todo - как создать 5 вопросов с разными questionsId и questionNumber
+  async crateFiveGameQuestions(dto: AddQuestionsToGameDto) {
+    await this.dataSource
+      .createQueryBuilder()
+      .insert()
+      .into(GameQuestion)
+      .values({
+        gameId: dto.gameId,
+        questionId: dto.questionsId[0],
+        questionNumber: 1,
+      })
       .execute()
   }
 }
