@@ -144,7 +144,7 @@ export class PlayerQuizRepository {
   }
 
   // todo - как создать 5 вопросов с разными questionsId и questionNumber
-  async crateFiveGameQuestions(dto: AddQuestionsToGameDto) {
+  async crateFiveGameQuestions2(dto: AddQuestionsToGameDto) {
     await this.dataSource
       .createQueryBuilder()
       .insert()
@@ -155,5 +155,23 @@ export class PlayerQuizRepository {
         questionNumber: 1,
       })
       .execute()
+  }
+  async crateFiveGameQuestions(dto: AddQuestionsToGameDto) {
+    const [fiveQuestions] = await this.dataSource.query(`
+    insert into game_question
+    (gameId, questionId, questionNumber) values
+    ($1, $2, 1),
+    ($1, $3, 2),
+    ($1, $4, 3),
+    ($1, $5, 4),
+    ($1, $6, 5);
+    `, [
+      dto.gameId,
+      dto.questionsId[0],
+      dto.questionsId[1],
+      dto.questionsId[2],
+      dto.questionsId[3],
+      dto.questionsId[4],
+    ])
   }
 }

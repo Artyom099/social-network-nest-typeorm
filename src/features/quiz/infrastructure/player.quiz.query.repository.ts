@@ -14,16 +14,14 @@ export class PlayerQuizQueryRepository {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
 
-  async getFiveQuestionsId() {
-    const questionsId = await this.dataSource.query(`
+  async getFiveQuestionsId(): Promise<string[]> {
+    return this.dataSource.query(`
     select "id"
     from question
     order by random()
     limit 5
     offset random()
     `,)
-
-    return questionsId ? questionsId : null
   }
   // достаем вопрос по айди игры и номеру вопроса
   async getQuestion(gameId: string, questionNumber: number): Promise<Question> {

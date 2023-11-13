@@ -19,8 +19,9 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
   ) {}
 
+  //todo - добавить кейс, что игрок ответил на все вопросы и ждет ответов другого игрока
   //todo - как завершить игру, только когда оба игрока ответили на все вопросы
-  // и в то же время не давать игроку отвечат, когда он ответил все вопросы и ждет другого игрока?
+  // и в то же время не давать игроку отвечать, когда он ответил все вопросы и ждет другого игрока?
   async execute(command: CreateAnswerCommand) {
     // достаем игру по юзеру
     const currentGame = await this.playerQuizQueryRepository.getActiveGame(command.userId)

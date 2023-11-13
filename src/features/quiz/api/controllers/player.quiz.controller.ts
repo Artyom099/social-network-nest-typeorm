@@ -67,7 +67,7 @@ export class PlayerQuizController {
   async sendAnswer(@Req() req, @Body() inputModel: AnswerInputModel) {
     const currentGame = await this.playerQueryRepository.getActiveGame(req.userId)
     //todo - добавить кейс, что игрок ответил на все вопросы и ждет ответов другого игрока
-    if (!currentGame || (currentGame && 1 !== 1)) {
+    if (!currentGame) {
       throw new ForbiddenException();
     } else {
       return this.commandBus.execute(new CreateAnswerCommand(req.userId, inputModel.answer));

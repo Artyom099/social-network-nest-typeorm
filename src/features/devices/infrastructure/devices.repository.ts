@@ -3,7 +3,6 @@ import {DeviceViewModel} from '../api/models/device.view.model';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {CreateDeviceDTO} from '../api/models/create.device.dto';
-import {Users} from '../../users/entity/user.entity';
 import {Devices} from '../entity/device.entity';
 
 @Injectable()
@@ -11,7 +10,7 @@ export class DevicesRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async createDevice(dto: CreateDeviceDTO): Promise<DeviceViewModel> {
-    const test = await this.dataSource
+    await this.dataSource
       .createQueryBuilder()
       .insert()
       .into(Devices)
