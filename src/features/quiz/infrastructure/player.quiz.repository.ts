@@ -134,6 +134,8 @@ export class PlayerQuizRepository {
       .execute()
   }
 
+  //todo - возможно надо записывать массив через цикл - начать с этого!!!!!!!!!!!!!!!!!!!!!!!!!
+  // почему-то не получается просто присвоить массив строк полю - @JoinTable()
   async addQuestionsToGame(dto: AddQuestionsToGameDto) {
     return this.dataSource
       .createQueryBuilder()
@@ -143,7 +145,7 @@ export class PlayerQuizRepository {
       .execute()
   }
 
-  // todo - как создать 5 вопросов с разными questionsId и questionNumber
+  // как создать 5 вопросов с разными questionsId и questionNumber
   async crateFiveGameQuestions2(dto: AddQuestionsToGameDto) {
     await this.dataSource
       .createQueryBuilder()
@@ -157,7 +159,6 @@ export class PlayerQuizRepository {
       .execute()
   }
   async crateFiveGameQuestions(dto: AddQuestionsToGameDto) {
-    console.log({AddQuestionsToGameDto__11: dto.questionsId});
     const [fiveQuestions] = await this.dataSource.query(`
     insert into game_question
     ("gameId", "questionId", "questionNumber") values

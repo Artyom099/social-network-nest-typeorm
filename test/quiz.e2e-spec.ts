@@ -443,8 +443,6 @@ describe('QuizController (e2e)', () => {
 
   it('9 – GET:pair-game-quiz/pairs/my-current – 404 no active game', async () => {
     const { firstAccessToken } = expect.getState();
-    // console.log(firstAccessToken);
-    // console.log(`refreshToken=${firstRefreshToken}`);
 
     const getResponse = await request(server)
       .get(`/pair-game-quiz/pairs/my-current`)

@@ -38,7 +38,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     }
     await this.playerQuizRepository.createPlayer(playerDTO)
 
-    console.log({ pending___Game___5: pendingGame });
+    // console.log({ pending___Game___5: pendingGame });
 
     if (pendingGame) {
       // если да, то
@@ -48,11 +48,9 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         gameId: pendingGame.id,
         questionsId: questionsId.map((q) => (q.id))
       }
-      // console.log({questionsDto: questionsDto});
+      console.log({questionsDto____1010: questionsDto});
       await this.playerQuizRepository.crateFiveGameQuestions(questionsDto)
       await this.playerQuizRepository.addQuestionsToGame(questionsDto)
-
-      // создаем игрока
 
       // добавляем игрока в эту пару и начинаем игру
       const dto: AddPlayerToGameDto = {
@@ -63,7 +61,6 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
       return this.playerQuizRepository.addPlayerToGame(dto)
 
     } else {
-      // создаем игрока
 
       console.log('6---6');
       // иначе создаем новую игру, первого игрока и ждем следующего игрока
