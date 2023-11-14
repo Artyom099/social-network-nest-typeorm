@@ -19,8 +19,8 @@ export class Game {
   @OneToOne(() => Player, pl => pl.game)
   @JoinColumn()
   firstPlayer: Player;
-  // @Column()
-  // firstPlayerId: string;
+  @Column({ nullable: true })
+  firstPlayerId: string;
 
   @OneToOne(() => Player, pl => pl.game, { nullable: true })
   @JoinColumn()

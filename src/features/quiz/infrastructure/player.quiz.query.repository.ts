@@ -14,15 +14,16 @@ export class PlayerQuizQueryRepository {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
 
-  async getFiveQuestionsId(): Promise<string[]> {
+  async getFiveQuestionsId() {
     return this.dataSource.query(`
     select "id"
     from question
     order by random()
-    limit 5
+    limit 6
     offset random()
     `,)
   }
+
   // достаем вопрос по айди игры и номеру вопроса
   async getQuestion(gameId: string, questionNumber: number): Promise<Question> {
     return this.dataSource.query(`
@@ -43,6 +44,7 @@ export class PlayerQuizQueryRepository {
 
     return player ? player.id : null;
   }
+
   // достаем ответы по айди игрока
   async getPlayerAnswersForGame(playerId: string): Promise<AnswerViewModel[]> {
     const answers = await this.dataSource.query(`
@@ -135,7 +137,7 @@ export class PlayerQuizQueryRepository {
   }
 
   async getActiveGame(id: string): Promise<GameViewModel | null> {
-    console.log('1----1');
+    // console.log('1----1');
     const [game] = await this.dataSource.query(`
     select *,
 
@@ -151,9 +153,8 @@ export class PlayerQuizQueryRepository {
     where g."id" = $1 and "status" = $2
     `, [id, GameStatus.active]);
 
-    console.log('2----2');
+    // console.log('2----2');
     if (!game) return null;
-    console.log('2');
 
     const questions = await this.dataSource.query(`
     select q."id", q."body"

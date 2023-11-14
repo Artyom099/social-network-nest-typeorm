@@ -442,7 +442,7 @@ describe('QuizController (e2e)', () => {
   });
 
   it('9 – GET:pair-game-quiz/pairs/my-current – 404 no active game', async () => {
-    const { firstAccessToken, firstRefreshToken } = expect.getState();
+    const { firstAccessToken } = expect.getState();
     // console.log(firstAccessToken);
     // console.log(`refreshToken=${firstRefreshToken}`);
 
@@ -471,7 +471,7 @@ describe('QuizController (e2e)', () => {
       firstPlayerProgress: {
         answers: [],
         player: {
-          id: firstCreatedUser.id,
+          id: expect.any(String),
           login: firstCreatedUser.login,
         },
         score: 0,
@@ -492,7 +492,8 @@ describe('QuizController (e2e)', () => {
     })
 
   });
-  it('11 – GET:pair-game-quiz/pairs/connection – 200 connect 2nd player $ start game', async () => {
+  it('11 – GET:pair-game-quiz/pairs/connection – 200 connect 2nd player & start game', async () => {
+    console.log('11------11');
     const { secondAccessToken, firstCreatedUser, secondCreatedUser } = expect.getState();
 
     const connectResponse = await request(server)

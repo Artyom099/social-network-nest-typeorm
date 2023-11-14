@@ -77,7 +77,7 @@ export class PlayerQuizRepository {
         id: dto.id,
         status: dto.status,
         pairCreatedDate: dto.pairCreatedDate,
-        // firstPlayerId: dto.firstPlayerId,
+        firstPlayerId: dto.firstPlayerId,
       })
       .execute()
 
@@ -157,9 +157,10 @@ export class PlayerQuizRepository {
       .execute()
   }
   async crateFiveGameQuestions(dto: AddQuestionsToGameDto) {
+    console.log({AddQuestionsToGameDto__11: dto.questionsId});
     const [fiveQuestions] = await this.dataSource.query(`
     insert into game_question
-    (gameId, questionId, questionNumber) values
+    ("gameId", "questionId", "questionNumber") values
     ($1, $2, 1),
     ($1, $3, 2),
     ($1, $4, 3),

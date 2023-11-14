@@ -38,15 +38,17 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     }
     await this.playerQuizRepository.createPlayer(playerDTO)
 
-    console.log({ pending___Game: pendingGame });
+    console.log({ pending___Game___5: pendingGame });
 
     if (pendingGame) {
       // если да, то
       // добавляем рандомных 5 вопросов
+      const questionsId = await this.playerQuizQueryRepository.getFiveQuestionsId()
       const questionsDto: AddQuestionsToGameDto = {
         gameId: pendingGame.id,
-        questionsId: await this.playerQuizQueryRepository.getFiveQuestionsId()
+        questionsId: questionsId.map((q) => (q.id))
       }
+      // console.log({questionsDto: questionsDto});
       await this.playerQuizRepository.crateFiveGameQuestions(questionsDto)
       await this.playerQuizRepository.addQuestionsToGame(questionsDto)
 
@@ -63,6 +65,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     } else {
       // создаем игрока
 
+      console.log('6---6');
       // иначе создаем новую игру, первого игрока и ждем следующего игрока
       const dto: CreateGameDto = {
         id: randomUUID(),
