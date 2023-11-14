@@ -77,7 +77,7 @@ export class PlayerQuizRepository {
         id: dto.id,
         status: dto.status,
         pairCreatedDate: dto.pairCreatedDate,
-        firstPlayerId: dto.firstPlayerId,
+        // firstPlayerId: dto.firstPlayerId,
       })
       .execute()
 

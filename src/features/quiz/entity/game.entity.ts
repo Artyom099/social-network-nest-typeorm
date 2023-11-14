@@ -1,9 +1,6 @@
-import {Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, JoinTable, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {GameStatus} from '../../../infrastructure/utils/constants';
-import {Question} from './question.entity';
-import {Users} from '../../users/entity/user.entity';
 import {Player} from './player.entity';
-import {Answer} from './answer.entity';
 import {GameQuestion} from './game.question.entity';
 
 @Entity()
@@ -22,8 +19,8 @@ export class Game {
   @OneToOne(() => Player, pl => pl.game)
   @JoinColumn()
   firstPlayer: Player;
-  @Column()
-  firstPlayerId: string;
+  // @Column()
+  // firstPlayerId: string;
 
   @OneToOne(() => Player, pl => pl.game, { nullable: true })
   @JoinColumn()
