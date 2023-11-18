@@ -16,6 +16,6 @@ export class GameQuestion {
 
   @ManyToOne(() => Question)
   question: Question;
-  @Column()
+  @Column({ nullable: true })
   questionId: string;
 }

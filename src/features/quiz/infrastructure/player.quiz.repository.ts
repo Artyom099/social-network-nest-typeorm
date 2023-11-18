@@ -134,7 +134,7 @@ export class PlayerQuizRepository {
       .execute()
   }
 
-  //todo - возможно надо записывать массив через цикл - начать с этого!!!!!!!!!!!!!!!!!!!!!!!!!
+  //todo - возможно надо записывать массив через цикл
   // почему-то не получается просто присвоить массив строк полю - @JoinTable()
   async addQuestionsToGame(dto: AddQuestionsToGameDto) {
     return this.dataSource

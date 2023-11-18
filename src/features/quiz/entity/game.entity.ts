@@ -31,5 +31,6 @@ export class Game {
 
   @OneToMany(() => GameQuestion, gq => gq.game)
   @JoinTable()
-  gameQuestions: GameQuestion[];
+  gameQuestions: string[];
+  // gameQuestions: GameQuestion[];
 }

@@ -19,7 +19,7 @@ export class PlayerQuizQueryRepository {
     select "id"
     from question
     order by random()
-    limit 6
+    limit 5
     offset random()
     `,)
   }

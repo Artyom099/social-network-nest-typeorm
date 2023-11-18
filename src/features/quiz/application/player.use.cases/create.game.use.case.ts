@@ -48,6 +48,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         gameId: pendingGame.id,
         questionsId: questionsId.map((q) => (q.id))
       }
+
       console.log({questionsDto____1010: questionsDto});
       await this.playerQuizRepository.crateFiveGameQuestions(questionsDto)
       await this.playerQuizRepository.addQuestionsToGame(questionsDto)
@@ -69,6 +70,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         status: GameStatus.pending,
         pairCreatedDate: new Date(),
         firstPlayerId: playerDTO.id,
+        //questionsId: questionsId.map((q) => (q.id))
       }
       return this.playerQuizRepository.createGame(dto)
     }
