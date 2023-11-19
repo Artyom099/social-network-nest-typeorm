@@ -38,8 +38,6 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     }
     await this.playerQuizRepository.createPlayer(playerDTO)
 
-    // console.log({ pending___Game___5: pendingGame });
-
     if (pendingGame) {
       // если да, то
       // добавляем рандомных 5 вопросов

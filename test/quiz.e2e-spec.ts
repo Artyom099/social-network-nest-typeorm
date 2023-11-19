@@ -488,7 +488,6 @@ describe('QuizController (e2e)', () => {
       startGameDate: null,
       finishGameDate: null,
     })
-
   });
   it('11 – GET:pair-game-quiz/pairs/connection – 200 connect 2nd player & start game', async () => {
     console.log('11------11');
@@ -525,8 +524,6 @@ describe('QuizController (e2e)', () => {
       startGameDate: expect.any(String),
       finishGameDate: null,
     })
-
-
   });
 
 })
