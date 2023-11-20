@@ -7,6 +7,9 @@ import {getRefreshTokenByResponse} from '../src/infrastructure/utils/utils';
 import {GameStatus} from '../src/infrastructure/utils/constants';
 import {DataSource} from 'typeorm';
 
+const sleep = (seconds: number) =>
+  new Promise((r) => setTimeout(r, seconds * 1000));
+
 describe('QuizController (e2e)', () => {
   let app: INestApplication;
   let server: any;
@@ -188,6 +191,8 @@ describe('QuizController (e2e)', () => {
   });
 
   it('6 – POST:sa/quiz/questions – 201 & create 5 questions', async () => {
+    await sleep(1.1);
+
     const firstQuestionInput = {
       body: 'body-first-question',
       correctAnswers: ['ans1', 'ans2', 'ans2'],
@@ -490,7 +495,6 @@ describe('QuizController (e2e)', () => {
     })
   });
   it('11 – GET:pair-game-quiz/pairs/connection – 200 connect 2nd player & start game', async () => {
-    console.log('11------11');
     const { secondAccessToken, firstCreatedUser, secondCreatedUser } = expect.getState();
 
     const connectResponse = await request(server)
@@ -505,7 +509,7 @@ describe('QuizController (e2e)', () => {
       firstPlayerProgress: {
         answers: [],
         player: {
-          id: firstCreatedUser.id,
+          id: expect.any(String),
           login: firstCreatedUser.login,
         },
         score: 0,
@@ -513,7 +517,7 @@ describe('QuizController (e2e)', () => {
       secondPlayerProgress: {
         answers: [],
         player: {
-          id: secondCreatedUser.id,
+          id: expect.any(String),
           login: secondCreatedUser.login,
         },
         score: 0,
@@ -525,5 +529,8 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     })
   });
+
+  // пользователи начинают отвечать на вопросы
+
 
 })

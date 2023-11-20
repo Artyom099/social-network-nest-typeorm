@@ -12,7 +12,6 @@ import {Player} from '../entity/player.entity';
 import {CreatePlayerDTO} from '../api/models/dto/create.player.dto';
 import {AddQuestionsToGameDto} from '../api/models/dto/addQuestionsToGameDto';
 import {AddPlayerToGameDto} from '../api/models/dto/add.player.to.game.dto';
-import {GameQuestion} from '../entity/game.question.entity';
 
 @Injectable()
 export class PlayerQuizRepository {
@@ -126,40 +125,62 @@ export class PlayerQuizRepository {
   }
 
   async addPlayerToGame(dto: AddPlayerToGameDto) {
-    return this.dataSource
-      .createQueryBuilder()
-      .update(Game)
-      .set({ secondPlayerId: dto.secondPlayerId, startGameDate: dto.startGameDate })
-      .where("id = :id", { id: dto.id })
-      .execute()
-  }
-
-  //todo - возможно надо записывать массив через цикл
-  // почему-то не получается просто присвоить массив строк полю - @JoinTable()
-  async addQuestionsToGame(dto: AddQuestionsToGameDto) {
-    return this.dataSource
-      .createQueryBuilder()
-      .update(Game)
-      .set({ gameQuestions: dto.questionsId })
-      .where("id = :id", { id: dto.gameId })
-      .execute()
-  }
-
-  // как создать 5 вопросов с разными questionsId и questionNumber
-  async crateFiveGameQuestions2(dto: AddQuestionsToGameDto) {
     await this.dataSource
       .createQueryBuilder()
-      .insert()
-      .into(GameQuestion)
-      .values({
-        gameId: dto.gameId,
-        questionId: dto.questionsId[0],
-        questionNumber: 1,
+      .update(Game)
+      .set({
+        secondPlayerId: dto.secondPlayerId,
+        startGameDate: dto.startGameDate,
+        status: GameStatus.active,
       })
+      .where("id = :id", { id: dto.id })
       .execute()
+
+    const [game] = await this.dataSource.query(`
+    select *,
+    
+      (select pl."login" as first_player_login
+      from player pl 
+      where pl."id" = g."firstPlayerId"),
+
+      (select pl."login" as second_player_login
+      from player pl
+      where pl."id" = g."secondPlayerId")
+
+    from game g
+    where g."id" = $1
+    `, [dto.id])
+
+    console.log({game_222: game});
+
+    return {
+      id: game.id,
+      firstPlayerProgress: {
+        answers: [],
+        player: {
+          id: game.firstPlayerId,
+          login: game.first_player_login,
+        },
+        score: 0,
+      },
+      secondPlayerProgress: {
+        answers: [],
+        player: {
+          id: game.secondPlayerId,
+          login: game.second_player_login,
+        },
+        score: 0,
+      },
+      gameQuestions: [],
+      status: game.status,
+      pairCreatedDate: game.pairCreatedDate,
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
+    }
   }
+
   async crateFiveGameQuestions(dto: AddQuestionsToGameDto) {
-    const [fiveQuestions] = await this.dataSource.query(`
+    return this.dataSource.query(`
     insert into game_question
     ("gameId", "questionId", "questionNumber") values
     ($1, $2, 1),

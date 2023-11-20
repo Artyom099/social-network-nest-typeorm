@@ -14,6 +14,7 @@ export class PlayerQuizQueryRepository {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
 
+  // достаем 5 случайнах вопросов
   async getFiveQuestionsId() {
     return this.dataSource.query(`
     select "id"

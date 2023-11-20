@@ -46,10 +46,8 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         gameId: pendingGame.id,
         questionsId: questionsId.map((q) => (q.id))
       }
-
-      console.log({questionsDto____1010: questionsDto});
+      // console.log({questionsDto____1010: questionsDto});
       await this.playerQuizRepository.crateFiveGameQuestions(questionsDto)
-      await this.playerQuizRepository.addQuestionsToGame(questionsDto)
 
       // добавляем игрока в эту пару и начинаем игру
       const dto: AddPlayerToGameDto = {
