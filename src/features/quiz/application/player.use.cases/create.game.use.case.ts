@@ -22,12 +22,12 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
   ) {}
 
   async execute(command: CreateGameCommand) {
-    console.log('3---3');
+    // console.log('3---3');
     // смотрим, ждет ли кто-то пару
     const pendingGame = await this.playerQuizQueryRepository.getPendingGame();
     const user = await this.usersQueryRepository.getUserById(command.userId)
 
-    console.log('4---4');
+    // console.log('4---4');
     const playerDTO: CreatePlayerDTO = {
       id: randomUUID(),
       score: 0,
@@ -59,7 +59,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
 
     } else {
 
-      console.log('6---6');
+      // console.log('6---6');
       // иначе создаем новую игру, первого игрока и ждем следующего игрока
       const dto: CreateGameDto = {
         id: randomUUID(),

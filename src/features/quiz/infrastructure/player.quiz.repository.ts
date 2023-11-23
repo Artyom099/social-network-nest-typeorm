@@ -151,7 +151,7 @@ export class PlayerQuizRepository {
     where g."id" = $1
     `, [dto.id])
 
-    console.log({game_222: game});
+    // console.log({game_222: game});
 
     return {
       id: game.id,

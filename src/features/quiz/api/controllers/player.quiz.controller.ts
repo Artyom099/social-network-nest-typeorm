@@ -23,11 +23,12 @@ export class PlayerQuizController {
   constructor(
     private commandBus: CommandBus,
     private playerQueryRepository: PlayerQuizQueryRepository,
-    ) {}
+  ) {}
 
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
   async getCurrentGame(@Req() req) {
+
     const currentGame = await this.playerQueryRepository.getActiveGame(req.userId);
     if (!currentGame) {
       throw new NotFoundException();
@@ -39,14 +40,17 @@ export class PlayerQuizController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getGame(@Req() req, @Param('id') gameId: string) {
-    const gamePair = await this.playerQueryRepository.getGameById(gameId);
-    if (!gamePair) throw new NotFoundException();
+    const game = await this.playerQueryRepository.getGameById(gameId);
+    if (!game) throw new NotFoundException();
 
-    if (req.userId !== gamePair.firstPlayerProgress.player.id ||
-      req.userId !== gamePair.secondPlayerProgress.player.id) {
+    const firstPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
+    if (!game.secondPlayerProgress.player.id) throw new ForbiddenException();
+    const secondPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
+
+    if (req.userId !== firstPlayerUserId && req.userId !== secondPlayerUserId) {
       throw new ForbiddenException();
     } else {
-      return gamePair;
+      return game;
     }
   }
 
