@@ -86,7 +86,7 @@ export class PlayerQuizQueryRepository {
 
   //todo - дописать джоин или подзапрос для айди и логина игрока
   async getGameById(id: string): Promise<GameViewModel | null> {
-    // error - invalid input syntax for type uuid: "incorrect_id_format"
+    // todo error - invalid input syntax for type uuid: "incorrect_id_format"
     const [game] = await this.dataSource.query(`
     select *,
            

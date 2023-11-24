@@ -534,14 +534,14 @@ describe('QuizController (e2e)', () => {
   it('12 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
 
-    const connectResponse = await request(server)
+    const getResponse = await request(server)
       .get(`/pair-game-quiz/pairs/${gameId}`)
       .auth(secondAccessToken.accessToken, { type: 'bearer' })
 
-    expect(connectResponse).toBeDefined();
-    expect(connectResponse.status).toEqual(HttpStatus.OK);
+    expect(getResponse).toBeDefined();
+    expect(getResponse.status).toEqual(HttpStatus.OK);
 
-    expect(connectResponse.body).toEqual({
+    expect(getResponse.body).toEqual({
       id: expect.any(String),
       firstPlayerProgress: {
         answers: [],
@@ -566,8 +566,54 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     })
   });
+  it('13 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
+    const { firstAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
+
+    const getResponse = await request(server)
+      .get(`/pair-game-quiz/pairs/${gameId}`)
+      .auth(firstAccessToken.accessToken, { type: 'bearer' });
+
+    expect(getResponse).toBeDefined();
+    expect(getResponse.status).toEqual(HttpStatus.OK);
+
+    expect(getResponse.body).toEqual({
+      id: expect.any(String),
+      firstPlayerProgress: {
+        answers: [],
+        player: {
+          id: expect.any(String),
+          login: firstCreatedUser.login,
+        },
+        score: 0,
+      },
+      secondPlayerProgress: {
+        answers: [],
+        player: {
+          id: expect.any(String),
+          login: secondCreatedUser.login,
+        },
+        score: 0,
+      },
+      gameQuestions: expect.any(Array),
+      status: GameStatus.active,
+      pairCreatedDate: expect.any(String),
+      startGameDate: expect.any(String),
+      finishGameDate: null,
+    });
+  });
 
   // пользователи начинают отвечать на вопросы
+  it('14 - POST:pair-game-quiz/pairs/my-current/answers', async () => {
+    const { firstAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+
+  })
 
 
 })

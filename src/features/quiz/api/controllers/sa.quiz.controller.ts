@@ -78,8 +78,6 @@ export class SAQuizController {
     @Param('id') id: string,
     @Body() inputModel: PublishQuestionInputModel,
   ) {
-    // const questionId = (id !== 'undefined') ? id : null;
-    // if (!questionId) throw new BadRequestException();
     const question = await this.saQuizQueryRepository.getQuestion(id)
     if (!question) {
       throw new NotFoundException();
