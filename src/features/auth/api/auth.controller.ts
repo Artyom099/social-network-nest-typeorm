@@ -54,7 +54,7 @@ export class AuthController {
   }
 
   @Post('login')
-  @UseGuards(RateLimitGuard)
+  // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   async login(
     @Req() req,

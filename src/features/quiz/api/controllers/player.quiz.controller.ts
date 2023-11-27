@@ -16,6 +16,7 @@ import {PlayerQuizQueryRepository} from '../../infrastructure/player.quiz.query.
 import {AnswerInputModel} from '../models/input/answer.input.model';
 import {CreateGameCommand} from '../../application/player.use.cases/create.game.use.case';
 import {CreateAnswerCommand} from '../../application/player.use.cases/create.answer.use.case';
+import {GameIdInputModel} from '../models/input/game.id.input.model';
 
 @Controller('pair-game-quiz/pairs')
 @UseGuards(BearerAuthGuard)
@@ -28,7 +29,6 @@ export class PlayerQuizController {
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
   async getCurrentGame(@Req() req) {
-
     const currentGame = await this.playerQueryRepository.getActiveGame(req.userId);
     if (!currentGame) {
       throw new NotFoundException();
@@ -39,14 +39,15 @@ export class PlayerQuizController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getGame(@Req() req, @Param('id') gameId: string) {
-    const game = await this.playerQueryRepository.getGameById(gameId);
+  // todo - нельзя достать чужую игру по id
+  async getGame(@Req() req, @Param('id') inputModel: GameIdInputModel) {
+    const game = await this.playerQueryRepository.getGameById(inputModel.gameId);
     if (!game) throw new NotFoundException();
 
     const firstPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
     if (!game.secondPlayerProgress.player.id) throw new ForbiddenException();
-    const secondPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
 
+    const secondPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
     if (req.userId !== firstPlayerUserId && req.userId !== secondPlayerUserId) {
       throw new ForbiddenException();
     } else {

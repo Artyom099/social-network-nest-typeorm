@@ -22,6 +22,7 @@ import {PublishQuestionCommand} from '../../application/sa.use.cases/publish.que
 import {UpdateQuestionCommand} from '../../application/sa.use.cases/update.question.use.case';
 import {DeleteQuestionCommand} from '../../application/sa.use.cases/delete.question.use.case';
 import {CreateQuestionCommand} from '../../application/sa.use.cases/create.question.use.case';
+import {GameIdInputModel} from '../models/input/game.id.input.model';
 
 @Controller('sa/quiz/questions')
 @UseGuards(BasicAuthGuard)
@@ -40,7 +41,7 @@ export class SAQuizController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createQuestion(@Body() inputModel: CreateQuestionInputModel) {
-    return this.commandBus.execute(new CreateQuestionCommand(inputModel))
+    return this.commandBus.execute(new CreateQuestionCommand(inputModel));
   }
 
   @Delete(':id')
@@ -48,6 +49,7 @@ export class SAQuizController {
   async deleteQuestion(@Param('id') id: string) {
     const questionId = (id !== 'undefined') ? id : null;
     if (!questionId) throw new BadRequestException();
+
     const question = await this.saQuizQueryRepository.getQuestion(questionId);
     if (!question) {
       throw new NotFoundException();
@@ -64,25 +66,35 @@ export class SAQuizController {
   ) {
     const questionId = (id !== 'undefined') ? id : null;
     if (!questionId) throw new BadRequestException();
-    const question = await this.saQuizQueryRepository.getQuestion(questionId)
+
+    const question = await this.saQuizQueryRepository.getQuestion(questionId);
     if (!question) {
       throw new NotFoundException();
     } else {
-      return this.commandBus.execute(new UpdateQuestionCommand(questionId, inputModel))
+      return this.commandBus.execute(new UpdateQuestionCommand(questionId, inputModel));
     }
   }
 
   @Put(':id/publish')
   @HttpCode(HttpStatus.NO_CONTENT)
   async publishQuestion(
-    @Param('id') id: string,
+    @Param('id') id: GameIdInputModel,
     @Body() inputModel: PublishQuestionInputModel,
   ) {
-    const question = await this.saQuizQueryRepository.getQuestion(id)
+    console.log('1----1');
+    console.log({id_1: id});
+    console.log({id_2: id.gameId}); // почему здесь приходит undefined?
+    const question = await this.saQuizQueryRepository.getQuestion(id.gameId);
+
+    console.log('2----2');
+    console.log({ ques: question});
+
     if (!question) {
+      console.log('3----3');
       throw new NotFoundException();
     } else {
-      return this.commandBus.execute(new PublishQuestionCommand(id, inputModel))
+      console.log('4----4');
+      return this.commandBus.execute(new PublishQuestionCommand(id.gameId, inputModel));
     }
   }
 }

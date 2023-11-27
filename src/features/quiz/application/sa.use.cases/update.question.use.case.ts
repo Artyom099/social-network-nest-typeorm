@@ -15,6 +15,6 @@ export class UpdateQuestionUseCase implements ICommandHandler<UpdateQuestionComm
   constructor(private saQuizRepository: SAQuizRepository) {}
 
   async execute(command: UpdateQuestionCommand) {
-    await this.saQuizRepository.updateQuestion(command.questionId, command.inputModel)
+    return this.saQuizRepository.updateQuestion(command.questionId, command.inputModel)
   }
 }
