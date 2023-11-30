@@ -47,14 +47,11 @@ export class SAQuizController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteQuestion(@Param('id') id: string) {
-    const questionId = (id !== 'undefined') ? id : null;
-    if (!questionId) throw new BadRequestException();
-
-    const question = await this.saQuizQueryRepository.getQuestion(questionId);
+    const question = await this.saQuizQueryRepository.getQuestion(id);
     if (!question) {
       throw new NotFoundException();
     } else {
-      return this.commandBus.execute(new DeleteQuestionCommand(questionId));
+      return this.commandBus.execute(new DeleteQuestionCommand(id));
     }
   }
 
@@ -64,37 +61,30 @@ export class SAQuizController {
     @Param('id') id: string,
     @Body() inputModel: CreateQuestionInputModel,
   ) {
-    const questionId = (id !== 'undefined') ? id : null;
-    if (!questionId) throw new BadRequestException();
-
-    const question = await this.saQuizQueryRepository.getQuestion(questionId);
+    const question = await this.saQuizQueryRepository.getQuestion(id);
     if (!question) {
       throw new NotFoundException();
     } else {
-      return this.commandBus.execute(new UpdateQuestionCommand(questionId, inputModel));
+      return this.commandBus.execute(new UpdateQuestionCommand(id, inputModel));
     }
   }
 
-  @Put(':id/publish')
+  @Put(':questionId/publish')
   @HttpCode(HttpStatus.NO_CONTENT)
   async publishQuestion(
-    @Param('id') id: GameIdInputModel,
+    @Param() id: GameIdInputModel,
     @Body() inputModel: PublishQuestionInputModel,
   ) {
-    console.log('1----1');
-    console.log({id_1: id});
-    console.log({id_2: id.gameId}); // почему здесь приходит undefined?
-    const question = await this.saQuizQueryRepository.getQuestion(id.gameId);
-
-    console.log('2----2');
-    console.log({ ques: question});
+    // console.log('1----1');
+    // console.log({id_1: id});
+    // console.log({id_2: id.gameId});
+    const question = await this.saQuizQueryRepository.getQuestion(id.questionId);
+    // console.log({ ques: question});
 
     if (!question) {
-      console.log('3----3');
       throw new NotFoundException();
     } else {
-      console.log('4----4');
-      return this.commandBus.execute(new PublishQuestionCommand(id.gameId, inputModel));
+      return this.commandBus.execute(new PublishQuestionCommand(id.questionId, inputModel));
     }
   }
 }

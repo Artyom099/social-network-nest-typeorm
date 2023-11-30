@@ -22,7 +22,7 @@ export class SAQuizQueryRepository {
     where "id" = $1
     `, [id])
 
-    console.log({repo_ques: question});
+    // console.log({repo_ques: question});
 
     return question ? question : null
   }
