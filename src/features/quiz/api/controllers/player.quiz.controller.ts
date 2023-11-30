@@ -42,15 +42,12 @@ export class PlayerQuizController {
   // todo - нельзя достать чужую игру по id
   async getGame(@Req() req, @Param() id: GameIdInputModel) {
     const game = await this.playerQueryRepository.getGameById(id.gameId);
-    console.log({game: game});
     if (!game) throw new NotFoundException();
 
     const firstPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
-    console.log({firstPlayerUserId: firstPlayerUserId});
     if (!game.secondPlayerProgress.player.id) throw new ForbiddenException();
 
     const secondPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
-    console.log({secondPlayerUserId: secondPlayerUserId});
     if (req.userId !== firstPlayerUserId && req.userId !== secondPlayerUserId) {
       throw new ForbiddenException();
     } else {
