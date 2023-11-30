@@ -538,7 +538,7 @@ describe('QuizController (e2e)', () => {
   it('12 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
     console.log('12---------12');
-    console.log({gameId: gameId});
+    console.log({test_gameId: gameId});
 
     const getResponse = await request(server)
       .get(`/pair-game-quiz/pairs/${gameId}`)

@@ -23,6 +23,7 @@ import {UpdateQuestionCommand} from '../../application/sa.use.cases/update.quest
 import {DeleteQuestionCommand} from '../../application/sa.use.cases/delete.question.use.case';
 import {CreateQuestionCommand} from '../../application/sa.use.cases/create.question.use.case';
 import {GameIdInputModel} from '../models/input/game.id.input.model';
+import {QuestionIdInputModel} from '../models/input/question.id.input.model';
 
 @Controller('sa/quiz/questions')
 @UseGuards(BasicAuthGuard)
@@ -72,7 +73,7 @@ export class SAQuizController {
   @Put(':questionId/publish')
   @HttpCode(HttpStatus.NO_CONTENT)
   async publishQuestion(
-    @Param() id: GameIdInputModel,
+    @Param() id: QuestionIdInputModel,
     @Body() inputModel: PublishQuestionInputModel,
   ) {
     // console.log('1----1');

@@ -1,7 +1,7 @@
 import {IsNotEmpty, IsUUID} from 'class-validator';
 
-export class GameIdInputModel {
+export class QuestionIdInputModel {
   @IsUUID()
   @IsNotEmpty()
-  gameId: string;
+  questionId: string;
 }
