@@ -359,7 +359,7 @@ describe('QuizController (e2e)', () => {
     })
   });
 
-  it('8 – POST:sa/users – create 1st & 2nd users by admin & login them', async () => {
+  it('8 – POST:sa/users – create 1, 2, 3 users by admin & login them', async () => {
     const firstUser = {
       login: 'lg-1111',
       password: 'qwerty1',
@@ -440,13 +440,58 @@ describe('QuizController (e2e)', () => {
     expect(refreshToken2).toEqual(expect.any(String));
 
 
+    const thirdUser = {
+      login: 'lg-3333',
+      password: 'qwerty3',
+      email: 'artyom33333@gmaill.com',
+    };
+    const thirdCreateResponse = await request(server)
+      .post('/sa/users')
+      .auth('admin', 'qwerty', {type: 'basic'})
+      .send({
+        login: thirdUser.login,
+        password: thirdUser.password,
+        email: thirdUser.email,
+      })
+      .expect(HttpStatus.CREATED);
+
+    const thirdCreatedUser = thirdCreateResponse.body;
+    expect(thirdCreatedUser).toEqual({
+      id: expect.any(String),
+      login: thirdUser.login,
+      email: thirdUser.email,
+      createdAt: expect.any(String),
+    });
+
+    const loginResponse3 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail: thirdUser.login,
+        password: thirdUser.password,
+      });
+
+    expect(loginResponse3).toBeDefined();
+    expect(loginResponse3.status).toBe(HttpStatus.OK);
+    expect(loginResponse3.body).toEqual({ accessToken: expect.any(String) });
+    const thirdAccessToken = loginResponse3.body;
+
+    const refreshToken3 = getRefreshTokenByResponse(loginResponse3);
+    expect(refreshToken3).toBeDefined();
+    expect(refreshToken3).toEqual(expect.any(String));
+
+
     expect.setState({
       firstCreatedUser,
-      secondCreatedUser,
       firstAccessToken,
       firstRefreshToken: refreshToken,
+
+      secondCreatedUser,
       secondAccessToken,
       secondRefreshToken: refreshToken2,
+
+      thirdCreatedUser,
+      thirdAccessToken,
+      thirdRefreshToken: refreshToken3,
     });
   });
 
@@ -537,8 +582,6 @@ describe('QuizController (e2e)', () => {
 
   it('12 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
-    console.log('12---------12');
-    console.log({test_gameId: gameId});
 
     const getResponse = await request(server)
       .get(`/pair-game-quiz/pairs/${gameId}`)
@@ -606,6 +649,17 @@ describe('QuizController (e2e)', () => {
       startGameDate: expect.any(String),
       finishGameDate: null,
     });
+  });
+  it('14 – GET:pair-game-quiz/pairs/:id – 403 - 3rd player get game by id', async () => {
+    const { thirdAccessToken, gameId } = expect.getState();
+    console.log('13-----13');
+
+    const getResponse = await request(server)
+      .get(`/pair-game-quiz/pairs/${gameId}`)
+      .auth(thirdAccessToken.accessToken, { type: 'bearer' });
+
+    expect(getResponse).toBeDefined();
+    expect(getResponse.status).toEqual(HttpStatus.FORBIDDEN);
   });
 
   // пользователи начинают отвечать на вопросы

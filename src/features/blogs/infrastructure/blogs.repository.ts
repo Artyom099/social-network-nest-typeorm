@@ -4,7 +4,6 @@ import {BlogInputModel} from '../api/models/input/blog.input.model';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {CreateBlogModel} from '../api/models/dto/create.blog.model';
-import {Users} from '../../users/entity/user.entity';
 import {Blogs} from '../entity/blog.entity';
 
 @Injectable()
