@@ -24,6 +24,6 @@ export class Player {
 
   @OneToOne(() => Game, { nullable: true })
   game: Game;
-  // @Column({ nullable: true })
-  // gameId: string;
+  @Column({ nullable: true })
+  gameId: string;
 }

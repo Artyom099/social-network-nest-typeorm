@@ -39,17 +39,17 @@ export class PlayerQuizController {
 
   @Get(':gameId')
   @HttpCode(HttpStatus.OK)
-  // todo - нельзя достать игрц по id, если ты в ней не участвуешь
+  // todo - нельзя достать игру по id, если ты в ней не участвуешь
   async getGame(@Req() req, @Param() id: GameIdInputModel) {
     const game = await this.playerQueryRepository.getGameById(id.gameId);
     if (!game) {
-      console.log(Error);
+      console.log();
       throw new NotFoundException();
     }
 
     const firstPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
     if (!game.secondPlayerProgress.player.id) {
-      console.log(Error);
+      console.log();
       throw new ForbiddenException();
     }
 
@@ -60,7 +60,7 @@ export class PlayerQuizController {
     console.log({pl_2: secondPlayerUserId});
 
     if (req.userId !== firstPlayerUserId && req.userId !== secondPlayerUserId) {
-      console.log(Error);
+      console.log();
       throw new ForbiddenException();
     } else {
       return game;

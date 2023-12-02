@@ -45,6 +45,15 @@ export class PlayerQuizQueryRepository {
 
     return player ? player.id : null;
   }
+  async getPlayer(userId: string, gameId: string) {
+    const player = await this.dataSource.query(`
+    select *
+    from player
+    where "userId" = $1 and "gameId" = $2
+    `, [userId, gameId]);
+
+    return player ? player : null;
+  }
 
   async getUserIdByPlayerId(id: string) {
     const [userId] = await this.dataSource.query(`

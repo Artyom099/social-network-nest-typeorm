@@ -8,6 +8,7 @@ import {CreatePlayerDTO} from '../../api/models/dto/create.player.dto';
 import {UsersQueryRepository} from '../../../users/infrastructure/users.query.repository';
 import {AddQuestionsToGameDto} from '../../api/models/dto/addQuestionsToGameDto';
 import {AddPlayerToGameDto} from '../../api/models/dto/add.player.to.game.dto';
+import {ForbiddenException} from '@nestjs/common';
 
 export class CreateGameCommand {
   constructor(public userId: string) {}
@@ -25,7 +26,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     // console.log('3---3');
     // смотрим, ждет ли кто-то пару
     const pendingGame = await this.playerQuizQueryRepository.getPendingGame();
-    const user = await this.usersQueryRepository.getUserById(command.userId)
+    const user = await this.usersQueryRepository.getUserById(command.userId);
 
     // console.log('4---4');
     const playerDTO: CreatePlayerDTO = {
@@ -40,6 +41,11 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
 
     if (pendingGame) {
       // если да, то
+
+      //если этот юзер уже присоединился к текущей игре, вернуть 403
+      const userIdCurrentPlayer = await this.playerQuizQueryRepository.getPlayer(command.userId, pendingGame.id);
+      if (command.userId === userIdCurrentPlayer) throw new ForbiddenException();
+
       // добавляем рандомных 5 вопросов
       const questionsId = await this.playerQuizQueryRepository.getFiveQuestionsId()
       const questionsDto: AddQuestionsToGameDto = {

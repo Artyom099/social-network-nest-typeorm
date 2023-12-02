@@ -580,7 +580,28 @@ describe('QuizController (e2e)', () => {
     expect.setState({ gameId: connectResponse.body.id });
   });
 
-  it('12 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
+  it('12 – GET:pair-game-quiz/pairs/connection – 403 1st player is already participating in active pair', async () => {
+    const { firstAccessToken, firstCreatedUser } = expect.getState();
+
+    const connectResponse = await request(server)
+      .post(`/pair-game-quiz/pairs/connection`)
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+
+    expect(connectResponse).toBeDefined();
+    expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+  it('13 – GET:pair-game-quiz/pairs/connection – 403 2nd player is already participating in active pair', async () => {
+    const { secondAccessToken, firstCreatedUser, secondCreatedUser } = expect.getState();
+
+    const connectResponse = await request(server)
+      .post(`/pair-game-quiz/pairs/connection`)
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+
+    expect(connectResponse).toBeDefined();
+    expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+
+  it('14 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
 
     const getResponse = await request(server)
@@ -615,7 +636,7 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     })
   });
-  it('13 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
+  it('15 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
     const { firstAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
 
     const getResponse = await request(server)
@@ -650,7 +671,7 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     });
   });
-  it('14 – GET:pair-game-quiz/pairs/:id – 403 - 3rd player get game by id', async () => {
+  it('16 – GET:pair-game-quiz/pairs/:id – 403 - 3rd player cannot get game by id', async () => {
     const { thirdAccessToken, gameId } = expect.getState();
     console.log('13-----13');
 
