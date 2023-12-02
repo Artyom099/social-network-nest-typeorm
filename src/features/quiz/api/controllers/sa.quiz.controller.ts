@@ -73,19 +73,14 @@ export class SAQuizController {
   @Put(':questionId/publish')
   @HttpCode(HttpStatus.NO_CONTENT)
   async publishQuestion(
-    @Param() id: QuestionIdInputModel,
+    @Param() param: QuestionIdInputModel,
     @Body() inputModel: PublishQuestionInputModel,
   ) {
-    // console.log('1----1');
-    // console.log({id_1: id});
-    // console.log({id_2: id.gameId});
-    const question = await this.saQuizQueryRepository.getQuestion(id.questionId);
-    // console.log({ ques: question});
-
+    const question = await this.saQuizQueryRepository.getQuestion(param.questionId);
     if (!question) {
       throw new NotFoundException();
     } else {
-      return this.commandBus.execute(new PublishQuestionCommand(id.questionId, inputModel));
+      return this.commandBus.execute(new PublishQuestionCommand(param.questionId, inputModel));
     }
   }
 }

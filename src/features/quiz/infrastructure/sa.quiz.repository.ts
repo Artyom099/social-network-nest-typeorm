@@ -43,7 +43,7 @@ export class SAQuizRepository {
     return this.dataSource
       .createQueryBuilder()
       .update(Question)
-      .set({ published: published })
+      .set({ published: published, updatedAt: new Date() })
       .where("id = :id", { id })
       .execute()
   }
