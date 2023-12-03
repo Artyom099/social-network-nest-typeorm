@@ -6,6 +6,8 @@ import {GameStatus} from '../../../infrastructure/utils/constants';
 import {GameViewModel} from '../api/models/view/game.view.model';
 import {AnswerViewModel} from '../api/models/view/answer.view.model';
 import {Question} from '../entity/question.entity';
+import {Game} from '../entity/game.entity';
+import {Player} from '../entity/player.entity';
 
 @Injectable()
 export class PlayerQuizQueryRepository {
@@ -36,7 +38,7 @@ export class PlayerQuizQueryRepository {
     `, [gameId, questionNumber])
   }
 
-  async getPlayerId(userId: string, gameId: string) {
+  async getPlayerId(userId: string, gameId: string): Promise<string> {
     const player = await this.dataSource.query(`
     select *
     from player
@@ -54,8 +56,18 @@ export class PlayerQuizQueryRepository {
 
     return player ? player : null;
   }
+  async getUsersIdCurrentGame(gameId: string) {
+    const usersId = await this.dataSource.query(`
+    select u."id"
+    from player pl
+    left join users u on u.id = pl."userId"
+    where pl."gameId" = $1
+    `, [gameId]);
 
-  async getUserIdByPlayerId(id: string) {
+    return usersId ? usersId : [];
+  }
+
+  async getUserIdByPlayerId(id: string): Promise<string> {
     const [userId] = await this.dataSource.query(`
       select "userId"
       from player pl 
@@ -93,9 +105,7 @@ export class PlayerQuizQueryRepository {
     return game ? game : null;
   }
 
-  //todo - дописать джоин или подзапрос для айди и логина игрока
   async getGameById(id: string): Promise<GameViewModel | null> {
-    // todo error - invalid input syntax for type uuid: "incorrect_id_format"
     const [game] = await this.dataSource.query(`
     select *,
            
@@ -144,6 +154,26 @@ export class PlayerQuizQueryRepository {
       where pl.id = $1
     `, [game.secondPlayerId]);
 
+    if (!game.secondPlayerId) {
+      return {
+        id: game.id,
+        firstPlayerProgress: {
+          answers: firstPlayerAnswers,
+          player: {
+            id: game.firstPlayerId,
+            login: game.firstPlayerLogin,
+          },
+          score: firstPlayerScore.score ? firstPlayerScore.score : 0,
+        },
+        secondPlayerProgress: null,
+        questions: null,
+        status: game.status,
+        pairCreatedDate: game.pairCreatedDate,
+        startGameDate: game.startGameDate,
+        finishGameDate: game.finishGameDate,
+      }
+    }
+
     return game ? {
       id: game.id,
       firstPlayerProgress: {
@@ -162,7 +192,7 @@ export class PlayerQuizQueryRepository {
         },
         score: secondPlayerScore.score ? secondPlayerScore.score : 0,
       },
-      gameQuestions: questions,
+      questions: questions,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
@@ -185,8 +215,6 @@ export class PlayerQuizQueryRepository {
     from game g
     where g."id" = $1 and "status" = $2
     `, [id, GameStatus.active]);
-
-    // console.log('2----2');
     if (!game) return null;
 
     const questions = await this.dataSource.query(`
@@ -197,21 +225,38 @@ export class PlayerQuizQueryRepository {
     where gq."gameId" = $1
     order by gq."questionNumber"
     `, [id]);
-    // console.log('3----3');
 
     const firstPlayerAnswers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"
     from answer
     where playerId = $1
     `, [game.firstPlayerId]);
-    // console.log('4----4');
-
     const secondPlayerAnswers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"
     from answer
     where playerId = $1
     `, [game.secondPlayerId]);
-    // console.log('5----5');
+
+    console.log({game: game});
+    if (!game.secondPlayerId) {
+      return {
+        id: game.id,
+        firstPlayerProgress: {
+          answers: firstPlayerAnswers,
+          player: {
+            id: game.firstPlayerId,
+            login: game.firstPlayerLogin,
+          },
+          score: game.firstPlayerProgress.score,
+        },
+        secondPlayerProgress: null,
+        questions: null,
+        status: game.status,
+        pairCreatedDate: game.pairCreatedDate,
+        startGameDate: game.startGameDate,
+        finishGameDate: game.finishGameDate,
+      }
+    }
 
     return game ? {
       id: game.id,
@@ -231,7 +276,7 @@ export class PlayerQuizQueryRepository {
         },
         score: game.secondPlayerProgress.score,
       },
-      gameQuestions: questions,
+      questions: questions,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,

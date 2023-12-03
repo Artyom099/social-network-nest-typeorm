@@ -25,11 +25,11 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
   async execute(command: CreateAnswerCommand) {
     // достаем игру по юзеру
     const currentGame = await this.playerQuizQueryRepository.getActiveGame(command.userId)
-    if (!currentGame || !currentGame.gameQuestions) throw new Error('no active game')
+    if (!currentGame || !currentGame.questions) throw new Error('no active game')
 
     const playerId = await this.playerQuizQueryRepository.getPlayerId(command.userId, currentGame.id)
     const playerAnswers = await this.playerQuizQueryRepository.getPlayerAnswersForGame(playerId)
-    if (currentGame.gameQuestions.length === playerAnswers.length) {
+    if (currentGame.questions.length === playerAnswers.length) {
       throw new Error('player already answer all questions')
     }
 
@@ -45,7 +45,7 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
     }
 
     // если вопрос был последний, завершаем игру
-    if (currentGame.gameQuestions.length === playerAnswers.length + 1) {
+    if (currentGame.questions.length === playerAnswers.length + 1) {
       await this.playerQuizRepository.finishGame(currentGame.id)
     }
 

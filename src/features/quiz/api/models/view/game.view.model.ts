@@ -3,8 +3,8 @@ import {AnswerStatus, GameStatus} from '../../../../../infrastructure/utils/cons
 export type GameViewModel = {
   id: string;
   firstPlayerProgress: firstPlayerProgressType,
-  secondPlayerProgress: secondPlayerProgressType,
-  gameQuestions: questionsType[] | null,
+  secondPlayerProgress: secondPlayerProgressType | null,
+  questions: questionsType[] | null,
   status: GameStatus;
   pairCreatedDate: Date;
   startGameDate: Date;

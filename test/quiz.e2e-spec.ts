@@ -532,15 +532,8 @@ describe('QuizController (e2e)', () => {
         },
         score: 0,
       },
-      secondPlayerProgress: {
-        answers: [],
-        player: {
-          id: null,
-          login: null,
-        },
-        score: 0,
-      },
-      gameQuestions: [],
+      secondPlayerProgress: null,
+      questions: null,
       status: GameStatus.pending,
       pairCreatedDate: expect.any(String),
       startGameDate: null,
@@ -575,7 +568,7 @@ describe('QuizController (e2e)', () => {
         },
         score: 0,
       },
-      gameQuestions: [],
+      questions: [],
       status: GameStatus.active,
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),
@@ -585,26 +578,28 @@ describe('QuizController (e2e)', () => {
     expect.setState({ gameId: connectResponse.body.id });
   });
 
-  // it('12 – GET:pair-game-quiz/pairs/connection – 403 1st player is already participating in active pair', async () => {
-  //   const { firstAccessToken } = expect.getState();
-  //
-  //   const connectResponse = await request(server)
-  //     .post(`/pair-game-quiz/pairs/connection`)
-  //     .auth(firstAccessToken.accessToken, { type: 'bearer' })
-  //
-  //   expect(connectResponse).toBeDefined();
-  //   expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
-  // });
-  // it('13 – GET:pair-game-quiz/pairs/connection – 403 2nd player is already participating in active pair', async () => {
-  //   const { secondAccessToken, firstCreatedUser, secondCreatedUser } = expect.getState();
-  //
-  //   const connectResponse = await request(server)
-  //     .post(`/pair-game-quiz/pairs/connection`)
-  //     .auth(secondAccessToken.accessToken, { type: 'bearer' })
-  //
-  //   expect(connectResponse).toBeDefined();
-  //   expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
-  // });
+  it('12 – GET:pair-game-quiz/pairs/connection – 403 1st player is already participating in active pair', async () => {
+    const { firstAccessToken } = expect.getState();
+    console.log('12-----12');
+
+    const connectResponse = await request(server)
+      .post(`/pair-game-quiz/pairs/connection`)
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+
+    expect(connectResponse).toBeDefined();
+    expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+  it('13 – GET:pair-game-quiz/pairs/connection – 403 2nd player is already participating in active pair', async () => {
+    const { secondAccessToken, firstCreatedUser, secondCreatedUser } = expect.getState();
+    console.log('13-----13');
+
+    const connectResponse = await request(server)
+      .post(`/pair-game-quiz/pairs/connection`)
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+
+    expect(connectResponse).toBeDefined();
+    expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
+  });
 
   it('14 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
@@ -634,7 +629,7 @@ describe('QuizController (e2e)', () => {
         },
         score: 0,
       },
-      gameQuestions: expect.any(Array),
+      questions: expect.any(Array),
       status: GameStatus.active,
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),
@@ -669,7 +664,7 @@ describe('QuizController (e2e)', () => {
         },
         score: 0,
       },
-      gameQuestions: expect.any(Array),
+      questions: expect.any(Array),
       status: GameStatus.active,
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),

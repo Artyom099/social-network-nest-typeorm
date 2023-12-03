@@ -40,13 +40,16 @@ export class PlayerQuizController {
   @Get(':gameId')
   @HttpCode(HttpStatus.OK)
   // todo - нельзя достать игру по id, если ты в ней не участвуешь
+  // Если игра в статусе ожидания второго игрока (status: "PendingSecondPlayer") -
+  // поля secondPlayerProgress: null, questions: null, startGameDate: null, finishGameDate: null
+
   async getGame(@Req() req, @Param() param: GameIdInputModel) {
     const game = await this.playerQueryRepository.getGameById(param.gameId);
     if (!game) throw new NotFoundException();
 
     const firstPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
 
-    if (!game.secondPlayerProgress.player.id) throw new ForbiddenException();
+    if (!game.secondPlayerProgress?.player.id) throw new ForbiddenException();
     const secondPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
 
     // если айди юзера не равно айди плеера1 и плеера2

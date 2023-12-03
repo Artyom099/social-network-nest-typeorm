@@ -99,15 +99,8 @@ export class PlayerQuizRepository {
         },
         score: game.score,
       },
-      secondPlayerProgress: {
-        answers: [],
-        player: {
-          id: null,
-          login: null,
-        },
-        score: 0,
-      },
-      gameQuestions: [],
+      secondPlayerProgress: null,
+      questions: null,
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
@@ -124,7 +117,7 @@ export class PlayerQuizRepository {
       .execute()
   }
 
-  async addPlayerToGame(dto: AddPlayerToGameDto) {
+  async addPlayerToGame(dto: AddPlayerToGameDto): Promise<GameViewModel> {
     await this.dataSource
       .createQueryBuilder()
       .update(Game)
@@ -151,8 +144,6 @@ export class PlayerQuizRepository {
     where g."id" = $1
     `, [dto.id])
 
-    // console.log({game_222: game});
-
     return {
       id: game.id,
       firstPlayerProgress: {
@@ -171,7 +162,7 @@ export class PlayerQuizRepository {
         },
         score: 0,
       },
-      gameQuestions: [],
+      questions: [],
       status: game.status,
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,

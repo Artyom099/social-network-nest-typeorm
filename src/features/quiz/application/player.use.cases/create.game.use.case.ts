@@ -23,12 +23,18 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
   ) {}
 
   async execute(command: CreateGameCommand) {
-    // console.log('3---3');
     // смотрим, ждет ли кто-то пару
     const pendingGame = await this.playerQuizQueryRepository.getPendingGame();
     const user = await this.usersQueryRepository.getUserById(command.userId);
 
-    // console.log('4---4');
+    // todo - если этот юзер уже присоединился к текущей игре, вернуть 403 - начать с этого
+    // как это проверить? сверить айди текущего юзера с юзер айди обоих плееров
+    if (pendingGame) {
+      const usersIdCurrentGame = await this.playerQuizQueryRepository.getUsersIdCurrentGame(pendingGame.id);
+      if (usersIdCurrentGame.includes(command.userId)) throw new ForbiddenException();
+    }
+
+    // создавать игрока текущему юзеру надо после проверки этого юзера на участие в текущей игре
     const playerDTO: CreatePlayerDTO = {
       id: randomUUID(),
       score: 0,
@@ -42,17 +48,12 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     if (pendingGame) {
       // если да, то
 
-      //если этот юзер уже присоединился к текущей игре, вернуть 403
-      const userIdCurrentPlayer = await this.playerQuizQueryRepository.getPlayer(command.userId, pendingGame.id);
-      if (command.userId === userIdCurrentPlayer) throw new ForbiddenException();
-
-      // добавляем рандомных 5 вопросов
+      // добавляем 5 рандомных вопросов
       const questionsId = await this.playerQuizQueryRepository.getFiveQuestionsId()
       const questionsDto: AddQuestionsToGameDto = {
         gameId: pendingGame.id,
         questionsId: questionsId.map((q) => (q.id))
       }
-      // console.log({questionsDto____1010: questionsDto});
       await this.playerQuizRepository.crateFiveGameQuestions(questionsDto)
 
       // добавляем игрока в эту пару и начинаем игру
@@ -65,7 +66,6 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
 
     } else {
 
-      // console.log('6---6');
       // иначе создаем новую игру, первого игрока и ждем следующего игрока
       const dto: CreateGameDto = {
         id: randomUUID(),
