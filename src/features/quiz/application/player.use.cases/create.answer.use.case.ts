@@ -4,6 +4,7 @@ import {PlayerQuizQueryRepository} from '../../infrastructure/player.quiz.query.
 import {AnswerStatus} from '../../../../infrastructure/utils/constants';
 import {CreateAnswerDTO} from '../../api/models/dto/create.answer.dto';
 import {randomUUID} from 'crypto';
+import {ForbiddenException} from '@nestjs/common';
 
 export class CreateAnswerCommand {
   constructor(
@@ -24,29 +25,30 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
   // и в то же время не давать игроку отвечать, когда он ответил все вопросы и ждет другого игрока?
   async execute(command: CreateAnswerCommand) {
     // достаем игру по юзеру
-    const currentGame = await this.playerQuizQueryRepository.getActiveGame(command.userId)
-    if (!currentGame || !currentGame.questions) throw new Error('no active game')
+    const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(command.userId);
+    if (!currentGame || !currentGame.questions) throw new ForbiddenException();
 
-    const playerId = await this.playerQuizQueryRepository.getPlayerId(command.userId, currentGame.id)
-    const playerAnswers = await this.playerQuizQueryRepository.getPlayerAnswersForGame(playerId)
+    // достаем плеера по юзеру и игре
+    const playerId = await this.playerQuizQueryRepository.getPlayerId(command.userId, currentGame.id);
+    const playerAnswers = await this.playerQuizQueryRepository.getPlayerAnswersForGame(playerId);
     if (currentGame.questions.length === playerAnswers.length) {
-      throw new Error('player already answer all questions')
+      throw new ForbiddenException();
     }
 
     // достаем вопрос по айди игры и порядковому номеру
-    const question = await this.playerQuizQueryRepository.getQuestion(currentGame.id, playerAnswers.length)
+    const question = await this.playerQuizQueryRepository.getQuestion(currentGame.id, playerAnswers.length);
 
     // проверяем правильность ответа
-    const answerStatus = question.correctAnswers.includes(command.answer) ? AnswerStatus.correct : AnswerStatus.incorrect
+    const answerStatus = question.correctAnswers.includes(command.answer) ? AnswerStatus.correct : AnswerStatus.incorrect;
 
     //если ответ верный, добавляем игроку балл
     if (answerStatus === AnswerStatus.correct) {
-      await this.playerQuizRepository.increaseScore(playerId)
+      await this.playerQuizRepository.increaseScore(playerId);
     }
 
     // если вопрос был последний, завершаем игру
     if (currentGame.questions.length === playerAnswers.length + 1) {
-      await this.playerQuizRepository.finishGame(currentGame.id)
+      await this.playerQuizRepository.finishGame(currentGame.id);
     }
 
     // возвращаем игроку ответ
@@ -57,7 +59,7 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
       addedAt: new Date(),
       questionId: question.id,
       playerId: playerId,
-    }
-    return this.playerQuizRepository.createAnswer(dto)
+    };
+    return this.playerQuizRepository.createAnswer(dto);
   }
 }

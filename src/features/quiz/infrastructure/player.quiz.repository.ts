@@ -29,13 +29,13 @@ export class PlayerQuizRepository {
         answerStatus: dto.answerStatus,
         addedAt: dto.addedAt,
       })
-      .execute()
+      .execute();
 
     const [answer] = await this.dataSource.query(`
       select *
       from answer
       where "id" = $1
-    `, [dto.id])
+    `, [dto.id]);
 
     return answer ? {
       questionId: answer.questionId,
@@ -56,7 +56,7 @@ export class PlayerQuizRepository {
         login: dto.login,
         // gameId: dto.gameId,
       })
-      .execute()
+      .execute();
   }
   async increaseScore(id: string) {
     return this.dataSource
@@ -64,7 +64,7 @@ export class PlayerQuizRepository {
       .update(Player)
       .set({ score: () => "score + 1" })
       .where("id = :id", { id })
-      .execute()
+      .execute();
   }
 
   async createGame(dto: CreateGameDto): Promise<GameViewModel> {
@@ -78,16 +78,20 @@ export class PlayerQuizRepository {
         pairCreatedDate: dto.pairCreatedDate,
         firstPlayerId: dto.firstPlayerId,
       })
-      .execute()
+      .execute();
 
-    // заджоинил игрока к игре
     const [game] = await this.dataSource.query(`
     select *
     from game g
-    left join player pl
-    on g."firstPlayerId" = pl."id"
     where g."id" = $1
-    `, [dto.id])
+    `, [dto.id]);
+
+    const [player] = await this.dataSource.query(`
+    select *
+    from player pl
+    left join users u on pl."userId" = u.id
+    where pl.id = $1
+    `, [game.firstPlayerId])
 
     return {
       id: game.id,
@@ -95,9 +99,9 @@ export class PlayerQuizRepository {
         answers: [],
         player: {
           id: game.firstPlayerId,
-          login: game.login,
+          login: player.login,
         },
-        score: game.score,
+        score: player.score,
       },
       secondPlayerProgress: null,
       questions: null,
@@ -114,7 +118,7 @@ export class PlayerQuizRepository {
       .update(Game)
       .set({ status: GameStatus.finished })
       .where("id = :id", { id })
-      .execute()
+      .execute();
   }
 
   async addPlayerToGame(dto: AddPlayerToGameDto): Promise<GameViewModel> {
@@ -127,22 +131,22 @@ export class PlayerQuizRepository {
         status: GameStatus.active,
       })
       .where("id = :id", { id: dto.id })
-      .execute()
+      .execute();
 
     const [game] = await this.dataSource.query(`
     select *,
     
-      (select pl."login" as first_player_login
+      (select pl."login" as "firstPlayerLogin"
       from player pl 
       where pl."id" = g."firstPlayerId"),
 
-      (select pl."login" as second_player_login
+      (select pl."login" as "secondPlayerLogin"
       from player pl
       where pl."id" = g."secondPlayerId")
 
     from game g
     where g."id" = $1
-    `, [dto.id])
+    `, [dto.id]);
 
     return {
       id: game.id,
@@ -150,7 +154,7 @@ export class PlayerQuizRepository {
         answers: [],
         player: {
           id: game.firstPlayerId,
-          login: game.first_player_login,
+          login: game.firstPlayerLogin,
         },
         score: 0,
       },
@@ -158,7 +162,7 @@ export class PlayerQuizRepository {
         answers: [],
         player: {
           id: game.secondPlayerId,
-          login: game.second_player_login,
+          login: game.secondPlayerLogin,
         },
         score: 0,
       },
@@ -167,7 +171,7 @@ export class PlayerQuizRepository {
       pairCreatedDate: game.pairCreatedDate,
       startGameDate: game.startGameDate,
       finishGameDate: game.finishGameDate,
-    }
+    };
   }
 
   async crateFiveGameQuestions(dto: AddQuestionsToGameDto) {
@@ -186,6 +190,6 @@ export class PlayerQuizRepository {
       dto.questionsId[2],
       dto.questionsId[3],
       dto.questionsId[4],
-    ])
+    ]);
   }
 }

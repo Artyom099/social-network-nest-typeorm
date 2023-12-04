@@ -1,19 +1,15 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
-import {InjectDataSource, InjectRepository} from '@nestjs/typeorm';
-import {DataSource, Repository} from 'typeorm';
-import {Users} from '../../users/entity/user.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectDataSource} from '@nestjs/typeorm';
+import {DataSource} from 'typeorm';
 import {GameStatus} from '../../../infrastructure/utils/constants';
 import {GameViewModel} from '../api/models/view/game.view.model';
 import {AnswerViewModel} from '../api/models/view/answer.view.model';
 import {Question} from '../entity/question.entity';
-import {Game} from '../entity/game.entity';
-import {Player} from '../entity/player.entity';
 
 @Injectable()
 export class PlayerQuizQueryRepository {
   constructor(
     @InjectDataSource() private dataSource: DataSource,
-    @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
 
   // достаем 5 случайнах вопросов
@@ -56,16 +52,6 @@ export class PlayerQuizQueryRepository {
 
     return player ? player : null;
   }
-  async getUsersIdCurrentGame(gameId: string) {
-    const usersId = await this.dataSource.query(`
-    select u."id"
-    from player pl
-    left join users u on u.id = pl."userId"
-    where pl."gameId" = $1
-    `, [gameId]);
-
-    return usersId ? usersId : [];
-  }
 
   async getUserIdByPlayerId(id: string): Promise<string> {
     const [userId] = await this.dataSource.query(`
@@ -77,12 +63,31 @@ export class PlayerQuizQueryRepository {
 
     return userId ? userId.userId : null;
   }
+  async usersIdActiveGames() {
+    const usersId = await this.dataSource.query(`
+    select u."id"
+    from player pl
+    left join users u on u.id = pl."userId"
+    left join game g on g."firstPlayerId" = pl.id
+    where g.status = $1 or g.status = $2
+    
+    union
+    
+    select u."id"
+    from player pl
+    left join users u on u.id = pl."userId"
+    left join game g on g."secondPlayerId" = pl.id
+    where g.status = $1 or g.status = $2
+    `, [GameStatus.active, GameStatus.pending]);
+
+    return usersId ? usersId : [];
+  }
 
   // достаем ответы по айди игрока
   async getPlayerAnswersForGame(playerId: string): Promise<AnswerViewModel[]> {
     const answers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"
-    from answers
+    from answer
     where "playerId" = $1
     `, [playerId])
 
@@ -120,7 +125,7 @@ export class PlayerQuizQueryRepository {
     from game g
     where g."id" = $1
     `, [id]);
-    if (!game) throw new NotFoundException();
+    if (!game) return null;
 
     const questions = await this.dataSource.query(`
     select q."id", q."body"
@@ -200,21 +205,40 @@ export class PlayerQuizQueryRepository {
     } : null;
   }
 
-  async getActiveGame(id: string): Promise<GameViewModel | null> {
+  async getActiveOrPendingGame(userId: string): Promise<GameViewModel | null> {
+    // достаем всех игроков этого юзера
+    const [playerId] = await this.dataSource.query(`
+    select p.id
+    from player p 
+    left join users u 
+    on p."userId" = u.id
+    where u.id = $1
+    `, [userId]);
+    if (!playerId) return null;
+
     const [game] = await this.dataSource.query(`
     select *,
 
-      (select pl."login" as "firstPlayerLogin"
+      (select pl.login as "firstPlayerLogin"
       from player pl
       where pl."id" = g."firstPlayerId"),
       
-      (select pl."login" as "secondPlayerLogin"
+      (select pl.score as "firstPlayerScore"
+      from player pl
+      where pl."id" = g."firstPlayerId"),
+      
+      (select pl.login as "secondPlayerLogin"
+      from player pl 
+      where pl."id" = g."secondPlayerId"),
+      
+      (select pl.score as "secondPlayerScore"
       from player pl 
       where pl."id" = g."secondPlayerId")
     
     from game g
-    where g."id" = $1 and "status" = $2
-    `, [id, GameStatus.active]);
+    where (g."firstPlayerId" = $1 or g."secondPlayerId" = $1)
+    and ("status" = $2 or "status" = $3)
+    `, [playerId.id, GameStatus.active, GameStatus.pending]);
     if (!game) return null;
 
     const questions = await this.dataSource.query(`
@@ -224,20 +248,19 @@ export class PlayerQuizQueryRepository {
     on q."id" = gq."questionId"
     where gq."gameId" = $1
     order by gq."questionNumber"
-    `, [id]);
+    `, [userId]);
 
     const firstPlayerAnswers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"
     from answer
-    where playerId = $1
+    where "playerId" = $1
     `, [game.firstPlayerId]);
     const secondPlayerAnswers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"
     from answer
-    where playerId = $1
+    where "playerId" = $1
     `, [game.secondPlayerId]);
 
-    console.log({game: game});
     if (!game.secondPlayerId) {
       return {
         id: game.id,
@@ -247,7 +270,7 @@ export class PlayerQuizQueryRepository {
             id: game.firstPlayerId,
             login: game.firstPlayerLogin,
           },
-          score: game.firstPlayerProgress.score,
+          score: game.firstPlayerScore,
         },
         secondPlayerProgress: null,
         questions: null,
@@ -266,7 +289,7 @@ export class PlayerQuizQueryRepository {
           id: game.firstPlayerId,
           login: game.firstPlayerLogin,
         },
-        score: game.firstPlayerProgress.score,
+        score: game.firstPlayerScore,
       },
       secondPlayerProgress: {
         answers: secondPlayerAnswers,
@@ -274,7 +297,7 @@ export class PlayerQuizQueryRepository {
           id: game.secondPlayerId,
           login: game.secondPlayerLogin,
         },
-        score: game.secondPlayerProgress.score,
+        score: game.secondPlayerScore,
       },
       questions: questions,
       status: game.status,

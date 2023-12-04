@@ -29,7 +29,7 @@ export class PlayerQuizController {
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
   async getCurrentGame(@Req() req) {
-    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId);
+    const currentGame = await this.playerQueryRepository.getActiveOrPendingGame(req.userId);
     if (!currentGame) {
       throw new NotFoundException();
     } else {
@@ -39,19 +39,16 @@ export class PlayerQuizController {
 
   @Get(':gameId')
   @HttpCode(HttpStatus.OK)
-  // todo - нельзя достать игру по id, если ты в ней не участвуешь
-  // Если игра в статусе ожидания второго игрока (status: "PendingSecondPlayer") -
-  // поля secondPlayerProgress: null, questions: null, startGameDate: null, finishGameDate: null
-
   async getGame(@Req() req, @Param() param: GameIdInputModel) {
     const game = await this.playerQueryRepository.getGameById(param.gameId);
     if (!game) throw new NotFoundException();
 
     const firstPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
 
-    if (!game.secondPlayerProgress?.player.id) throw new ForbiddenException();
-    const secondPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
-
+    let secondPlayerUserId: string | null = null;
+    if (game.secondPlayerProgress && game.secondPlayerProgress.player.id) {
+      secondPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
+    }
     // если айди юзера не равно айди плеера1 и плеера2
     if (req.userId !== firstPlayerUserId && req.userId !== secondPlayerUserId) {
       throw new ForbiddenException();
@@ -63,7 +60,8 @@ export class PlayerQuizController {
   @Post('connection')
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req) {
-    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId);
+    const currentGame = await this.playerQueryRepository.getActiveOrPendingGame(req.userId);
+    // если есть активная игра, то юзер не может подключиться к еще одной игре
     if (currentGame) {
       throw new ForbiddenException();
     } else {
@@ -74,8 +72,7 @@ export class PlayerQuizController {
   @Post('my-current/answers')
   @HttpCode(HttpStatus.OK)
   async sendAnswer(@Req() req, @Body() inputModel: AnswerInputModel) {
-    const currentGame = await this.playerQueryRepository.getActiveGame(req.userId)
-    //todo - добавить кейс, что игрок ответил на все вопросы и ждет ответов другого игрока
+    const currentGame = await this.playerQueryRepository.getActiveOrPendingGame(req.userId);
     if (!currentGame) {
       throw new ForbiddenException();
     } else {
