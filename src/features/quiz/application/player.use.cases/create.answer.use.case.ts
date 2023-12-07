@@ -35,6 +35,11 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
       throw new ForbiddenException();
     }
 
+    // если игрок ответил на все вопросы, возвращаем 403
+    if (playerAnswers.length === 5) {
+      return new ForbiddenException();
+    }
+
     // достаем вопрос по айди игры и порядковому номеру
     const question = await this.playerQuizQueryRepository.getQuestion(currentGame.id, playerAnswers.length);
 

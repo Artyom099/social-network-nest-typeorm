@@ -733,7 +733,7 @@ describe('QuizController (e2e)', () => {
     expect(getResponse.status).toEqual(HttpStatus.FORBIDDEN);
   });
 
-  // пользователи начинают отвечать на вопросы
+  // игроки начинают отвечать на вопросы
   it('14 - POST:pair-game-quiz/pairs/my-current/answers - 1st player', async () => {
     const { firstAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
 
