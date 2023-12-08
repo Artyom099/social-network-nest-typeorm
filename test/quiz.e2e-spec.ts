@@ -143,7 +143,6 @@ describe('QuizController (e2e)', () => {
 
     expect(publishResponse).toBeDefined();
     expect(publishResponse.status).toEqual(HttpStatus.NO_CONTENT);
-    expect(publishResponse).not.toBeNull();
 
     const getResponse = await request(server)
       .get('/sa/quiz/questions')
@@ -661,7 +660,6 @@ describe('QuizController (e2e)', () => {
 
     expect(getResponse).toBeDefined();
     expect(getResponse.status).toEqual(HttpStatus.OK);
-
     expect(getResponse.body).toEqual({
       id: expect.any(String),
       firstPlayerProgress: {
@@ -696,7 +694,6 @@ describe('QuizController (e2e)', () => {
 
     expect(getResponse).toBeDefined();
     expect(getResponse.status).toEqual(HttpStatus.OK);
-
     expect(getResponse.body).toEqual({
       id: expect.any(String),
       firstPlayerProgress: {
