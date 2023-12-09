@@ -60,8 +60,8 @@ export class PlayerQuizController {
   @Post('connection')
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req) {
-    const currentGame = await this.playerQueryRepository.getActiveOrPendingGame(req.userId);
     // если есть активная игра, то юзер не может подключиться к еще одной игре
+    const currentGame = await this.playerQueryRepository.getActiveOrPendingGame(req.userId);
     if (currentGame) {
       throw new ForbiddenException();
     } else {

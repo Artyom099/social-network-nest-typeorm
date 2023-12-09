@@ -19,7 +19,6 @@ export class Game {
   @OneToOne(() => Player, pl => pl.game)
   @JoinColumn()
   firstPlayer: Player;
-  // @Column({ nullable: true })
   @Column()
   firstPlayerId: string;
 
@@ -32,5 +31,4 @@ export class Game {
   @OneToMany(() => GameQuestion, gq => gq.game)
   @JoinTable()
   gameQuestions: string[];
-  // gameQuestions: GameQuestion[];
 }

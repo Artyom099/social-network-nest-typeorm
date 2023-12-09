@@ -205,8 +205,8 @@ export class PlayerQuizQueryRepository {
     } : null;
   }
 
+  // достаем всех игроков этого юзера
   async getActiveOrPendingGame(userId: string): Promise<GameViewModel | null> {
-    // достаем всех игроков этого юзера
     const [playerId] = await this.dataSource.query(`
     select p.id
     from player p 
