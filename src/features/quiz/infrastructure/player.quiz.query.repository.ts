@@ -4,7 +4,6 @@ import {DataSource} from 'typeorm';
 import {GameStatus} from '../../../infrastructure/utils/constants';
 import {GameViewModel} from '../api/models/view/game.view.model';
 import {AnswerViewModel} from '../api/models/view/answer.view.model';
-import {Question} from '../entity/question.entity';
 
 @Injectable()
 export class PlayerQuizQueryRepository {
@@ -20,18 +19,18 @@ export class PlayerQuizQueryRepository {
     order by random()
     limit 5
     offset random()
-    `,)
+    `,);
   }
 
   // достаем вопрос по айди игры и номеру вопроса
-  async getQuestion(gameId: string, questionNumber: number): Promise<Question> {
+  async getQuestion(gameId: string, questionNumber: number) {
     return this.dataSource.query(`
     select *
     from question q
     left join game_question gq
     on q."id" = gq."questionId"
     where gq."gameId" = $1 and gq."questionNumber" = $2
-    `, [gameId, questionNumber])
+    `, [gameId, questionNumber]);
   }
 
   async getPlayerId(userId: string, gameId: string): Promise<string> {
@@ -249,6 +248,107 @@ export class PlayerQuizQueryRepository {
     where gq."gameId" = $1
     order by gq."questionNumber"
     `, [userId]);
+
+    const firstPlayerAnswers = await this.dataSource.query(`
+    select "questionId", "answerStatus", "addedAt"
+    from answer
+    where "playerId" = $1
+    `, [game.firstPlayerId]);
+    const secondPlayerAnswers = await this.dataSource.query(`
+    select "questionId", "answerStatus", "addedAt"
+    from answer
+    where "playerId" = $1
+    `, [game.secondPlayerId]);
+
+    if (!game.secondPlayerId) {
+      return {
+        id: game.id,
+        firstPlayerProgress: {
+          answers: firstPlayerAnswers,
+          player: {
+            id: game.firstPlayerId,
+            login: game.firstPlayerLogin,
+          },
+          score: game.firstPlayerScore,
+        },
+        secondPlayerProgress: null,
+        questions: null,
+        status: game.status,
+        pairCreatedDate: game.pairCreatedDate,
+        startGameDate: game.startGameDate,
+        finishGameDate: game.finishGameDate,
+      }
+    }
+
+    return game ? {
+      id: game.id,
+      firstPlayerProgress: {
+        answers: firstPlayerAnswers,
+        player: {
+          id: game.firstPlayerId,
+          login: game.firstPlayerLogin,
+        },
+        score: game.firstPlayerScore,
+      },
+      secondPlayerProgress: {
+        answers: secondPlayerAnswers,
+        player: {
+          id: game.secondPlayerId,
+          login: game.secondPlayerLogin,
+        },
+        score: game.secondPlayerScore,
+      },
+      questions: questions,
+      status: game.status,
+      pairCreatedDate: game.pairCreatedDate,
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
+    } : null;
+  }
+
+  async getActiveGame(userId: string): Promise<GameViewModel | null> {
+    const [playerId] = await this.dataSource.query(`
+    select p.id
+    from player p 
+    left join users u 
+    on p."userId" = u.id
+    where u.id = $1
+    `, [userId]);
+    if (!playerId) return null;
+
+    const [game] = await this.dataSource.query(`
+    select *,
+
+      (select pl.login as "firstPlayerLogin"
+      from player pl
+      where pl."id" = g."firstPlayerId"),
+      
+      (select pl.score as "firstPlayerScore"
+      from player pl
+      where pl."id" = g."firstPlayerId"),
+      
+      (select pl.login as "secondPlayerLogin"
+      from player pl 
+      where pl."id" = g."secondPlayerId"),
+      
+      (select pl.score as "secondPlayerScore"
+      from player pl 
+      where pl."id" = g."secondPlayerId")
+    
+    from game g
+    where ("firstPlayerId" = $1 or "secondPlayerId" = $1)
+    and status = $2
+    `, [playerId.id, GameStatus.active]);
+    if (!game) return null;
+
+    const questions = await this.dataSource.query(`
+    select q."id", q."body"
+    from game_question gq
+    left join question q
+    on q."id" = gq."questionId"
+    where gq."gameId" = $1
+    order by gq."questionNumber"
+    `, [game.id]);
 
     const firstPlayerAnswers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"

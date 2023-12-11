@@ -4,7 +4,7 @@ import {AppModule} from '../src/app.module';
 import {appSettings} from '../src/infrastructure/settings/app.settings';
 import request from 'supertest';
 import {getRefreshTokenByResponse} from '../src/infrastructure/utils/utils';
-import {GameStatus} from '../src/infrastructure/utils/constants';
+import {AnswerStatus, GameStatus} from '../src/infrastructure/utils/constants';
 import {DataSource} from 'typeorm';
 
 const sleep = (seconds: number) =>
@@ -731,15 +731,21 @@ describe('QuizController (e2e)', () => {
   });
 
   // игроки начинают отвечать на вопросы
-  it('14 - POST:pair-game-quiz/pairs/my-current/answers - 1st player', async () => {
-    const { firstAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
+  it('17 - POST:pair-game-quiz/pairs/my-current/answers - 1st player', async () => {
+    const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
-      .post('pair-game-quiz/pairs/my-current/answers')
-      .auth(firstAccessToken.accessToken, { type: 'bearer' });
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans1' });
 
     expect(sendAnswer).toBeDefined();
     expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.correct,
+      addedAt: expect.any(String),
+    });
 
   });
 

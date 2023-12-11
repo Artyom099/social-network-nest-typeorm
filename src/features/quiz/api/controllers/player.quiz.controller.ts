@@ -23,13 +23,13 @@ import {GameIdInputModel} from '../models/input/game.id.input.model';
 export class PlayerQuizController {
   constructor(
     private commandBus: CommandBus,
-    private playerQueryRepository: PlayerQuizQueryRepository,
+    private playerQuizQueryRepository: PlayerQuizQueryRepository,
   ) {}
 
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
   async getCurrentGame(@Req() req) {
-    const currentGame = await this.playerQueryRepository.getActiveOrPendingGame(req.userId);
+    const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
     if (!currentGame) {
       throw new NotFoundException();
     } else {
@@ -40,14 +40,14 @@ export class PlayerQuizController {
   @Get(':gameId')
   @HttpCode(HttpStatus.OK)
   async getGame(@Req() req, @Param() param: GameIdInputModel) {
-    const game = await this.playerQueryRepository.getGameById(param.gameId);
+    const game = await this.playerQuizQueryRepository.getGameById(param.gameId);
     if (!game) throw new NotFoundException();
 
-    const firstPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
+    const firstPlayerUserId = await this.playerQuizQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
 
     let secondPlayerUserId: string | null = null;
     if (game.secondPlayerProgress && game.secondPlayerProgress.player.id) {
-      secondPlayerUserId = await this.playerQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
+      secondPlayerUserId = await this.playerQuizQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
     }
     // если айди юзера не равно айди плеера1 и плеера2
     if (req.userId !== firstPlayerUserId && req.userId !== secondPlayerUserId) {
@@ -61,7 +61,7 @@ export class PlayerQuizController {
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req) {
     // если есть активная игра, то юзер не может подключиться к еще одной игре
-    const currentGame = await this.playerQueryRepository.getActiveOrPendingGame(req.userId);
+    const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
     if (currentGame) {
       throw new ForbiddenException();
     } else {
@@ -72,10 +72,13 @@ export class PlayerQuizController {
   @Post('my-current/answers')
   @HttpCode(HttpStatus.OK)
   async sendAnswer(@Req() req, @Body() inputModel: AnswerInputModel) {
-    const currentGame = await this.playerQueryRepository.getActiveOrPendingGame(req.userId);
+    const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
+    console.log({ currentGame: currentGame });
     if (!currentGame) {
+      console.log('no');
       throw new ForbiddenException();
     } else {
+      console.log('yes');
       return this.commandBus.execute(new CreateAnswerCommand(req.userId, inputModel.answer));
     }
   }
