@@ -21,6 +21,8 @@ export class Player {
   @ManyToOne(() => Answer, a => a.player)
   @JoinColumn()
   answers: Answer[];
+  @Column({ nullable: true })
+  answersId: string[];
 
   @OneToOne(() => Game, { nullable: true })
   game: Game;

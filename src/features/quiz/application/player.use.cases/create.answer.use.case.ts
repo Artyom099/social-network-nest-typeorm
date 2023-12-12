@@ -26,13 +26,17 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
   async execute(command: CreateAnswerCommand) {
     // достаем игру по юзеру
     const currentGame = await this.playerQuizQueryRepository.getActiveGame(command.userId);
+    console.log({ currentGame: currentGame });
     if (!currentGame || !currentGame.questions) {
       console.log('1---');
       throw new ForbiddenException();
     }
 
     // достаем плеера по userId и gameId
+    console.log({ userId: command.userId });
+    console.log({ currentGameId: currentGame.id });
     const playerId = await this.playerQuizQueryRepository.getPlayerId(command.userId, currentGame.id);
+    console.log({ playerId: playerId });
     const playerAnswers = await this.playerQuizQueryRepository.getPlayerAnswersForGame(playerId);
     console.log(currentGame.questions.length);
     console.log(playerAnswers.length);
@@ -74,6 +78,7 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
       questionId: question.id,
       playerId,
     };
+    await this.playerQuizRepository.updatePlayersAnswerId(dto.playerId, dto.id);
     return this.playerQuizRepository.createAnswer(dto);
   }
 }

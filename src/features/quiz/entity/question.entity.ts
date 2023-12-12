@@ -1,5 +1,4 @@
 import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {Answer} from './answer.entity';
 import {GameQuestion} from './game.question.entity';
 
 @Entity()
@@ -20,6 +19,6 @@ export class Question {
   @OneToMany(() => GameQuestion, gq => gq.question)
   gameQuestions: GameQuestion[];
 
-  @OneToMany(() => Answer, a => a.question)
-  answers: Answer[];
+  // @OneToMany(() => Answer, a => a.question)
+  // answers: Answer[];
 }

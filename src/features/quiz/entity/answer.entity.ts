@@ -1,6 +1,5 @@
-import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {AnswerStatus} from '../../../infrastructure/utils/constants';
-import {Question} from './question.entity';
 import {Player} from './player.entity';
 
 @Entity()
@@ -14,9 +13,9 @@ export class Answer {
   @Column()
   addedAt: Date;
 
-  @ManyToOne(() => Question, q => q.answers)
-  @JoinColumn()
-  question: Question;
+  // @ManyToOne(() => Question, q => q.answers)
+  // @JoinColumn()
+  // question: Question;
   @Column()
   questionId: string;
 

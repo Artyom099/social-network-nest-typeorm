@@ -73,7 +73,6 @@ export class PlayerQuizController {
   @HttpCode(HttpStatus.OK)
   async sendAnswer(@Req() req, @Body() inputModel: AnswerInputModel) {
     const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
-    console.log({ currentGame: currentGame });
     if (!currentGame) {
       console.log('no');
       throw new ForbiddenException();

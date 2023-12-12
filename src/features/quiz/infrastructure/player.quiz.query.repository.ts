@@ -24,17 +24,19 @@ export class PlayerQuizQueryRepository {
 
   // достаем вопрос по айди игры и номеру вопроса
   async getQuestion(gameId: string, questionNumber: number) {
-    return this.dataSource.query(`
+    const [question] = await this.dataSource.query(`
     select *
     from question q
     left join game_question gq
     on q."id" = gq."questionId"
     where gq."gameId" = $1 and gq."questionNumber" = $2
     `, [gameId, questionNumber]);
+
+    return question ? question : null;
   }
 
   async getPlayerId(userId: string, gameId: string): Promise<string> {
-    const player = await this.dataSource.query(`
+    const [player] = await this.dataSource.query(`
     select *
     from player
     where "userId" = $1 and "gameId" = $2
@@ -43,7 +45,7 @@ export class PlayerQuizQueryRepository {
     return player ? player.id : null;
   }
   async getPlayer(userId: string, gameId: string) {
-    const player = await this.dataSource.query(`
+    const [player] = await this.dataSource.query(`
     select *
     from player
     where "userId" = $1 and "gameId" = $2

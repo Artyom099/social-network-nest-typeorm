@@ -59,13 +59,16 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     } else {
 
       // иначе создаем новую игру, первого игрока и ждем следующего игрока
+
       const dto: CreateGameDto = {
         id: randomUUID(),
         status: GameStatus.pending,
         pairCreatedDate: new Date(),
         firstPlayerId: playerDTO.id,
       };
+      await this.playerQuizRepository.updatePlayersGameId(playerDTO.id,dto.id);
       return this.playerQuizRepository.createGame(dto);
+
     }
   }
 }

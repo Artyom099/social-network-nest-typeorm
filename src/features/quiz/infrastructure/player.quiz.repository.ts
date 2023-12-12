@@ -28,6 +28,7 @@ export class PlayerQuizRepository {
         questionId: dto.questionId,
         answerStatus: dto.answerStatus,
         addedAt: dto.addedAt,
+        playerId: dto.playerId,
       })
       .execute();
 
@@ -54,8 +55,24 @@ export class PlayerQuizRepository {
         score: dto.score,
         userId: dto.userId,
         login: dto.login,
-        // gameId: dto.gameId,
+        gameId: dto.gameId,
       })
+      .execute();
+  }
+  async updatePlayersGameId(id: string, gameId: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Player)
+      .set({ gameId: gameId })
+      .where("id = :id", { id })
+      .execute();
+  }
+  async updatePlayersAnswerId(id: string, answerId: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Player)
+      .set({ answersId: () => `array_append("answersId", ${answerId})` })
+      .where("id = :id", { id })
       .execute();
   }
   async increaseScore(id: string) {

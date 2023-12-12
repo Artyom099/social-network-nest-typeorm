@@ -198,7 +198,7 @@ describe('QuizController (e2e)', () => {
 
     const firstQuestionInput = {
       body: 'body-first-question',
-      correctAnswers: ['ans1', 'ans2', 'ans2'],
+      correctAnswers: ['ans1', 'ans2', 'ans3'],
     };
     const createResponse1 = await request(server)
       .post(`/sa/quiz/questions/`)
@@ -213,7 +213,7 @@ describe('QuizController (e2e)', () => {
 
     const secondQuestionInput = {
       body: 'body-second-question',
-      correctAnswers: ['ans1', 'ans2', 'ans2'],
+      correctAnswers: ['ans1', 'ans2', 'ans3'],
     };
     const createResponse2 = await request(server)
       .post(`/sa/quiz/questions/`)
@@ -228,7 +228,7 @@ describe('QuizController (e2e)', () => {
 
     const thirdQuestionInput = {
       body: 'body-third-question',
-      correctAnswers: ['ans1', 'ans2', 'ans2'],
+      correctAnswers: ['ans1', 'ans2', 'ans3'],
     };
     const createResponse3 = await request(server)
       .post(`/sa/quiz/questions/`)
@@ -243,7 +243,7 @@ describe('QuizController (e2e)', () => {
 
     const fourthQuestionInput = {
       body: 'body-fourth-question',
-      correctAnswers: ['ans1', 'ans2', 'ans2'],
+      correctAnswers: ['ans1', 'ans2', 'ans3'],
     };
     const createResponse4 = await request(server)
       .post(`/sa/quiz/questions/`)
@@ -258,7 +258,7 @@ describe('QuizController (e2e)', () => {
 
     const fifthQuestionInput = {
       body: 'body-fifth-question',
-      correctAnswers: ['ans1', 'ans2', 'ans2'],
+      correctAnswers: ['ans1', 'ans2', 'ans3'],
     };
     const createResponse5 = await request(server)
       .post(`/sa/quiz/questions/`)
@@ -731,7 +731,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // игроки начинают отвечать на вопросы
-  it('17 - POST:pair-game-quiz/pairs/my-current/answers - 1st player', async () => {
+  it('17 - POST:pair-game-quiz/pairs/my-current/answers - 1st player, 1st question', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
