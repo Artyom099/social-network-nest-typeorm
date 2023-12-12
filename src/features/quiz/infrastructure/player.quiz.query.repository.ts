@@ -90,7 +90,7 @@ export class PlayerQuizQueryRepository {
     select "questionId", "answerStatus", "addedAt"
     from answer
     where "playerId" = $1
-    `, [playerId])
+    `, [playerId]);
 
     return answers.map((a) => {
       return {
@@ -98,7 +98,7 @@ export class PlayerQuizQueryRepository {
         answerStatus: a.answerStatus,
         addedAt: a.addedAt,
       }
-    })
+    });
   }
 
   async getPendingGame() {

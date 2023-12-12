@@ -71,15 +71,24 @@ export class PlayerQuizRepository {
     return this.dataSource
       .createQueryBuilder()
       .update(Player)
-      .set({ answersId: () => `array_append("answersId", ${answerId})` })
+      .set({ answersId: () => `array_append('answersId', '${answerId}')` })
       .where("id = :id", { id })
       .execute();
   }
+
   async increaseScore(id: string) {
     return this.dataSource
       .createQueryBuilder()
       .update(Player)
       .set({ score: () => "score + 1" })
+      .where("id = :id", { id })
+      .execute();
+  }
+  async increaseAnswersCount(id: string) {
+    return this.dataSource
+      .createQueryBuilder()
+      .update(Player)
+      .set({ answersCount: () => "answersCount + 1" })
       .where("id = :id", { id })
       .execute();
   }

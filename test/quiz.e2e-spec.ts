@@ -7,8 +7,7 @@ import {getRefreshTokenByResponse} from '../src/infrastructure/utils/utils';
 import {AnswerStatus, GameStatus} from '../src/infrastructure/utils/constants';
 import {DataSource} from 'typeorm';
 
-const sleep = (seconds: number) =>
-  new Promise((r) => setTimeout(r, seconds * 1000));
+const sleep = (seconds: number) => new Promise((r) => setTimeout(r, seconds * 1000));
 
 describe('QuizController (e2e)', () => {
   let app: INestApplication;
@@ -731,7 +730,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // игроки начинают отвечать на вопросы
-  it('17 - POST:pair-game-quiz/pairs/my-current/answers - 1st player, 1st question', async () => {
+  it('17 - POST:pair-game-quiz/pairs/my-current/answers - 1st player, 1st question, correct ans', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -746,7 +745,54 @@ describe('QuizController (e2e)', () => {
       answerStatus: AnswerStatus.correct,
       addedAt: expect.any(String),
     });
+  });
+  it('18 - POST:pair-game-quiz/pairs/my-current/answers - 1st player, 2nd question, incorrect ans', async () => {
+    const { firstAccessToken } = expect.getState();
 
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'incorrect-ans' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.incorrect,
+      addedAt: expect.any(String),
+    });
+  });
+  it('19 - POST:pair-game-quiz/pairs/my-current/answers - 2nd player, 1st question, incorrect ans', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'incorrect-ans' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.incorrect,
+      addedAt: expect.any(String),
+    });
+  });
+  it('20 - POST:pair-game-quiz/pairs/my-current/answers - 2nd player, 2nd question, correct ans', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.correct,
+      addedAt: expect.any(String),
+    });
   });
 
 

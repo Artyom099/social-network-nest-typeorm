@@ -17,6 +17,8 @@ export class Player {
   userId: string;
   @Column()
   login: string;
+  @Column({ default: 0 })
+  answersCount: number;
 
   @ManyToOne(() => Answer, a => a.player)
   @JoinColumn()

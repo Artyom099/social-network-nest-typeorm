@@ -33,52 +33,43 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
     }
 
     // достаем плеера по userId и gameId
-    console.log({ userId: command.userId });
-    console.log({ currentGameId: currentGame.id });
-    const playerId = await this.playerQuizQueryRepository.getPlayerId(command.userId, currentGame.id);
-    console.log({ playerId: playerId });
-    const playerAnswers = await this.playerQuizQueryRepository.getPlayerAnswersForGame(playerId);
+    const player = await this.playerQuizQueryRepository.getPlayer(command.userId, currentGame.id);
     console.log(currentGame.questions.length);
-    console.log(playerAnswers.length);
-    if (currentGame.questions.length === playerAnswers.length) {
-      console.log('2---');
-      throw new ForbiddenException();
-    }
+    console.log(player.answersCount);
 
     // если игрок ответил на все вопросы, возвращаем 403
-    if (playerAnswers.length === 5) {
-      console.log('3---');
+    if (player.answersCount === 5) {
+      console.log('2---');
       return new ForbiddenException();
     }
 
     // достаем вопрос по айди игры и порядковому номеру
-    const question = await this.playerQuizQueryRepository.getQuestion(currentGame.id, playerAnswers.length + 1);
-    console.log({ question: question });
-    console.log({ correctAnswers: question.correctAnswers });
+    const question = await this.playerQuizQueryRepository.getQuestion(currentGame.id, player.answersCount + 1);
 
     // проверяем правильность ответа
     const answerStatus = question.correctAnswers.includes(command.answer) ? AnswerStatus.correct : AnswerStatus.incorrect;
 
     //если ответ верный, добавляем игроку балл
     if (answerStatus === AnswerStatus.correct) {
-      await this.playerQuizRepository.increaseScore(playerId);
+      await this.playerQuizRepository.increaseScore(player.id);
     }
 
     // если вопрос был последний, завершаем игру
-    if (currentGame.questions.length === playerAnswers.length + 1) {
+    if (currentGame.questions.length === player.answersCount + 1) {
       await this.playerQuizRepository.finishGame(currentGame.id);
     }
 
-    // возвращаем игроку ответ
     const dto: CreateAnswerDTO = {
       id: randomUUID(),
       answer: command.answer,
       answerStatus,
       addedAt: new Date(),
       questionId: question.id,
-      playerId,
+      playerId: player.id,
     };
-    await this.playerQuizRepository.updatePlayersAnswerId(dto.playerId, dto.id);
+    // увеличиваем игроку answersCount
+    await this.playerQuizRepository.increaseAnswersCount(player.id);
+    // возвращаем ответ
     return this.playerQuizRepository.createAnswer(dto);
   }
 }
