@@ -59,6 +59,7 @@ export class PlayerQuizRepository {
       })
       .execute();
   }
+
   async updatePlayersGameId(id: string, gameId: string) {
     return this.dataSource
       .createQueryBuilder()
@@ -142,7 +143,7 @@ export class PlayerQuizRepository {
     return this.dataSource
       .createQueryBuilder()
       .update(Game)
-      .set({ status: GameStatus.finished })
+      .set({ status: GameStatus.finished, finishGameDate: new Date() })
       .where("id = :id", { id })
       .execute();
   }

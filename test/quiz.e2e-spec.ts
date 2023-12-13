@@ -192,7 +192,7 @@ describe('QuizController (e2e)', () => {
     })
   });
 
-  it('6 – POST:sa/quiz/questions – 201 & create 5 questions', async () => {
+  it('6 – POST:sa/quiz/questions – 201 & create 6 questions', async () => {
     await sleep(1.1);
 
     const firstQuestionInput = {
@@ -270,6 +270,21 @@ describe('QuizController (e2e)', () => {
     expect(createResponse5.status).toEqual(HttpStatus.CREATED);
     const Q5 = createResponse5.body
 
+    const sixthQuestionInput = {
+      body: 'body-fifth-question',
+      correctAnswers: ['ans1', 'ans2', 'ans3'],
+    };
+    const createResponse6 = await request(server)
+      .post(`/sa/quiz/questions/`)
+      .auth('admin', 'qwerty', {type: 'basic'})
+      .send({
+        body: sixthQuestionInput.body,
+        correctAnswers: sixthQuestionInput.correctAnswers,
+      });
+    expect(createResponse6).toBeDefined();
+    expect(createResponse6.status).toEqual(HttpStatus.CREATED);
+    const Q6 = createResponse6.body
+
 
     const getResponse = await request(server)
       .get('/sa/quiz/questions')
@@ -279,14 +294,14 @@ describe('QuizController (e2e)', () => {
       pagesCount: 1,
       page: 1,
       pageSize: 10,
-      totalCount: 5,
-      items: [ Q5, Q4, Q3, Q2, Q1 ],
+      totalCount: 6,
+      items: [ Q6, Q5, Q4, Q3, Q2, Q1 ],
     })
 
-    expect.setState({ Q5, Q4, Q3, Q2, Q1 });
+    expect.setState({ Q6, Q5, Q4, Q3, Q2, Q1 });
   });
-  it('7 – PUT:sa/quiz/questions/:id – 204 & publish 5 questions', async () => {
-    const { Q5, Q4, Q3, Q2, Q1 } = expect.getState();
+  it('7 – PUT:sa/quiz/questions/:id – 204 & publish 6 questions', async () => {
+    const { Q6, Q5, Q4, Q3, Q2, Q1 } = expect.getState();
 
     const createResponse1 = await request(server)
       .put(`/sa/quiz/questions/${Q1.id}/publish`)
@@ -323,6 +338,13 @@ describe('QuizController (e2e)', () => {
     expect(createResponse5).toBeDefined();
     expect(createResponse5.status).toEqual(HttpStatus.NO_CONTENT);
 
+    const createResponse6 = await request(server)
+      .put(`/sa/quiz/questions/${Q6.id}/publish`)
+      .auth('admin', 'qwerty', {type: 'basic'})
+      .send({ published: true });
+    expect(createResponse6).toBeDefined();
+    expect(createResponse6.status).toEqual(HttpStatus.NO_CONTENT);
+
     const getResponse = await request(server)
       .get('/sa/quiz/questions')
       .auth('admin', 'qwerty', {type: 'basic'})
@@ -331,8 +353,13 @@ describe('QuizController (e2e)', () => {
       pagesCount: 1,
       page: 1,
       pageSize: 10,
-      totalCount: 5,
+      totalCount: 6,
       items: [
+        {
+          ...Q6,
+          published: true,
+          updatedAt: expect.any(String),
+        },
         {
           ...Q5,
           published: true,
@@ -730,7 +757,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // игроки начинают отвечать на вопросы
-  it('17 - POST:pair-game-quiz/pairs/my-current/answers - 1st player, 1st question, correct ans', async () => {
+  it('17 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st player, 1st question, correct ans', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -746,7 +773,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('18 - POST:pair-game-quiz/pairs/my-current/answers - 1st player, 2nd question, incorrect ans', async () => {
+  it('18 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st player, 2nd question, incorrect ans', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -762,7 +789,99 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('19 - POST:pair-game-quiz/pairs/my-current/answers - 2nd player, 1st question, incorrect ans', async () => {
+
+  it('15 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
+    const { firstAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
+
+    const getResponse = await request(server)
+      .get(`/pair-game-quiz/pairs/${gameId}`)
+      .auth(firstAccessToken.accessToken, { type: 'bearer' });
+
+    expect(getResponse).toBeDefined();
+    expect(getResponse.status).toEqual(HttpStatus.OK);
+    expect(getResponse.body).toEqual({
+      id: expect.any(String),
+      firstPlayerProgress: {
+        answers: [
+          {
+            questionId: expect.any(String),
+            answerStatus: expect.any(String),
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: expect.any(String),
+            addedAt: expect.any(String),
+          },
+        ],
+        player: {
+          id: expect.any(String),
+          login: firstCreatedUser.login,
+        },
+        score: 1,
+      },
+      secondPlayerProgress: {
+        answers: [],
+        player: {
+          id: expect.any(String),
+          login: secondCreatedUser.login,
+        },
+        score: 0,
+      },
+      questions: expect.any(Array),
+      status: GameStatus.active,
+      pairCreatedDate: expect.any(String),
+      startGameDate: expect.any(String),
+      finishGameDate: null,
+    });
+  });
+  it('14 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
+    const { secondAccessToken, firstCreatedUser, secondCreatedUser, gameId } = expect.getState();
+
+    const getResponse = await request(server)
+      .get(`/pair-game-quiz/pairs/${gameId}`)
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+
+    expect(getResponse).toBeDefined();
+    expect(getResponse.status).toEqual(HttpStatus.OK);
+    expect(getResponse.body).toEqual({
+      id: expect.any(String),
+      firstPlayerProgress: {
+        answers:  [
+          {
+            questionId: expect.any(String),
+            answerStatus: expect.any(String),
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: expect.any(String),
+            addedAt: expect.any(String),
+          },
+        ],
+        player: {
+          id: expect.any(String),
+          login: firstCreatedUser.login,
+        },
+        score: 1,
+      },
+      secondPlayerProgress: {
+        answers: [],
+        player: {
+          id: expect.any(String),
+          login: secondCreatedUser.login,
+        },
+        score: 0,
+      },
+      questions: expect.any(Array),
+      status: GameStatus.active,
+      pairCreatedDate: expect.any(String),
+      startGameDate: expect.any(String),
+      finishGameDate: null,
+    })
+  });
+
+  it('19 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd player, 1st question, incorrect ans', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -778,7 +897,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('20 - POST:pair-game-quiz/pairs/my-current/answers - 2nd player, 2nd question, correct ans', async () => {
+  it('20 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd player, 2nd question, correct ans', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -793,6 +912,137 @@ describe('QuizController (e2e)', () => {
       answerStatus: AnswerStatus.correct,
       addedAt: expect.any(String),
     });
+  });
+
+  it('21 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st player, 3rd question, correct ans', async () => {
+    const { firstAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.correct,
+      addedAt: expect.any(String),
+    });
+  });
+  it('22 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st player, 4th question, correct ans', async () => {
+    const { firstAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.correct,
+      addedAt: expect.any(String),
+    });
+  });
+  it('23 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st player, 5th question, correct ans', async () => {
+    const { firstAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.correct,
+      addedAt: expect.any(String),
+    });
+  });
+  it('24 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st player, 6th question, correct ans', async () => {
+    const { firstAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+
+  it('25 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd player, 3rd question, correct ans', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.correct,
+      addedAt: expect.any(String),
+    });
+  });
+  it('26 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd player, 4th question, correct ans', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.correct,
+      addedAt: expect.any(String),
+    });
+  });
+  it('27 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd player, 5th question, correct ans', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.OK);
+    expect(sendAnswer.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: AnswerStatus.correct,
+      addedAt: expect.any(String),
+    });
+  });
+  it('28 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 2nd player, 6th question, correct ans', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+
+  it('10.3 – GET:pair-game-quiz/pairs/my-current – 200 - 1st player get his current game', async () => {
+    const { firstAccessToken } = expect.getState();
+
+    const getResponse = await request(server)
+      .get(`/pair-game-quiz/pairs/my-current`)
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+
+    expect(getResponse).toBeDefined();
+    expect(getResponse.status).toEqual(HttpStatus.NOT_FOUND);
   });
 
 

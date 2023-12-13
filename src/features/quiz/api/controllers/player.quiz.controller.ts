@@ -72,12 +72,12 @@ export class PlayerQuizController {
   @Post('my-current/answers')
   @HttpCode(HttpStatus.OK)
   async sendAnswer(@Req() req, @Body() inputModel: AnswerInputModel) {
-    const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
+    const currentGame = await this.playerQuizQueryRepository.getActiveGame(req.userId);
     if (!currentGame) {
-      console.log('no');
+      // console.log('no');
       throw new ForbiddenException();
     } else {
-      console.log('yes');
+      // console.log('yes');
       return this.commandBus.execute(new CreateAnswerCommand(req.userId, inputModel.answer));
     }
   }

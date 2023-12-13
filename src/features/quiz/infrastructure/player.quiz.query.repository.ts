@@ -44,7 +44,7 @@ export class PlayerQuizQueryRepository {
 
     return player ? player.id : null;
   }
-  async getPlayer(userId: string, gameId: string) {
+  async getCurrentPlayer(userId: string, gameId: string) {
     const [player] = await this.dataSource.query(`
     select *
     from player
@@ -53,16 +53,24 @@ export class PlayerQuizQueryRepository {
 
     return player ? player : null;
   }
+  async getOtherPlayer(userId: string, gameId: string) {
+    const [player] = await this.dataSource.query(`
+    select *
+    from player
+    where "userId" != $1 and "gameId" = $2
+    `, [userId, gameId]);
+
+    return player ? player : null;
+  }
 
   async getUserIdByPlayerId(id: string): Promise<string> {
-    const [userId] = await this.dataSource.query(`
+    const [player] = await this.dataSource.query(`
       select "userId"
-      from player pl 
-      left join users u on u.id = pl."userId"
-      where pl.id = $1
+      from player
+      where id = $1
     `, [id]);
 
-    return userId ? userId.userId : null;
+    return player ? player.userId : null;
   }
   async usersIdActiveGames() {
     const usersId = await this.dataSource.query(`
@@ -363,6 +371,7 @@ export class PlayerQuizQueryRepository {
     where "playerId" = $1
     `, [game.secondPlayerId]);
 
+    // todo - у активной игры обязательно есть 2 игрока
     if (!game.secondPlayerId) {
       return {
         id: game.id,

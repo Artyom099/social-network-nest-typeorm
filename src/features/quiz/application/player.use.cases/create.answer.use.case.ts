@@ -20,42 +20,42 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
   ) {}
 
-  //todo - добавить кейс, что игрок ответил на все вопросы и ждет ответов другого игрока
-  //todo - как завершить игру, только когда оба игрока ответили на все вопросы
-  // и в то же время не давать игроку отвечать, когда он ответил все вопросы и ждет другого игрока?
   async execute(command: CreateAnswerCommand) {
-    // достаем игру по юзеру
+    // достаем игру по userId
     const currentGame = await this.playerQuizQueryRepository.getActiveGame(command.userId);
-    console.log({ currentGame: currentGame });
     if (!currentGame || !currentGame.questions) {
       console.log('1---');
       throw new ForbiddenException();
     }
 
-    // достаем плеера по userId и gameId
-    const player = await this.playerQuizQueryRepository.getPlayer(command.userId, currentGame.id);
-    console.log(currentGame.questions.length);
-    console.log(player.answersCount);
+    // достаем игроков по userId и gameId
+    const currentPlayer = await this.playerQuizQueryRepository.getCurrentPlayer(command.userId, currentGame.id);
+    const otherPlayer = await this.playerQuizQueryRepository.getOtherPlayer(command.userId, currentGame.id);
 
     // если игрок ответил на все вопросы, возвращаем 403
-    if (player.answersCount === 5) {
+    if (currentPlayer.answersCount >= 5) {
       console.log('2---');
-      return new ForbiddenException();
+      throw new ForbiddenException();
     }
 
-    // достаем вопрос по айди игры и порядковому номеру
-    const question = await this.playerQuizQueryRepository.getQuestion(currentGame.id, player.answersCount + 1);
+    // достаем вопрос по gameId и порядковому номеру
+    const question = await this.playerQuizQueryRepository.getQuestion(currentGame.id, currentPlayer.answersCount + 1);
+    if (!question) {
+      console.log('3---');
+      throw new ForbiddenException();
+    }
 
     // проверяем правильность ответа
     const answerStatus = question.correctAnswers.includes(command.answer) ? AnswerStatus.correct : AnswerStatus.incorrect;
 
     //если ответ верный, добавляем игроку балл
     if (answerStatus === AnswerStatus.correct) {
-      await this.playerQuizRepository.increaseScore(player.id);
+      await this.playerQuizRepository.increaseScore(currentPlayer.id);
     }
 
-    // если вопрос был последний, завершаем игру
-    if (currentGame.questions.length === player.answersCount + 1) {
+    // если оба игрока ответили на все вопросы, завершаем игру
+    if (currentPlayer.answersCount + 1 >= 5 && otherPlayer.answersCount + 1 >= 5) {
+      // todo - если игрок ответил первым, и у него есть хотя бы 1 верный ответ, добавляем ему 1 балл - как это сделать?
       await this.playerQuizRepository.finishGame(currentGame.id);
     }
 
@@ -65,10 +65,10 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
       answerStatus,
       addedAt: new Date(),
       questionId: question.id,
-      playerId: player.id,
+      playerId: currentPlayer.id,
     };
     // увеличиваем игроку answersCount
-    await this.playerQuizRepository.increaseAnswersCount(player.id);
+    await this.playerQuizRepository.increaseAnswersCount(currentPlayer.id);
     // возвращаем ответ
     return this.playerQuizRepository.createAnswer(dto);
   }
