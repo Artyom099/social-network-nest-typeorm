@@ -216,14 +216,15 @@ export class PlayerQuizQueryRepository {
 
   // достаем всех игроков этого юзера
   async getActiveOrPendingGame(userId: string): Promise<GameViewModel | null> {
-    const [playerId] = await this.dataSource.query(`
+    const playersId = await this.dataSource.query(`
     select p.id
     from player p 
     left join users u 
     on p."userId" = u.id
     where u.id = $1
     `, [userId]);
-    if (!playerId) return null;
+    if (!playersId) return null;
+    const arrOfPlayersId = playersId.map((pl) => pl.id);
 
     const [game] = await this.dataSource.query(`
     select *,
@@ -245,9 +246,10 @@ export class PlayerQuizQueryRepository {
       where pl."id" = g."secondPlayerId")
     
     from game g
-    where (g."firstPlayerId" = $1 or g."secondPlayerId" = $1)
+    where (g."firstPlayerId" = any($1) or g."secondPlayerId" = any($1))
     and ("status" = $2 or "status" = $3)
-    `, [playerId.id, GameStatus.active, GameStatus.pending]);
+    `, [arrOfPlayersId, GameStatus.active, GameStatus.pending]);
+    // Поиск значения в массиве - g."firstPlayerId" = any($1);
     if (!game) return null;
 
     const questions = await this.dataSource.query(`
@@ -257,7 +259,7 @@ export class PlayerQuizQueryRepository {
     on q."id" = gq."questionId"
     where gq."gameId" = $1
     order by gq."questionNumber"
-    `, [userId]);
+    `, [game.id]);
 
     const firstPlayerAnswers = await this.dataSource.query(`
     select "questionId", "answerStatus", "addedAt"

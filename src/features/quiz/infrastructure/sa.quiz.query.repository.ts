@@ -6,7 +6,6 @@ import {Users} from '../../users/entity/user.entity';
 import {Question} from '../entity/question.entity';
 import {PaginationViewModel} from '../../../infrastructure/models/pagination.view.model';
 import {QuestionViewModel} from '../api/models/view/question.view.model';
-import {GameIdInputModel} from '../api/models/input/game.id.input.model';
 
 @Injectable()
 export class SAQuizQueryRepository {
@@ -21,8 +20,6 @@ export class SAQuizQueryRepository {
     from question
     where "id" = $1
     `, [id])
-
-    // console.log({repo_ques: question});
 
     return question ? question : null
   }

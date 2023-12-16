@@ -6,19 +6,19 @@ import {ConfigService} from '@nestjs/config';
 export class TypeOrmOptions implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService) {}
 
-  createTypeOrmOptions():  TypeOrmModuleOptions {
-    const nodeEnv = this.configService.getOrThrow<string>('NODE_ENV')
-    console.log(nodeEnv);
+  createTypeOrmOptions(): TypeOrmModuleOptions {
+    const nodeEnv = this.configService.getOrThrow<string>('NODE_ENV');
+    console.log({ nodeEnv: nodeEnv });
     if  (nodeEnv && nodeEnv.toUpperCase() === 'DEVELOPMENT' || nodeEnv.toUpperCase() === 'TEST') {
       console.log('dev');
-      return this.getLocalDb()
+      return this.getLocalDb();
     } else {
       console.log('prod');
       return this.getRemoteDb();
     }
   }
 
-  private getLocalDb(): TypeOrmModuleOptions{
+  private getLocalDb(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
       host: '127.0.0.1',
@@ -31,7 +31,7 @@ export class TypeOrmOptions implements TypeOrmOptionsFactory {
     }
   }
 
-  private getRemoteDb(): TypeOrmModuleOptions{
+  private getRemoteDb(): TypeOrmModuleOptions {
     console.log(this.configService.get("PG_REMOTE_URL"));
     return {
       type: 'postgres',

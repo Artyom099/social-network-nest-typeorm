@@ -30,6 +30,7 @@ export class PlayerQuizController {
   @HttpCode(HttpStatus.OK)
   async getCurrentGame(@Req() req) {
     const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
+    console.log({ currentGame: currentGame });
     if (!currentGame) {
       throw new NotFoundException();
     } else {
