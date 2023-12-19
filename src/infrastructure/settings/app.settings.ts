@@ -27,7 +27,7 @@ export const appSettings = (app: INestApplication) => {
         errors.forEach((err) => {
           // достаем ключи из объектоа constraints каждого элемента массива
           const keys = Object.keys(err.constraints || {});
-          // пробегаемся по ключам и преобразуем каждую ошибку в нужный нам вид
+          // пробегаемся по ключам и добавляем каждую ошибку в нужном нам виде в массив errorsForResponse
           keys.forEach((key) => {
             if (err.constraints) {
               errorsForResponse.push({
