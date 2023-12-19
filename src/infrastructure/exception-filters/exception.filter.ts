@@ -23,7 +23,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const [message, field] = responseBody.message.split('=>');
         errorsMessages.push({ message, field });
       } else {
-        //можно ли оставить never?
         responseBody.message.forEach((m: never) => errorsMessages.push(m));
       }
 

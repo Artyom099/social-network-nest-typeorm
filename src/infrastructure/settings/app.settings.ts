@@ -19,12 +19,15 @@ export const appSettings = (app: INestApplication) => {
       transform: true,
       stopAtFirstError: true,
       // forbidUnknownValues: false,
+
       // в exceptionFactory передаем массив ошибок errors
       exceptionFactory: (errors) => {
         const errorsForResponse: any = [];
 
         errors.forEach((err) => {
+          // достаем ключи из объектоа constraints каждого элемента массива
           const keys = Object.keys(err.constraints || {});
+          // пробегаемся по ключам и преобразуем каждую ошибку в нужный нам вид
           keys.forEach((key) => {
             if (err.constraints) {
               errorsForResponse.push({
