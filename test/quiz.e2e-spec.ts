@@ -13,6 +13,7 @@ describe('QuizController (e2e)', () => {
   let app: INestApplication;
   let server: any;
   let manager: any;
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],

@@ -8,7 +8,7 @@ describe('AppController (e2e)', () => {
   let app: INestApplication;
   let server: any;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
