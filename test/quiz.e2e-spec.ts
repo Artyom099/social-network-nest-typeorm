@@ -27,7 +27,7 @@ describe('QuizController (e2e)', () => {
 
     const dataSource = await moduleFixture.resolve(DataSource)
     manager = dataSource.manager
-    await manager.query(`SELECT truncate_tables('postgres');`)
+    // await manager.query(`SELECT truncate_tables('postgres');`)
     // const queryRunner = dataSource.manager.connection.createQueryRunner()
     // await queryRunner.dropSchema('public', true, true);
     // await queryRunner.createSchema('public', true);

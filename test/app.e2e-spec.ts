@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import {HttpStatus, INestApplication} from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/infrastructure/settings/app.settings';
@@ -22,7 +22,7 @@ describe('AppController (e2e)', () => {
   it('/ (GET)', async () => {
     await request(server)
       .get('/')
-      .expect(200)
+      .expect(HttpStatus.OK)
       .expect('Blog API');
   });
 });

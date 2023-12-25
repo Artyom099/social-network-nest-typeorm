@@ -8,7 +8,7 @@ export const bootstrap = async () => {
     appSettings(app);
     const PORT = process.env.PORT || 3000;
     await app.listen(PORT, () => {
-      console.log(`App started at ${PORT} port`);
+      console.log(`App started at http://localhost:${PORT}`);
     });
   } catch (e) {
     console.log('cant start', e);
