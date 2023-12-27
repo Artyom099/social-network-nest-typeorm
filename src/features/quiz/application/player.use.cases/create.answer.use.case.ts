@@ -23,7 +23,7 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
   async execute(command: CreateAnswerCommand) {
     // достаем игру по userId
     const currentGame = await this.playerQuizQueryRepository.getActiveGame(command.userId);
-    if (!currentGame || !currentGame.questions) {
+    if (!currentGame) {
       console.log('1---');
       throw new ForbiddenException();
     }
@@ -32,7 +32,7 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
     const currentPlayer = await this.playerQuizQueryRepository.getCurrentPlayer(command.userId, currentGame.id);
     const otherPlayer = await this.playerQuizQueryRepository.getOtherPlayer(command.userId, currentGame.id);
 
-    // если игрок ответил на все вопросы, возвращаем 403
+    // если игрок ответил на все вопросы, возвращаем 403 - заменить 5 на количество вопросов?
     if (currentPlayer.answersCount >= 5) {
       console.log('2---');
       throw new ForbiddenException();
@@ -48,9 +48,14 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
     // проверяем правильность ответа
     const answerStatus = question.correctAnswers.includes(command.answer) ? AnswerStatus.correct : AnswerStatus.incorrect;
 
-    //если ответ верный, добавляем игроку балл
+    // если ответ верный, добавляем игроку балл
     if (answerStatus === AnswerStatus.correct) {
       await this.playerQuizRepository.increaseScore(currentPlayer.id);
+    }
+
+    // если текущий игрок ответил первым, добавляем ему 1 балл
+    if (currentPlayer.answersCount + 1 >= 5 && otherPlayer.answersCount < 5) {
+      await this.playerQuizRepository.increaseAnswersCount(currentPlayer.id);
     }
 
     // если оба игрока ответили на все вопросы, завершаем игру
