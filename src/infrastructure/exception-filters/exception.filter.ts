@@ -48,7 +48,9 @@ export class ErrorExceptionFilter implements ExceptionFilter {
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send({ error: exception.toString(), stack: exception.stack });
     } else {
-      response.status(HttpStatus.INTERNAL_SERVER_ERROR).send('some error occurred');
+      response
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .send(`some error occurred: ${exception}`);
     }
   }
 }

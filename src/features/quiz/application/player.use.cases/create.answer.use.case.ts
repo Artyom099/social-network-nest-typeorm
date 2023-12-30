@@ -53,11 +53,6 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
       await this.playerQuizRepository.increaseScore(currentPlayer.id);
     }
 
-    // если текущий игрок ответил первым, добавляем ему 1 балл
-    if (currentPlayer.answersCount + 1 >= 5 && otherPlayer.answersCount < 5) {
-      await this.playerQuizRepository.increaseAnswersCount(currentPlayer.id);
-    }
-
     // если оба игрока ответили на все вопросы, завершаем игру
     if (currentPlayer.answersCount + 1 >= 5 && otherPlayer.answersCount + 1 >= 5) {
       // todo - если игрок ответил первым, и у него есть хотя бы 1 верный ответ, добавляем ему 1 балл - как это сделать?
@@ -74,6 +69,12 @@ export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand>
     };
     // увеличиваем игроку answersCount
     await this.playerQuizRepository.increaseAnswersCount(currentPlayer.id);
+
+    // если текущий игрок ответил первым, добавляем ему 1 балл
+    if (currentPlayer.answersCount + 1 >= 5 && otherPlayer.answersCount < 5) {
+      await this.playerQuizRepository.increaseAnswersCount(currentPlayer.id);
+    }
+
     // возвращаем ответ
     return this.playerQuizRepository.createAnswer(dto);
   }

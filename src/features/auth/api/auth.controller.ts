@@ -25,7 +25,6 @@ import {UsersQueryRepository} from '../../users/infrastructure/users.query.repos
 import {AuthInputModel} from './models/input/auth.input.model';
 import {EmailInputModel} from './models/input/email.input.model';
 import {SetNewPasswordInputModel} from './models/input/set.new.password.input.model';
-import {UsersRepository} from '../../users/infrastructure/users.repository';
 import {ResendConfirmationCommand} from '../application/use.cases/resend.confirmation.use.case';
 import {CreateDeviceDTO} from '../../devices/api/models/create.device.dto';
 import {CheckCredentialsCommand} from '../application/use.cases/check.credentials.use.case';
@@ -93,7 +92,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
     const { deviceId, lastActiveDate, token } = await this.commandBus.execute(
-      new RefreshTokenCommand(req.cookies.refreshToken))
+      new RefreshTokenCommand(req.cookies.refreshToken));
 
     await this.devicesService.updateLastActiveDate(deviceId, lastActiveDate);
     res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure: true });

@@ -1,6 +1,5 @@
 import {BlogsRepository} from '../../infrastructure/blogs.repository';
 import {BlogInputModel} from '../../api/models/input/blog.input.model';
-import {UsersQueryRepository} from '../../../users/infrastructure/users.query.repository';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {BlogViewModel} from '../../api/models/view/blog.view.model';
 import {randomUUID} from 'crypto';
@@ -14,7 +13,6 @@ export class CreateBlogCommand {
 export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
   constructor(
     private blogsRepository: BlogsRepository,
-    private usersQueryRepository: UsersQueryRepository,
   ) {}
 
   async execute(command: CreateBlogCommand): Promise<BlogViewModel | null> {

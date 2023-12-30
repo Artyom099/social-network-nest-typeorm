@@ -26,6 +26,7 @@ import {CreateCommentCommand} from '../../comments/application/use.cases/create.
 import {LikeStatusInputModel} from '../../comments/api/models/input/like.status.input.model';
 import {BlogsQueryRepository} from '../../blogs/infrastructure/blogs.query.repository';
 import {BannedUsersForBlogQueryRepository} from '../../users/infrastructure/banned.users.for.blog.query.repository';
+import {CreateCommentDto} from '../../comments/api/models/dto/create.comment.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -98,12 +99,12 @@ export class PostsController {
     if (isUserBannedForBlog) {
       throw new ForbiddenException();
     } else {
-      const model = {
+      const dto: CreateCommentDto = {
         postId,
         content: inputModel.content,
         userId: user.id,
       };
-      return this.commandBus.execute(new CreateCommentCommand(model));
+      return this.commandBus.execute(new CreateCommentCommand(dto));
     }
   }
 
