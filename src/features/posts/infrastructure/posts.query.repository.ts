@@ -261,7 +261,7 @@ export class PostsQueryRepository {
       query.offset(),
     ])
 
-    const items = await Promise.all(sortedPosts.map(async (p) => {
+    const items: PostViewModel[] = await Promise.all(sortedPosts.map(async (p) => {
       const [myLikeInfo] = await this.dataSource.query(`
       select *
       from "post_likes"
