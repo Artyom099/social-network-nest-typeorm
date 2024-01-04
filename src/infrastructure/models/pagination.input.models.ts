@@ -11,17 +11,17 @@ export class DefaultPaginationInput {
   })
   sortBy = SortBy.default;
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }): SortDirection => {
     return value === SortDirection.asc ? SortDirection.asc : SortDirection.desc;
   })
   sortDirection: 'asc' | 'desc' = SortDirection.desc;
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }): number => {
     return value < 1 || value % 1 !== 0 ? 1 : Number(value);
   })
   pageNumber = 1;
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }): number => {
     return value < 1 || value % 1 !== 0 ? 10 : Number(value);
   })
   pageSize = 10;
@@ -29,11 +29,11 @@ export class DefaultPaginationInput {
   offset(): number {
     return (this.pageNumber - 1) * this.pageSize;
   }
-  pagesCountSql(totalCount: { count: string }): number {
-    return Math.ceil(parseInt(totalCount.count, 10) / this.pageSize);
+  pagesCountSql(pgCount: { count: string }): number {
+    return Math.ceil(parseInt(pgCount.count, 10) / this.pageSize);
   }
-  totalCountSql(tCount: { count: string }): number {
-    return parseInt(tCount.count, 10)
+  totalCountSql(pgCount: { count: string }): number {
+    return parseInt(pgCount.count, 10)
   }
 }
 
@@ -48,7 +48,7 @@ export class BlogsPaginationInput extends DefaultPaginationInput {
 export class UsersPaginationInput extends DefaultPaginationInput {
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => {
+  @Transform(({ value }): boolean | null => {
     return value === BanStatus.banned
       ? true
       : value === BanStatus.notBanned
@@ -84,7 +84,7 @@ export class GamePairPaginationInput extends DefaultPaginationInput {
   bodySearchTerm: string = '';
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => {
+  @Transform(({ value }): boolean | null => {
     return value === BanStatus.banned
       ? true
       : value === BanStatus.notBanned
