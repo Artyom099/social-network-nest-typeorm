@@ -26,21 +26,21 @@ export class DevicesController {
 
   @Get('devices')
   @HttpCode(HttpStatus.OK)
-  async getDevices(@Req() req) {
+  async getDevices(@Req() req: any) {
     const payload = await this.tokensService.getTokenPayload(req.cookies.refreshToken);
     return this.devicesQueryRepository.getDevices(payload.userId);
   }
 
   @Delete('devices')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteOtherDevices(@Req() req) {
+  async deleteOtherDevices(@Req() req: any) {
     const payload = await this.tokensService.getTokenPayload(req.cookies.refreshToken);
     return this.devicesService.deleteOtherDevices(payload.deviceId, payload.userId);
   }
 
   @Delete('devices/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteCurrentDevice(@Req() req, @Param('id') deviceId: string) {
+  async deleteCurrentDevice(@Req() req: any, @Param('id') deviceId: string) {
     const currentDevice = await this.devicesQueryRepository.getDevice(deviceId);
     if (!currentDevice) throw new NotFoundException();
 

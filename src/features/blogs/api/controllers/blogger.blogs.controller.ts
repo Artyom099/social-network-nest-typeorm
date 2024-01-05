@@ -42,7 +42,7 @@ export class BloggerBlogsController {
   // логика блогов блоггера
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getBlogs(@Req() req, @Query() query: BlogsPaginationInput) {
+  async getBlogs(@Req() req: any, @Query() query: BlogsPaginationInput) {
     return this.blogsQueryRepository.getBlogsCurrentBlogger(
       req.userId,
       query,
@@ -51,7 +51,7 @@ export class BloggerBlogsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Req() req, @Body() inputModel: BlogInputModel) {
+  async createBlog(@Req() req: any, @Body() inputModel: BlogInputModel) {
     // return this.commandBus.execute(
     //   new CreateBlogCommand(req.userId, inputModel),
     // );
@@ -60,7 +60,7 @@ export class BloggerBlogsController {
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
@@ -77,7 +77,7 @@ export class BloggerBlogsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Req() req, @Param('id') blogId: string) {
+  async deleteBlog(@Req() req: any, @Param('id') blogId: string) {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
     if (!blog) throw new NotFoundException('blog not found');
 
@@ -94,7 +94,7 @@ export class BloggerBlogsController {
   @Get(':id/posts')
   @HttpCode(HttpStatus.OK)
   async getPostsCurrentBlog(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Query() query: DefaultPaginationInput,
   ) {
@@ -113,7 +113,7 @@ export class BloggerBlogsController {
   @Post(':id/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostCurrentBlog(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModel,
   ) {
@@ -132,7 +132,7 @@ export class BloggerBlogsController {
   @Put(':id/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Param('postId') postId: string,
     @Body() inputModel: PostInputModel,
@@ -154,7 +154,7 @@ export class BloggerBlogsController {
   @Delete(':id/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Param('postId') postId: string,
   ) {
@@ -178,7 +178,7 @@ export class BloggerBlogsController {
   @Get('comments')
   @HttpCode(HttpStatus.OK)
   async getCommentsCurrentBlog(
-    @Req() req,
+    @Req() req: any,
     @Query() query: DefaultPaginationInput,
   ) {
     return this.commentsQueryRepository.getCommentsCurrentBlogger(req.userId, query);

@@ -56,7 +56,7 @@ export class UsersQueryRepository {
       },
     } : null;
   }
-  //todo: any!!
+  //todo: delete any type!!
   async getUserByIdSA2(id: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
@@ -145,7 +145,7 @@ export class UsersQueryRepository {
       },
     } : null;
   }
-  //todo any!!
+  //todo: delete any type!!
   async getUserByRecoveryCode(code: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')

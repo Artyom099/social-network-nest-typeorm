@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -22,7 +21,6 @@ import {PublishQuestionCommand} from '../../application/sa.use.cases/publish.que
 import {UpdateQuestionCommand} from '../../application/sa.use.cases/update.question.use.case';
 import {DeleteQuestionCommand} from '../../application/sa.use.cases/delete.question.use.case';
 import {CreateQuestionCommand} from '../../application/sa.use.cases/create.question.use.case';
-import {GameIdInputModel} from '../models/input/game.id.input.model';
 import {QuestionIdInputModel} from '../models/input/question.id.input.model';
 
 @Controller('sa/quiz/questions')

@@ -43,14 +43,14 @@ export class PostsController {
   @Get()
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
-  async getPosts(@Req() req, @Query() query: DefaultPaginationInput) {
+  async getPosts(@Req() req: any, @Query() query: DefaultPaginationInput) {
     return this.postsQueryRepository.getPosts(req.userId, query);
   }
 
   @Get(':id')
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
-  async getPost(@Req() req, @Param('id') postId: string) {
+  async getPost(@Req() req: any, @Param('id') postId: string) {
     const post = await this.postsQueryRepository.getPost(postId, req.userId);
     if (!post) throw new NotFoundException('post not found');
 
@@ -66,7 +66,7 @@ export class PostsController {
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getCommentsCurrentPost(
-    @Req() req,
+    @Req() req: any,
     @Param('id') postId: string,
     @Query() query: DefaultPaginationInput,
   ) {
@@ -86,7 +86,7 @@ export class PostsController {
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createCommentCurrentPost(
-    @Req() req,
+    @Req() req: any,
     @Param('id') postId: string,
     @Body() inputModel: CommentInputModel,
   ) {
@@ -112,7 +112,7 @@ export class PostsController {
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatus(
-    @Req() req,
+    @Req() req: any,
     @Param('id') postId: string,
     @Body() inputModel: LikeStatusInputModel,
   ) {

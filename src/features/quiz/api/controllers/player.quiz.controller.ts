@@ -28,9 +28,8 @@ export class PlayerQuizController {
 
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
-  async getCurrentGame(@Req() req) {
+  async getCurrentGame(@Req() req: any) {
     const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
-    // console.log({ currentGame: currentGame });
     if (!currentGame) {
       throw new NotFoundException();
     } else {
@@ -40,7 +39,7 @@ export class PlayerQuizController {
 
   @Get(':gameId')
   @HttpCode(HttpStatus.OK)
-  async getGame(@Req() req, @Param() param: GameIdInputModel) {
+  async getGame(@Req() req: any, @Param() param: GameIdInputModel) {
     const game = await this.playerQuizQueryRepository.getGameById(param.gameId);
     if (!game) throw new NotFoundException();
 
@@ -50,6 +49,7 @@ export class PlayerQuizController {
     if (game.secondPlayerProgress && game.secondPlayerProgress.player.id) {
       secondPlayerUserId = await this.playerQuizQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
     }
+
     // если айди юзера не равно айди плеера1 и плеера2
     if (req.userId !== firstPlayerUserId && req.userId !== secondPlayerUserId) {
       throw new ForbiddenException();
@@ -60,7 +60,7 @@ export class PlayerQuizController {
 
   @Post('connection')
   @HttpCode(HttpStatus.OK)
-  async createGame(@Req() req) {
+  async createGame(@Req() req: any) {
     // если есть активная игра, то юзер не может подключиться к еще одной игре
     const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
     if (currentGame) {
@@ -72,7 +72,7 @@ export class PlayerQuizController {
 
   @Post('my-current/answers')
   @HttpCode(HttpStatus.OK)
-  async sendAnswer(@Req() req, @Body() inputModel: AnswerInputModel) {
+  async sendAnswer(@Req() req: any, @Body() inputModel: AnswerInputModel) {
     const currentGame = await this.playerQuizQueryRepository.getActiveGame(req.userId);
     if (!currentGame) {
       // console.log('no');

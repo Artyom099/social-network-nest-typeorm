@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class EmailAdapter {
   async sendEmail(email: string, subject: string, message: string) {
-    const transporter = await nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       host: 'smtp.mail.ru',
       port: 465,
       secure: true,
@@ -41,8 +41,7 @@ export class EmailAdapter {
         html: message,
       });
     } catch (e) {
-      console.error('Mail sending failed');
-      console.error(e);
+      console.error('Mail sending failed - ', e);
     }
   }
 }

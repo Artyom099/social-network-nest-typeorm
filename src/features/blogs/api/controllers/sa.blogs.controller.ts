@@ -40,7 +40,7 @@ export class SABlogsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getBlogs(@Req() req, @Query() query: BlogsPaginationInput) {
+  async getBlogs(@Req() req: any, @Query() query: BlogsPaginationInput) {
     return this.blogsQueryRepository.getBlogsCurrentBlogger(req.userId, query);
   }
 
@@ -53,7 +53,7 @@ export class SABlogsController {
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
@@ -64,7 +64,7 @@ export class SABlogsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Req() req, @Param('id') blogId: string) {
+  async deleteBlog(@Req() req: any, @Param('id') blogId: string) {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
     if (!blog) throw new NotFoundException('blog not found');
     return this.blogsService.deleteBlog(blogId);
@@ -74,7 +74,7 @@ export class SABlogsController {
   @Get(':id/posts')
   @HttpCode(HttpStatus.OK)
   async getPostsCurrentBlog(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Query() query: DefaultPaginationInput,
   ) {
@@ -93,7 +93,7 @@ export class SABlogsController {
   @Post(':id/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostCurrentBlog(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModel,
   ) {
@@ -108,7 +108,7 @@ export class SABlogsController {
   @Put(':id/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Param('postId') postId: string,
     @Body() inputModel: PostInputModel,
@@ -127,7 +127,7 @@ export class SABlogsController {
   @Delete(':id/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Param('postId') postId: string,
   ) {
