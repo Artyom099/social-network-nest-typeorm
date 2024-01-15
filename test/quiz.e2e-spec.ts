@@ -3,8 +3,8 @@ import {Test, TestingModule} from '@nestjs/testing';
 import {AppModule} from '../src/app.module';
 import {appSettings} from '../src/infrastructure/settings/app.settings';
 import request from 'supertest';
-import {getRefreshTokenByResponse} from '../src/infrastructure/utils/utils';
-import {AnswerStatus, GameStatus} from '../src/infrastructure/utils/constants';
+import {getRefreshTokenByResponse} from '../src/infrastructure/utils/helpers';
+import {AnswerStatus, GameStatus} from '../src/infrastructure/utils/enums';
 import {DataSource} from 'typeorm';
 
 const sleep = (seconds: number) => new Promise((r) => setTimeout(r, seconds * 1000));

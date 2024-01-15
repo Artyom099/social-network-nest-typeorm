@@ -1,16 +1,14 @@
 import {
-  BadRequestException,
+  BadRequestException, DynamicModule,
   INestApplication,
   ValidationPipe,
 } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
-import { AppModule } from '../../app.module';
 import { HttpExceptionFilter } from '../exception-filters/exception.filter';
 
-export const appSettings = (app: INestApplication) => {
-  app.use(cookieParser());
-  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+export const appSettings = <T>(app: INestApplication, module: T) => {
+  useContainer(app.select(module as DynamicModule),  { fallbackOnErrors: true });
 
   // не получается перенести пайп в отдельный файл
   app.useGlobalPipes(
@@ -42,7 +40,7 @@ export const appSettings = (app: INestApplication) => {
       },
     }),
   );
-
-  app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.use(cookieParser());
+  app.enableCors();
 };

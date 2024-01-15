@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
 import {Game} from '../entity/game.entity';
-import {GameStatus} from '../../../infrastructure/utils/constants';
+import {GameStatus} from '../../../infrastructure/utils/enums';
 import {CreateGameDto} from '../api/models/dto/create.game.dto';
 import {Answer} from '../entity/answer.entity';
 import {CreateAnswerDTO} from '../api/models/dto/create.answer.dto';

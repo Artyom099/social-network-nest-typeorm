@@ -1,5 +1,5 @@
 import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {LikeStatus} from '../../../infrastructure/utils/constants';
+import {LikeStatus} from '../../../infrastructure/utils/enums';
 import {Posts} from './post.entity';
 import {Users} from '../../users/entity/user.entity';
 

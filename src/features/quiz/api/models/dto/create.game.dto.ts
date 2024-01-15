@@ -1,4 +1,4 @@
-import {GameStatus} from '../../../../../infrastructure/utils/constants';
+import {GameStatus} from '../../../../../infrastructure/utils/enums';
 
 export type CreateGameDto = {
   id: string;

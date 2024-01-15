@@ -57,18 +57,18 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Req() req: any,
-    @Res({ passthrough: true }) res,
-    @Body() InputModel: AuthInputModel,
+    @Res({ passthrough: true }) res: any,
+    @Body() inputModel: AuthInputModel,
   ) {
     const token = await this.commandBus.execute(new CheckCredentialsCommand(
-      InputModel.loginOrEmail,
-      InputModel.password,
+      inputModel.loginOrEmail,
+      inputModel.password,
     ));
     if (!token) throw new UnauthorizedException();
 
     //todo - move to IsUserBannedUseCase??
     // или можно проверять на бан в CheckCredentialsUseCase?
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(InputModel.loginOrEmail);
+    const user = await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.loginOrEmail);
     if (user?.banInfo.isBanned) {
       throw new UnauthorizedException();
     } else {
@@ -110,13 +110,13 @@ export class AuthController {
   @Post('new-password')
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async setNewPassword(@Body() InputModel: SetNewPasswordInputModel) {
-    const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(InputModel.recoveryCode);
+  async setNewPassword(@Body() inputModel: SetNewPasswordInputModel) {
+    const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(inputModel.recoveryCode);
     if (!isUserConfirm) {
       throw new BadRequestException();
     } else {
       return this.commandBus.execute(
-        new UpdatePasswordCommand(InputModel.recoveryCode, InputModel.newPassword)
+        new UpdatePasswordCommand(inputModel.recoveryCode, inputModel.newPassword)
       );
     }
   }
@@ -125,9 +125,9 @@ export class AuthController {
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   //todo -> для моих тестов статус OK, по документации NO_CONTENT
-  async passwordRecovery(@Body() InputModel: EmailInputModel) {
+  async passwordRecovery(@Body() inputModel: EmailInputModel) {
     return {
-      recoveryCode: await this.commandBus.execute(new SendRecoveryCodeCommand(InputModel.email))
+      recoveryCode: await this.commandBus.execute(new SendRecoveryCodeCommand(inputModel.email))
     };
   }
 
@@ -162,7 +162,7 @@ export class AuthController {
   @Post('registration-email-resending')
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async resendConfirmationEmail(@Body() body: { email: string }) {
+  async resendConfirmationEmail(@Body() body: EmailInputModel) {
     const user = await this.usersQueryRepository.getUserByLoginOrEmail(body.email);
     if (!user || user.isConfirmed) {
       throw new BadRequestException('email not exist or confirm=>email');

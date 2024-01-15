@@ -1,7 +1,7 @@
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {PlayerQuizRepository} from '../../infrastructure/player.quiz.repository';
 import {PlayerQuizQueryRepository} from '../../infrastructure/player.quiz.query.repository';
-import {AnswerStatus} from '../../../../infrastructure/utils/constants';
+import {AnswerStatus} from '../../../../infrastructure/utils/enums';
 import {CreateAnswerDTO} from '../../api/models/dto/create.answer.dto';
 import {randomUUID} from 'crypto';
 import {ForbiddenException} from '@nestjs/common';

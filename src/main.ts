@@ -5,7 +5,7 @@ import {appSettings} from './infrastructure/settings/app.settings';
 export const bootstrap = async () => {
   try {
     const app = await NestFactory.create(AppModule);
-    appSettings(app);
+    appSettings<AppModule>(app, AppModule);
     const PORT = process.env.PORT || 3000;
     await app.listen(PORT, () => {
       console.log(`App started at http://localhost:${PORT}`);

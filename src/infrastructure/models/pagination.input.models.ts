@@ -1,4 +1,4 @@
-import {BanStatus, SortBy, SortDirection} from '../utils/constants';
+import {BanStatus, SortBy, SortDirection} from '../utils/enums';
 import {IsBoolean, IsOptional, IsString} from 'class-validator';
 import {Transform} from 'class-transformer';
 import {isNil} from '@nestjs/common/utils/shared.utils';

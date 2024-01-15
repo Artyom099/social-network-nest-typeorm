@@ -1,4 +1,4 @@
-import {LikeStatus} from '../../../../infrastructure/utils/constants';
+import {LikeStatus} from '../../../../infrastructure/utils/enums';
 import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
 import {CommentsRepository} from '../../infrastructure/comments.repository';
 import {UpdateCommentLikeModel} from '../../api/models/dto/update.comment.like.model';

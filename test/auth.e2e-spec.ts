@@ -3,7 +3,7 @@ import {HttpStatus, INestApplication} from '@nestjs/common';
 import request from 'supertest';
 import {AppModule} from '../src/app.module';
 import {appSettings} from '../src/infrastructure/settings/app.settings';
-import {getRefreshTokenByResponse, getRefreshTokenByResponseWithTokenName,} from '../src/infrastructure/utils/utils';
+import {getRefreshTokenByResponse, getRefreshTokenByResponseWithTokenName,} from '../src/infrastructure/utils/helpers';
 
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));

@@ -3,8 +3,8 @@ import {HttpStatus, INestApplication} from '@nestjs/common';
 import request from 'supertest';
 import {AppModule} from '../src/app.module';
 import {appSettings} from '../src/infrastructure/settings/app.settings';
-import {getRefreshTokenByResponse, getRefreshTokenByResponseWithTokenName,} from '../src/infrastructure/utils/utils';
-import {LikeStatus} from '../src/infrastructure/utils/constants';
+import {getRefreshTokenByResponse, getRefreshTokenByResponseWithTokenName,} from '../src/infrastructure/utils/helpers';
+import {LikeStatus} from '../src/infrastructure/utils/enums';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;

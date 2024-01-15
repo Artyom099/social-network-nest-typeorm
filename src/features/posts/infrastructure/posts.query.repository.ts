@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {DefaultPaginationInput} from '../../../infrastructure/models/pagination.input.models';
-import {LikeStatus} from '../../../infrastructure/utils/constants';
+import {LikeStatus} from '../../../infrastructure/utils/enums';
 import {PostViewModel,} from '../api/models/view/post.view.model';
 import {PaginationViewModel} from '../../../infrastructure/models/pagination.view.model';
 import {InjectDataSource} from '@nestjs/typeorm';

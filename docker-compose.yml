@@ -1,0 +1,62 @@
+version: '3.5'
+
+services:
+  # название сервиса
+  postgres_db:
+    # образ
+    image: postgres
+    # политика перезапуска
+    restart: always
+    # env переменные выгружаем из файла или пишем руками
+    # env_file:
+    # - .env
+    environment:
+      - POSTGRES_PASSWORD=vgy78uhb
+    # название контейнера
+    container_name: postgres
+    # тема для постоянного хранения данных (при пересборке не удаляется)
+    volumes:
+      - ./pgdata:/val/lib/postgresql/data
+    # порт для обращения к приложению : порт приложения внутри контейнера
+    ports:
+      - '5678:5678'
+    # сети, к которым подключен контейнер
+    networks:
+      - super-network
+
+  # название сервиса
+  app:
+    # указывает конфигурацию сборки для создания образа контейнера из исходного кода
+    build:
+      # путь к каталогу с Dockerfile или url репозитория git
+      context: .
+      # название файла Dockerfile
+      dockerfile: Dockerfile
+    # название контейнера
+    container_name: api
+    # env переменные
+    # env_file:
+    #   - .env
+    environment:
+      - POSTGRES_HOST=postgres_db
+      - POSTGRES_PORT=5678
+      - POSTGRES_PASSWORD=vgy78uhb
+      - APP_PORT=3001
+    # определяем порядок запуска - app запускается после postgres_db
+    depends_on:
+      - postgres_db
+    volumes:
+      - ./src:/app/src
+    # порт для обращения к приложению : порт приложения внутри контейнера
+    ports:
+      - '3001:3001'
+    # сети, к которым подключен контейнер
+    networks:
+      - super-network
+
+# определяем сети для контейнеров
+networks:
+  super-network:
+    driver: bridge
+
+# для запуска используем docker-compose up

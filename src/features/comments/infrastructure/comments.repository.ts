@@ -1,4 +1,4 @@
-import {LikeStatus} from '../../../infrastructure/utils/constants';
+import {LikeStatus} from '../../../infrastructure/utils/enums';
 import {Injectable} from '@nestjs/common';
 import {CreateCommentModel} from '../api/models/dto/create.comment.model';
 import {InjectDataSource} from '@nestjs/typeorm';

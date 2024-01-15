@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {PostInputModel} from '../api/models/input/post.input.model';
-import {LikeStatus} from '../../../infrastructure/utils/constants';
+import {LikeStatus} from '../../../infrastructure/utils/enums';
 import {PostViewModel} from '../api/models/view/post.view.model';
 import {CreatePostModel} from '../api/models/dto/create.post.model';
 import {InjectDataSource} from '@nestjs/typeorm';

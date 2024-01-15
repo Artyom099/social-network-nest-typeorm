@@ -34,7 +34,7 @@ import {BannedUsersForBlog} from './features/users/entity/banned.user.for.blog.e
 import {Devices} from './features/devices/entity/device.entity';
 import {Blogs} from './features/blogs/entity/blog.entity';
 import {Posts} from './features/posts/entity/post.entity';
-import {TypeOrmOptions} from './infrastructure/options/type-orm.options';
+import {TypeOrmOptions} from './infrastructure/options/type.orm.options';
 import {Comments} from './features/comments/entity/сomment.entity';
 import {CommentLikes} from './features/comments/entity/comment.likes.entity';
 import {PostLikes} from './features/posts/entity/post.likes.entity';

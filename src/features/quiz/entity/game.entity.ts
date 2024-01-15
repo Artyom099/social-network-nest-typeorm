@@ -1,5 +1,5 @@
 import {Column, Entity, JoinColumn, JoinTable, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {GameStatus} from '../../../infrastructure/utils/constants';
+import {GameStatus} from '../../../infrastructure/utils/enums';
 import {Player} from './player.entity';
 import {GameQuestion} from './game.question.entity';
 

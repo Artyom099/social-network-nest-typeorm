@@ -1,5 +1,5 @@
 import {Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {AnswerStatus} from '../../../infrastructure/utils/constants';
+import {AnswerStatus} from '../../../infrastructure/utils/enums';
 import {Player} from './player.entity';
 
 @Entity()

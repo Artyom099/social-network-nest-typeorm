@@ -1,4 +1,4 @@
-import {AnswerStatus, GameStatus} from '../../../../../infrastructure/utils/constants';
+import {AnswerStatus, GameStatus} from '../../../../../infrastructure/utils/enums';
 
 export type GameViewModel = {
   id: string;

@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {InjectDataSource} from '@nestjs/typeorm';
 import {DataSource} from 'typeorm';
-import {GameStatus} from '../../../infrastructure/utils/constants';
+import {GameStatus} from '../../../infrastructure/utils/enums';
 import {GameViewModel} from '../api/models/view/game.view.model';
 import {AnswerViewModel} from '../api/models/view/answer.view.model';
 
