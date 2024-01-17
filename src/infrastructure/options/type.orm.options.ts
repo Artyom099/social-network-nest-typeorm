@@ -21,8 +21,8 @@ export class TypeOrmOptions implements TypeOrmOptionsFactory {
   private getLocalDb(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: process.env.POSTGRES_HOST || '127.0.0.1',
-      port: Number(process.env.POSTGRES_PORT) || 4001,
+      host: process.env.PG_LOCAL_HOST || '127.0.0.1',
+      port: Number(process.env.PG_LOCAL_PORT) || 5432,
       username: 'postgres',
       password: 'vgy78uhb',
       database: 'postgres',
@@ -32,7 +32,7 @@ export class TypeOrmOptions implements TypeOrmOptionsFactory {
   }
 
   private getRemoteDb(): TypeOrmModuleOptions {
-    console.log(this.configService.get("PG_REMOTE_URL"));
+    console.log(this.configService.get('PG_REMOTE_URL'));
     return {
       type: 'postgres',
       url: this.configService.getOrThrow<string>("PG_REMOTE_URL"),

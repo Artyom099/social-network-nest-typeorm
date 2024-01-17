@@ -3,6 +3,7 @@ import {PostsRepository} from '../infrastructure/posts.repository';
 import {PostInputModel} from '../api/models/input/post.input.model';
 import {LikeStatus} from '../../../infrastructure/utils/enums';
 import {UsersQueryRepository} from '../../users/infrastructure/users.query.repository';
+import {UpdatePostLikesModel} from '../api/models/dto/update.post.likes.model';
 
 @Injectable()
 export class PostsService {
@@ -12,8 +13,8 @@ export class PostsService {
   ) {}
 
   //todo - переписать на use cases
-  async updatePost(postId: string, InputModel: PostInputModel) {
-    return this.postsRepository.updatePost(postId, InputModel);
+  async updatePost(postId: string, inputModel: PostInputModel) {
+    return this.postsRepository.updatePost(postId, inputModel);
   }
   async deletePost(postId: string) {
     return this.postsRepository.deletePost(postId);
@@ -23,16 +24,17 @@ export class PostsService {
     const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) return null;
 
-    const updatePostLikesModel = {
+    const dto: UpdatePostLikesModel = {
       postId,
       userId,
       likeStatus,
       addedAt: new Date(),
       login: user.login,
     }
-    await this.postsRepository.setPostNone(updatePostLikesModel)
+    await this.postsRepository.setPostNone(dto);
+
     if (likeStatus !== LikeStatus.None) {
-      return this.postsRepository.setPostReaction(updatePostLikesModel)
+      return this.postsRepository.setPostReaction(dto);
     }
   }
 }

@@ -125,6 +125,32 @@ const useCases = [
   BanUserForCurrentBlogUseCase,
   UpdateConfirmationCodeUseCase,
 ];
+const repositories = [
+  TestRepository,
+
+  SAQuizRepository,
+  SAQuizQueryRepository,
+  PlayerQuizRepository,
+  PlayerQuizQueryRepository,
+
+  UsersRepository,
+  UsersQueryRepository,
+
+  BlogsRepository,
+  BlogsQueryRepository,
+
+  PostsRepository,
+  PostsQueryRepository,
+
+  CommentsRepository,
+  CommentsQueryRepository,
+
+  DevicesRepository,
+  DevicesQueryRepository,
+
+  BannedUsersForBlogRepository,
+  BannedUsersForBlogQueryRepository,
+];
 
 @Module({
   imports: [
@@ -180,14 +206,9 @@ const useCases = [
   ],
   providers: [
     ...useCases,
-
-    SAQuizRepository,
-    SAQuizQueryRepository,
-    PlayerQuizRepository,
-    PlayerQuizQueryRepository,
+    ...repositories,
 
     AppService,
-    TestRepository,
 
     EmailAdapter,
     EmailManager,
@@ -195,27 +216,10 @@ const useCases = [
     TokensService,
     RequestService,
 
-    UsersRepository,
-    UsersQueryRepository,
-
-    BannedUsersForBlogRepository,
-    BannedUsersForBlogQueryRepository,
-
     DevicesService,
-    DevicesRepository,
-    DevicesQueryRepository,
-
     BlogsService,
-    BlogsRepository,
-    BlogsQueryRepository,
     BlogExistsConstraint,
-
     PostsService,
-    PostsRepository,
-    PostsQueryRepository,
-
-    CommentsRepository,
-    CommentsQueryRepository,
   ],
 })
 export class AppModule {}

@@ -11,8 +11,8 @@ services:
     # env_file:
     # - .env
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
+#      - POSTGRES_DB=postgres
+#      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=vgy78uhb
     # название контейнера
     container_name: postgres
@@ -21,7 +21,7 @@ services:
       - ./pgdata:/val/lib/postgresql/data
     # порт для обращения к приложению : порт приложения внутри контейнера
     ports:
-      - '4001:5432'
+      - '5432:5432'
     # сети, к которым подключен контейнер
     networks:
       - super-network
@@ -41,7 +41,7 @@ services:
     #   - .env
     environment:
       - POSTGRES_HOST=postgres_db
-      - POSTGRES_PORT=4001
+      - POSTGRES_PORT=5432
       - POSTGRES_PASSWORD=vgy78uhb
       - APP_PORT=3001
     # определяем порядок запуска - app запускается после postgres_db
@@ -62,3 +62,4 @@ networks:
     driver: bridge
 
 # для запуска используем docker-compose up
+# для остановки используем docker-compose down
