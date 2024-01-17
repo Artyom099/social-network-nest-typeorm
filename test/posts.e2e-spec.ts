@@ -9,15 +9,17 @@ import {getRefreshTokenByResponse, getRefreshTokenByResponseWithTokenName,} from
 describe('PostsController (e2e)', () => {
   let app: INestApplication;
   let server: any;
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
     server = app.getHttpServer();
+
     await request(server).delete('/testing/all-data');
   });
 

@@ -32,5 +32,5 @@ RUN yarn build
 EXPOSE ${PORT}
 
 # указываем команду и аргументы для выполнения внутри контейнера
-CMD [ "yarn", "start"]
+CMD [ "yarn", "start" ]
 #CMD yarn 'start:dev'

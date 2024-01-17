@@ -21,8 +21,8 @@ export class TypeOrmOptions implements TypeOrmOptionsFactory {
   private getLocalDb(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: '127.0.0.1',
-      port: 4000,
+      host: process.env.POSTGRES_HOST || '127.0.0.1',
+      port: Number(process.env.POSTGRES_PORT) || 4001,
       username: 'postgres',
       password: 'vgy78uhb',
       database: 'postgres',

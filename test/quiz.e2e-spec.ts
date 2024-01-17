@@ -20,9 +20,10 @@ describe('QuizController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
     server = app.getHttpServer();
+
     await request(server).delete('/testing/all-data');
 
     const dataSource = await moduleFixture.resolve(DataSource)

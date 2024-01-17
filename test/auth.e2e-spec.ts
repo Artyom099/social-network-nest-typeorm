@@ -19,11 +19,11 @@ describe('AuthController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
     // repo = app.get()
-
     server = app.getHttpServer();
+
     await request(server).delete('/testing/all-data');
   });
 

@@ -9,15 +9,17 @@ import {LikeStatus} from '../src/infrastructure/utils/enums';
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
   let server: any;
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
     server = app.getHttpServer();
+
     await request(server).delete('/testing/all-data');
   });
 
@@ -708,15 +710,17 @@ describe('UsersController (e2e)', () => {
 describe('Ban users for different blogs', () => {
   let app: INestApplication;
   let server: any;
+  
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
     server = app.getHttpServer();
+
     await request(server).delete('/testing/all-data');
   });
 
