@@ -5,6 +5,7 @@ import {AnswerStatus} from '../../../../infrastructure/utils/enums';
 import {CreateAnswerDTO} from '../../api/models/dto/create.answer.dto';
 import {randomUUID} from 'crypto';
 import {ForbiddenException} from '@nestjs/common';
+import {DataSource} from 'typeorm';
 
 export class CreateAnswerCommand {
   constructor(
@@ -16,11 +17,14 @@ export class CreateAnswerCommand {
 @CommandHandler(CreateAnswerCommand)
 export class CreateAnswerUseCase implements ICommandHandler<CreateAnswerCommand> {
   constructor(
+    private dataSource: DataSource,
     private playerQuizRepository: PlayerQuizRepository,
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
   ) {}
 
   async execute(command: CreateAnswerCommand) {
+    const queryRunner = this.dataSource.createQueryRunner()
+
     // достаем игру по userId
     const currentGame = await this.playerQuizQueryRepository.getActiveGame(command.userId);
     if (!currentGame) {

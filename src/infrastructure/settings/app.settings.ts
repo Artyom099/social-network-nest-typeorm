@@ -23,14 +23,14 @@ export const appSettings = <T>(app: INestApplication, module: T) => {
         const errorsForResponse: any = [];
 
         errors.forEach((err) => {
-          // достаем ключи из объектоа constraints каждого элемента массива
+          // достаем ключи из объектов constraints каждого элемента массива
           const keys = Object.keys(err.constraints || {});
           // пробегаемся по ключам и добавляем каждую ошибку в нужном нам виде в массив errorsForResponse
           keys.forEach((key) => {
             if (err.constraints) {
               errorsForResponse.push({
-                message: err.constraints[key],
                 field: err.property,
+                message: err.constraints[key],
               });
             }
           });

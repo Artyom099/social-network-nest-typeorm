@@ -36,3 +36,9 @@ EXPOSE ${PORT}
 # указываем команду и аргументы для выполнения внутри контейнера
 CMD [ "yarn", "start" ]
 #CMD yarn 'start:dev'
+
+
+# для локальной сборки =>
+# docker build . t social-network-nest-typeorm
+# порт вне контейнера : порт внутри контейнера
+# docker run -p 3000:3001 social-network-nest-typeorm
