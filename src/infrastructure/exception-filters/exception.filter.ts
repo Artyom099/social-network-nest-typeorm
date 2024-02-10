@@ -4,8 +4,8 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
+} from "@nestjs/common";
+import { Request, Response } from "express";
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -15,12 +15,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
+    const responseBody: any = exception.getResponse();
+
     if (status === HttpStatus.BAD_REQUEST) {
       const errorsMessages: any = [];
-      const responseBody: any = exception.getResponse();
 
-      if (typeof responseBody.message === 'string') {
-        const [message, field] = responseBody.message.split('=>');
+      if (typeof responseBody.message === "string") {
+        const [message, field] = responseBody.message.split("=>");
         errorsMessages.push({ message, field });
       } else {
         responseBody.message.forEach((m: never) => errorsMessages.push(m));
@@ -32,6 +33,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         statusCode: status,
         timestamp: new Date().toISOString(),
         path: request.url,
+        exception: exception,
       });
     }
   }
@@ -43,7 +45,7 @@ export class ErrorExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    if (process.env.environment !== 'production') {
+    if (process.env.environment !== "production") {
       response
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .send({ error: exception.toString(), stack: exception.stack });

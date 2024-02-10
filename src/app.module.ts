@@ -92,6 +92,20 @@ import {DeleteQuestionUseCase} from './features/quiz/application/sa.use.cases/de
 import {PublishQuestionUseCase} from './features/quiz/application/sa.use.cases/publish.question.use.case';
 import {GameQuestion} from './features/quiz/entity/game.question.entity';
 
+const entities = [Users,
+  BannedUsersForBlog,
+  Devices,
+  Blogs,
+  Posts,
+  PostLikes,
+  Comments,
+  CommentLikes,
+
+  Game,
+  Player,
+  Answer,
+  Question,
+  GameQuestion,]
 const useCases = [
   CreateGameUseCase,
   CreateAnswerUseCase,
@@ -151,12 +165,46 @@ const repositories = [
   BannedUsersForBlogRepository,
   BannedUsersForBlogQueryRepository,
 ];
+const controllers = [
+  SAQuizController,
+  PlayerQuizController,
+
+  AppController,
+  TestController,
+  AuthController,
+  DevicesController,
+
+  SaUsersController,
+  BloggerUsersController,
+
+  PublicBlogsController,
+  BloggerBlogsController,
+  SABlogsController,
+
+  PostsController,
+  CommentsController,
+]
+const services = [
+  AppService,
+
+  EmailAdapter,
+  EmailManager,
+  HashService,
+  TokensService,
+  RequestService,
+
+  DevicesService,
+  BlogsService,
+  BlogExistsConstraint,
+  PostsService,
+]
 
 @Module({
   imports: [
     CqrsModule,
     JwtModule.register({ global: true }),
     ConfigModule.forRoot({ isGlobal: true }),
+
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -167,59 +215,11 @@ const repositories = [
     MongooseModule.forFeature([
       { name: Request.name, schema: RequestSchema },
     ]),
+
     TypeOrmModule.forRootAsync({ useClass: TypeOrmOptions }),
-    TypeOrmModule.forFeature([
-      Users,
-      BannedUsersForBlog,
-      Devices,
-      Blogs,
-      Posts,
-      PostLikes,
-      Comments,
-      CommentLikes,
-
-      Game,
-      Player,
-      Answer,
-      Question,
-      GameQuestion,
-    ])
+    TypeOrmModule.forFeature([...entities])
   ],
-  controllers: [
-    SAQuizController,
-    PlayerQuizController,
-
-    AppController,
-    TestController,
-    AuthController,
-    DevicesController,
-
-    SaUsersController,
-    BloggerUsersController,
-
-    PublicBlogsController,
-    BloggerBlogsController,
-    SABlogsController,
-
-    PostsController,
-    CommentsController,
-  ],
-  providers: [
-    ...useCases,
-    ...repositories,
-
-    AppService,
-
-    EmailAdapter,
-    EmailManager,
-    HashService,
-    TokensService,
-    RequestService,
-
-    DevicesService,
-    BlogsService,
-    BlogExistsConstraint,
-    PostsService,
-  ],
+  controllers: [...controllers],
+  providers: [...useCases, ...services, ...repositories],
 })
 export class AppModule {}

@@ -1,6 +1,7 @@
 import {
   Body,
-  Controller, ForbiddenException,
+  Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -8,33 +9,36 @@ import {
   Param,
   Post,
   Req,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
-import {CommandBus} from '@nestjs/cqrs';
-import {BearerAuthGuard} from '../../../../infrastructure/guards/bearer-auth.guard';
-import {PlayerQuizQueryRepository} from '../../infrastructure/player.quiz.query.repository';
-import {AnswerInputModel} from '../models/input/answer.input.model';
-import {CreateGameCommand} from '../../application/player.use.cases/create.game.use.case';
-import {CreateAnswerCommand} from '../../application/player.use.cases/create.answer.use.case';
-import {GameIdInputModel} from '../models/input/game.id.input.model';
+import { CommandBus } from '@nestjs/cqrs';
+import { BearerAuthGuard } from '../../../../infrastructure/guards/bearer-auth.guard';
+import { PlayerQuizQueryRepository } from '../../infrastructure/player.quiz.query.repository';
+import { AnswerInputModel } from '../models/input/answer.input.model';
+import { CreateGameCommand } from '../../application/player.use.cases/create.game.use.case';
+import { CreateAnswerCommand } from '../../application/player.use.cases/create.answer.use.case';
+import { GameIdInputModel } from '../models/input/game.id.input.model';
+import { ExceptionResponseHandler } from '../../../../infrastructure/core/exception.response.handler';
+import { ApproachType } from '../../../../infrastructure/utils/enums';
+import { GameViewModel } from '../models/view/game.view.model';
 
 @Controller('pair-game-quiz/pairs')
 @UseGuards(BearerAuthGuard)
-export class PlayerQuizController {
+export class PlayerQuizController extends ExceptionResponseHandler {
   constructor(
     private commandBus: CommandBus,
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
-  ) {}
+  ) {
+    super(ApproachType.http);
+  }
 
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
-  async getCurrentGame(@Req() req: any) {
-    const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
-    if (!currentGame) {
-      throw new NotFoundException();
-    } else {
-      return currentGame;
-    }
+  async getCurrentGame(@Req() req: any): Promise<GameViewModel> {
+    const currentGameResult =
+      await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
+
+    return this.sendExceptionOrResponse(currentGameResult);
   }
 
   @Get(':gameId')
@@ -43,11 +47,17 @@ export class PlayerQuizController {
     const game = await this.playerQuizQueryRepository.getGameById(param.gameId);
     if (!game) throw new NotFoundException();
 
-    const firstPlayerUserId = await this.playerQuizQueryRepository.getUserIdByPlayerId(game.firstPlayerProgress.player.id);
+    const firstPlayerUserId =
+      await this.playerQuizQueryRepository.getUserIdByPlayerId(
+        game.firstPlayerProgress.player.id,
+      );
 
     let secondPlayerUserId: string | null = null;
     if (game.secondPlayerProgress && game.secondPlayerProgress.player.id) {
-      secondPlayerUserId = await this.playerQuizQueryRepository.getUserIdByPlayerId(game.secondPlayerProgress.player.id);
+      secondPlayerUserId =
+        await this.playerQuizQueryRepository.getUserIdByPlayerId(
+          game.secondPlayerProgress.player.id,
+        );
     }
 
     // если айди юзера не равно айди плеера1 и плеера2
@@ -61,25 +71,20 @@ export class PlayerQuizController {
   @Post('connection')
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req: any) {
-    // если есть активная игра, то юзер не может подключиться к еще одной игре
-    const currentGame = await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
-    if (currentGame) {
-      throw new ForbiddenException();
-    } else {
-      return this.commandBus.execute(new CreateGameCommand(req.userId));
-    }
+    const createGemaResult = await this.commandBus.execute(
+      new CreateGameCommand(req.userId),
+    );
+
+    return this.sendExceptionOrResponse(createGemaResult);
   }
 
   @Post('my-current/answers')
   @HttpCode(HttpStatus.OK)
   async sendAnswer(@Req() req: any, @Body() inputModel: AnswerInputModel) {
-    const currentGame = await this.playerQuizQueryRepository.getActiveGame(req.userId);
-    if (!currentGame) {
-      // console.log('no');
-      throw new ForbiddenException();
-    } else {
-      // console.log('yes');
-      return this.commandBus.execute(new CreateAnswerCommand(req.userId, inputModel.answer));
-    }
+    const createAnswerResult = await this.commandBus.execute(
+      new CreateAnswerCommand(req.userId, inputModel.answer),
+    );
+
+    return this.sendExceptionOrResponse(createAnswerResult);
   }
 }
