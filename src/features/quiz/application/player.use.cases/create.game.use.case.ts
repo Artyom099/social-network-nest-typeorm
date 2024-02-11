@@ -13,6 +13,7 @@ import { AddQuestionsToGameDto } from '../../api/models/dto/add.questions.to.gam
 import { AddPlayerToGameDto } from '../../api/models/dto/add.player.to.game.dto';
 import { DataSource } from 'typeorm';
 import { ContractDto } from '../../../../infrastructure/core/contract.dto';
+import { InjectDataSource } from '@nestjs/typeorm';
 
 export class CreateGameCommand {
   constructor(public userId: string) {}
@@ -21,7 +22,7 @@ export class CreateGameCommand {
 @CommandHandler(CreateGameCommand)
 export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
   constructor(
-    private dataSource: DataSource,
+    @InjectDataSource() private dataSource: DataSource,
     private usersQueryRepository: UsersQueryRepository,
     private playerQuizRepository: PlayerQuizRepository,
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
@@ -44,7 +45,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    // const manager = queryRunner.manager;
+    const manager = queryRunner.manager;
 
     try {
       const activeGame = await this.playerQuizQueryRepository.getActiveGame(
@@ -64,7 +65,6 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         id: randomUUID(),
         userId,
         login: user.payload!,
-        answers: [],
         gameId: pendingGame.payload ? pendingGame.payload.id : 'mock',
       };
       await this.playerQuizRepository.createPlayer(playerDTO);
@@ -94,12 +94,9 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         // добавляем игрока в эту пару и начинаем игру
         const dto: AddPlayerToGameDto = {
           id: pendingGame.payload.id,
-          startGameDate: new Date(),
           secondPlayerId: playerDTO.id,
         };
         newGame = await this.playerQuizRepository.addPlayerToGame(dto);
-
-        await queryRunner.commitTransaction();
       }
 
       // если никто не ждет пару
@@ -117,9 +114,9 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         );
 
         newGame = await this.playerQuizRepository.createGame(dto);
-
-        await queryRunner.commitTransaction();
       }
+
+      await queryRunner.commitTransaction();
     } catch (e) {
       console.log({ create_game_error: e });
       await queryRunner.rollbackTransaction();

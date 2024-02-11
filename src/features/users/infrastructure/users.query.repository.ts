@@ -29,7 +29,8 @@ export class UsersQueryRepository {
     return user ? user : null;
   }
   async getUserForQuiz(id: string): Promise<ContractDto<string | null>> {
-    const user = await this.usersRepo
+    const user = await this.dataSource
+      .getRepository(Users)
       .createQueryBuilder('user')
       // .select('user.id', 'id')
       // .select('user.login', 'login')

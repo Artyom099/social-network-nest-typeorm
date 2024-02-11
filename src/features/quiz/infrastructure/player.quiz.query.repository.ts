@@ -5,6 +5,7 @@ import { GameStatus, InternalCode } from '../../../infrastructure/utils/enums';
 import { GameViewModel } from '../api/models/view/game.view.model';
 import { ContractDto } from '../../../infrastructure/core/contract.dto';
 import { Game } from '../entity/game.entity';
+import { Question } from '../entity/question.entity';
 
 @Injectable()
 export class PlayerQuizQueryRepository {
@@ -413,7 +414,10 @@ export class PlayerQuizQueryRepository {
   }
 
   // question
-  async getQuestion(gameId: string, questionNumber: number) {
+  async getQuestion(
+    gameId: string,
+    questionNumber: number,
+  ): Promise<Question | null> {
     // достаем вопрос по айди игры и номеру вопроса
 
     const [question] = await this.dataSource.query(

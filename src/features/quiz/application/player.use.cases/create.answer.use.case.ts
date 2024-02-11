@@ -9,6 +9,7 @@ import { CreateAnswerDTO } from '../../api/models/dto/create.answer.dto';
 import { randomUUID } from 'crypto';
 import { DataSource } from 'typeorm';
 import { ContractDto } from '../../../../infrastructure/core/contract.dto';
+import { Question } from '../../entity/question.entity';
 
 export class CreateAnswerCommand {
   constructor(public userId: string, public answer: string) {}
@@ -25,11 +26,11 @@ export class CreateAnswerUseCase
   ) {}
 
   async execute(command: CreateAnswerCommand) {
+    const { userId, answer } = command;
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-
-    const { userId, answer } = command;
 
     try {
       // достаем игру по userId
@@ -62,9 +63,7 @@ export class CreateAnswerUseCase
       if (!question) return new ContractDto(InternalCode.Forbidden);
 
       // проверяем правильность ответа
-      const answerStatus = question.correctAnswers.includes(answer)
-        ? AnswerStatus.correct
-        : AnswerStatus.incorrect;
+      const answerStatus = this.getAnswerStatus(question, answer);
 
       // если ответ верный, добавляем игроку балл
       if (answerStatus === AnswerStatus.correct) {
@@ -139,13 +138,19 @@ export class CreateAnswerUseCase
 
       if (answerResult.hasError())
         return new ContractDto(InternalCode.Internal_Server);
+
       return new ContractDto(InternalCode.Success, answerResult.payload);
     } catch (e) {
       console.log({ create_ans_error: e });
       await queryRunner.rollbackTransaction();
-      // return new ContractDto(InternalCode.Internal_Server);
     } finally {
       await queryRunner.release();
     }
+  }
+
+  getAnswerStatus(question: Question, answer: string): AnswerStatus {
+    return question.correctAnswers.includes(answer)
+      ? AnswerStatus.correct
+      : AnswerStatus.incorrect;
   }
 }

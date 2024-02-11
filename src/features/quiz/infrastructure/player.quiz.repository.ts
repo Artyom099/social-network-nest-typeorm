@@ -89,7 +89,7 @@ export class PlayerQuizRepository {
       .update(Game)
       .set({
         secondPlayerId: dto.secondPlayerId,
-        startGameDate: dto.startGameDate,
+        startGameDate: new Date(),
         status: GameStatus.active,
       })
       .where('id = :id', { id: dto.id })
