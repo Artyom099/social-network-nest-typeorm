@@ -1,11 +1,11 @@
-import { ApproachType, InternalCode } from "../utils/enums";
+import { ApproachType, InternalCode } from '../utils/enums';
 import {
   ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
-} from "@nestjs/common";
-import { ContractDto } from "./contract.dto";
+} from '@nestjs/common';
+import { ContractDto } from './contract.dto';
 
 export class ExceptionResponseHandler {
   private readonly typeExceptionMethod: ApproachType;
@@ -19,11 +19,13 @@ export class ExceptionResponseHandler {
   sendExceptionOrResponse(dto: ContractDto<any>) {
     if (dto.hasError()) {
       const ExceptionClass = this[this.typeExceptionMethod](
-        this.typeExceptionMethod === ApproachType.tcp ? undefined : dto.code
+        this.typeExceptionMethod === ApproachType.tcp ? undefined : dto.code,
       );
 
       throw new ExceptionClass(
-        this.typeExceptionMethod === ApproachType.tcp ? dto.code : undefined
+        // this.typeExceptionMethod === ApproachType.tcp ? dto.code : undefined
+        dto.code,
+        dto.message,
       );
     }
     return dto.payload;

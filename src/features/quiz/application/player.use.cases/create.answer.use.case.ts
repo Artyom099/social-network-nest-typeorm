@@ -7,7 +7,6 @@ import {
 } from '../../../../infrastructure/utils/enums';
 import { CreateAnswerDTO } from '../../api/models/dto/create.answer.dto';
 import { randomUUID } from 'crypto';
-import { ForbiddenException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { ContractDto } from '../../../../infrastructure/core/contract.dto';
 
@@ -110,8 +109,6 @@ export class CreateAnswerUseCase
           c_bolshe_o: current.finishAnswersDate > other.finishAnswersDate,
         });
 
-        // todo - как сравнивать время завершения ответов на вопросы, если там есть null?
-
         // если игрок ответил первым, и у него есть хотя бы 1 верный ответ, добавляем ему балл
         if (
           current.finishAnswersDate < other.finishAnswersDate &&
@@ -144,7 +141,7 @@ export class CreateAnswerUseCase
         return new ContractDto(InternalCode.Internal_Server);
       return new ContractDto(InternalCode.Success, answerResult.payload);
     } catch (e) {
-      console.log({ error: e });
+      console.log({ create_ans_error: e });
       await queryRunner.rollbackTransaction();
       // return new ContractDto(InternalCode.Internal_Server);
     } finally {

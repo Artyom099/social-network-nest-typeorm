@@ -5,17 +5,19 @@ import {
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
-} from "typeorm";
-import { Users } from "../../users/entity/user.entity";
-import { Answer } from "./answer.entity";
-import { Game } from "./game.entity";
+} from 'typeorm';
+import { Users } from '../../users/entity/user.entity';
+import { Answer } from './answer.entity';
+import { Game } from './game.entity';
 
 @Entity()
 export class Player {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column()
+  @Column({ default: 0 })
   score: number;
+  @Column({ default: 0 })
+  answersCount: number;
   @Column({ nullable: true })
   finishAnswersDate: Date;
 
@@ -26,8 +28,6 @@ export class Player {
   userId: string;
   @Column()
   login: string;
-  @Column({ default: 0 })
-  answersCount: number;
 
   @ManyToOne(() => Answer, (a) => a.player)
   @JoinColumn()

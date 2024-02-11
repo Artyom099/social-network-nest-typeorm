@@ -1,7 +1,13 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {LikeStatus} from '../../../infrastructure/utils/enums';
-import {Posts} from './post.entity';
-import {Users} from '../../users/entity/user.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { LikeStatus } from '../../../infrastructure/utils/enums';
+import { Posts } from './post.entity';
+import { Users } from '../../users/entity/user.entity';
 
 @Entity()
 export class PostLikes {
@@ -12,15 +18,15 @@ export class PostLikes {
   @Column()
   status: LikeStatus;
 
-  @ManyToOne(() => Posts, p => p.likes)
+  @ManyToOne(() => Posts, (p) => p.likes)
   @JoinColumn()
   post: Posts;
   @Column()
   postId: string;
 
-  @ManyToOne(() => Users, u => u.post_likes)
+  @ManyToOne(() => Users, (u) => u.post_likes)
   @JoinColumn()
-  user: Users
+  user: Users;
   @Column()
   userId: string;
   @Column()

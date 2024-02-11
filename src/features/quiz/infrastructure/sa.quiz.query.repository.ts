@@ -1,11 +1,11 @@
-import {Injectable} from '@nestjs/common';
-import {InjectDataSource, InjectRepository} from '@nestjs/typeorm';
-import {DataSource, Repository} from 'typeorm';
-import {GamePairPaginationInput} from '../../../infrastructure/models/pagination.input.models';
-import {Users} from '../../users/entity/user.entity';
-import {Question} from '../entity/question.entity';
-import {PaginationViewModel} from '../../../infrastructure/models/pagination.view.model';
-import {QuestionViewModel} from '../api/models/view/question.view.model';
+import { Injectable } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { GamePairPaginationInput } from '../../../infrastructure/models/pagination.input.models';
+import { Users } from '../../users/entity/user.entity';
+import { Question } from '../entity/question.entity';
+import { PaginationViewModel } from '../../../infrastructure/models/pagination.view.model';
+import { QuestionViewModel } from '../api/models/view/question.view.model';
 
 @Injectable()
 export class SAQuizQueryRepository {
@@ -15,27 +15,33 @@ export class SAQuizQueryRepository {
   ) {}
 
   async getQuestion(id: string): Promise<Question | null> {
-    const [question] = await this.dataSource.query(`
+    const [question] = await this.dataSource.query(
+      `
     select * 
     from question
     where "id" = $1
-    `, [id])
+    `,
+      [id],
+    );
 
-    return question ? question : null
+    return question ? question : null;
   }
 
-  async getQuestions(query: GamePairPaginationInput): Promise<PaginationViewModel<QuestionViewModel>> {
-    const [totalCount] = await this.dataSource.query(`
+  async getQuestions(
+    query: GamePairPaginationInput,
+  ): Promise<PaginationViewModel<QuestionViewModel>> {
+    const [totalCount] = await this.dataSource.query(
+      `
       select count(*)
       from question
       where ("body" ilike $1)
       and ("published" = $2 or $2 is null)
-    `, [
-      `%${query.bodySearchTerm}%`,
-      query.publishedStatus,
-    ]);
+    `,
+      [`%${query.bodySearchTerm}%`, query.publishedStatus],
+    );
 
-    const sortedQuestions = await this.dataSource.query(`
+    const sortedQuestions = await this.dataSource.query(
+      `
       select *
       from question
       where ("body" ilike $1)
@@ -43,12 +49,14 @@ export class SAQuizQueryRepository {
       order by "${query.sortBy}" ${query.sortDirection}
       limit $3
       offset $4
-    `, [
-      `%${query.bodySearchTerm}%`,
-      query.publishedStatus,
-      query.pageSize,
-      query.offset(),
-    ])
+    `,
+      [
+        `%${query.bodySearchTerm}%`,
+        query.publishedStatus,
+        query.pageSize,
+        query.offset(),
+      ],
+    );
 
     const items = sortedQuestions.map((q) => {
       return {
@@ -58,8 +66,8 @@ export class SAQuizQueryRepository {
         published: q.published,
         createdAt: q.createdAt,
         updatedAt: q.updatedAt,
-      }
-    })
+      };
+    });
 
     return {
       pagesCount: query.pagesCountSql(totalCount), // общее количество страниц

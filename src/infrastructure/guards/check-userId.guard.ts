@@ -17,6 +17,7 @@ export class CheckUserIdGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: jwtConstants.refreshSecret,
       });
+      console.log({ token_payload: payload });
       request.userId = payload.userId;
     }
     return true;

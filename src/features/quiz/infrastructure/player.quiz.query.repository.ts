@@ -11,7 +11,7 @@ export class PlayerQuizQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   // game
-  async getPendingGame(): Promise<ContractDto<Game>> {
+  async getPendingGame(): Promise<ContractDto<Game | null>> {
     const [game] = await this.dataSource.query(
       `
     select *
@@ -21,7 +21,12 @@ export class PlayerQuizQueryRepository {
       [GameStatus.pending],
     );
 
-    if (!game) return new ContractDto(InternalCode.NotFound);
+    if (!game)
+      return new ContractDto(
+        InternalCode.NotFound,
+        null,
+        'pending game not found',
+      );
 
     return new ContractDto(InternalCode.Success, game);
   }
@@ -241,7 +246,7 @@ export class PlayerQuizQueryRepository {
 
   async getActiveOrPendingGame(
     userId: string,
-  ): Promise<ContractDto<GameViewModel>> {
+  ): Promise<ContractDto<GameViewModel | null>> {
     const playersId = await this.dataSource.query(
       `
     select p.id
@@ -282,7 +287,12 @@ export class PlayerQuizQueryRepository {
       [arrOfPlayersId, GameStatus.active, GameStatus.pending],
     );
     // Поиск значения в массиве - g."firstPlayerId" = any($1);
-    if (!game) return new ContractDto(InternalCode.NotFound);
+    if (!game)
+      return new ContractDto(
+        InternalCode.NotFound,
+        null,
+        'active or pending game not found',
+      );
 
     const questions = await this.dataSource.query(
       `

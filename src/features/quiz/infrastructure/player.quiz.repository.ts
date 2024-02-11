@@ -149,7 +149,6 @@ export class PlayerQuizRepository {
       .into(Player)
       .values({
         id: dto.id,
-        score: dto.score,
         userId: dto.userId,
         login: dto.login,
         gameId: dto.gameId,

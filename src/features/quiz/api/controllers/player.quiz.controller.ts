@@ -21,6 +21,7 @@ import { GameIdInputModel } from '../models/input/game.id.input.model';
 import { ExceptionResponseHandler } from '../../../../infrastructure/core/exception.response.handler';
 import { ApproachType } from '../../../../infrastructure/utils/enums';
 import { GameViewModel } from '../models/view/game.view.model';
+import { CurrentUserId } from '../../../../infrastructure/decorators/current.user.id.decorator';
 
 @Controller('pair-game-quiz/pairs')
 @UseGuards(BearerAuthGuard)
@@ -70,9 +71,9 @@ export class PlayerQuizController extends ExceptionResponseHandler {
 
   @Post('connection')
   @HttpCode(HttpStatus.OK)
-  async createGame(@Req() req: any) {
+  async createGame(@Req() req: any, @CurrentUserId() userId: string) {
     const createGameResult = await this.commandBus.execute(
-      new CreateGameCommand(req.userId),
+      new CreateGameCommand(userId),
     );
 
     return this.sendExceptionOrResponse(createGameResult);

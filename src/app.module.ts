@@ -1,98 +1,98 @@
-import {Module} from '@nestjs/common';
-import {AppController} from './app.controller';
-import {AppService} from './app.service';
-import {BloggerBlogsController} from './features/blogs/api/controllers/blogger.blogs.controller';
-import {BlogsService} from './features/blogs/application/blogs.service';
-import {BlogsRepository} from './features/blogs/infrastructure/blogs.repository';
-import {PostsController} from './features/posts/api/posts.controller';
-import {PostsService} from './features/posts/application/posts.service';
-import {PostsRepository} from './features/posts/infrastructure/posts.repository';
-import {TestController} from './features/test/test.controller';
-import {TestRepository} from './features/test/test.repository';
-import {CommentsController} from './features/comments/api/comments.controller';
-import {CommentsRepository} from './features/comments/infrastructure/comments.repository';
-import {MongooseModule} from '@nestjs/mongoose';
-import {CommentsQueryRepository} from './features/comments/infrastructure/comments.query.repository';
-import {PostsQueryRepository} from './features/posts/infrastructure/posts.query.repository';
-import {BlogsQueryRepository} from './features/blogs/infrastructure/blogs.query.repository';
-import {ConfigModule, ConfigService} from '@nestjs/config';
-import {Request, RequestSchema} from './infrastructure/guards/rate.limit/request.schema';
-import {CqrsModule} from '@nestjs/cqrs';
-import {BindBlogUseCase} from './features/blogs/application/sa.use.cases/bind.blog.use.case';
-import {CreateBlogUseCase} from './features/blogs/application/blogger.use.cases/create.blog.use.case';
-import {PublicBlogsController} from './features/blogs/api/controllers/public.blogs.controller';
-import {SABlogsController} from './features/blogs/api/controllers/sa.blogs.controller';
-import {CreatePostUseCase} from './features/posts/application/blogger.use.cases/create.post.use.case';
-import {CreateCommentUseCase} from './features/comments/application/use.cases/create.comment.use.case';
-import {BanBlogUseCase} from './features/blogs/application/sa.use.cases/ban.blog.use.case';
-import {UpdateBlogUseCase} from './features/blogs/application/blogger.use.cases/update.blog.use.case';
-import {BlogExistsConstraint} from './features/users/api/models/input/ban.user.current.blog.input.model';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {UpdateCommentUseCase} from './features/comments/application/use.cases/update.comment.use.case';
-import {Users} from './features/users/entity/user.entity';
-import {BannedUsersForBlog} from './features/users/entity/banned.user.for.blog.entity';
-import {Devices} from './features/devices/entity/device.entity';
-import {Blogs} from './features/blogs/entity/blog.entity';
-import {Posts} from './features/posts/entity/post.entity';
-import {TypeOrmOptions} from './infrastructure/options/type.orm.options';
-import {Comments} from './features/comments/entity/сomment.entity';
-import {CommentLikes} from './features/comments/entity/comment.likes.entity';
-import {PostLikes} from './features/posts/entity/post.likes.entity';
-import {UpdateCommentLikesUseCase} from './features/comments/application/use.cases/update.comment.likes.use.case';
-import {DeleteCommentUseCase} from './features/comments/application/use.cases/delete.comment.use.case';
-import {BanUserUseCase} from './features/users/application/sa.users.use.cases/ban.user.use.case';
-import {UnbanUserUseCase} from './features/users/application/sa.users.use.cases/unban.user.use.case';
-import {DeleteUserUseCase} from './features/users/application/sa.users.use.cases/delete.user.use.case';
-import {ConfirmEmailUseCase} from './features/auth/application/use.cases/confirm.email.use.case';
-import {RegisterUserUseCase} from './features/auth/application/use.cases/register.user.use.case';
-import {RefreshTokenUseCase} from './features/auth/application/use.cases/refresh.token.use.case';
-import {UpdatePasswordUseCase} from './features/auth/application/use.cases/update.password.use.case';
-import {SendRecoveryCodeUseCase} from './features/auth/application/use.cases/send.recovery.code.use.case';
-import {CheckCredentialsUseCase} from './features/auth/application/use.cases/check.credentials.use.case';
-import {CreateUserByAdminUseCase} from './features/users/application/sa.users.use.cases/create.user.use.case';
-import {ResendConfirmationUseCase} from './features/auth/application/use.cases/resend.confirmation.use.case';
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { BloggerBlogsController } from './features/blogs/api/controllers/blogger.blogs.controller';
+import { BlogsService } from './features/blogs/application/blogs.service';
+import { BlogsRepository } from './features/blogs/infrastructure/blogs.repository';
+import { PostsController } from './features/posts/api/posts.controller';
+import { PostsService } from './features/posts/application/posts.service';
+import { PostsRepository } from './features/posts/infrastructure/posts.repository';
+import { TestController } from './features/test/test.controller';
+import { TestRepository } from './features/test/test.repository';
+import { CommentsController } from './features/comments/api/comments.controller';
+import { CommentsRepository } from './features/comments/infrastructure/comments.repository';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CommentsQueryRepository } from './features/comments/infrastructure/comments.query.repository';
+import { PostsQueryRepository } from './features/posts/infrastructure/posts.query.repository';
+import { BlogsQueryRepository } from './features/blogs/infrastructure/blogs.query.repository';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
-  BanUserForCurrentBlogUseCase
-} from './features/users/application/blogger.users.use.cases/ban.user.for.current.blog.use.case';
-import {UpdateConfirmationCodeUseCase} from './features/auth/application/use.cases/update.confirmation.code.use.case';
-import {JwtModule} from '@nestjs/jwt';
-import {AuthController} from './features/auth/api/auth.controller';
-import {SaUsersController} from './features/users/api/controllers/sa.users.controller';
-import {BloggerUsersController} from './features/users/api/controllers/blogger.users.controller';
-import {DevicesController} from './features/devices/api/devices.controller';
-import {RequestService} from './infrastructure/services/request.service';
-import {TokensService} from './infrastructure/services/tokens.service';
-import {EmailAdapter} from './infrastructure/adapters/email.adapter';
-import {EmailManager} from './infrastructure/services/email.manager';
-import {HashService} from './infrastructure/services/hash.service';
-import {UsersRepository} from './features/users/infrastructure/users.repository';
-import {UsersQueryRepository} from './features/users/infrastructure/users.query.repository';
-import {BannedUsersForBlogRepository} from './features/users/infrastructure/banned.users.for.blog.repository';
-import {
-  BannedUsersForBlogQueryRepository
-} from './features/users/infrastructure/banned.users.for.blog.query.repository';
-import {DevicesService} from './features/devices/application/devices.service';
-import {DevicesRepository} from './features/devices/infrastructure/devices.repository';
-import {DevicesQueryRepository} from './features/devices/infrastructure/devices.query.repository';
-import {Question} from './features/quiz/entity/question.entity';
-import {Answer} from './features/quiz/entity/answer.entity';
-import {Game} from './features/quiz/entity/game.entity';
-import {Player} from './features/quiz/entity/player.entity';
-import {SAQuizController} from './features/quiz/api/controllers/sa.quiz.controller';
-import {PlayerQuizController} from './features/quiz/api/controllers/player.quiz.controller';
-import {PlayerQuizQueryRepository} from './features/quiz/infrastructure/player.quiz.query.repository';
-import {PlayerQuizRepository} from './features/quiz/infrastructure/player.quiz.repository';
-import {SAQuizRepository} from './features/quiz/infrastructure/sa.quiz.repository';
-import {SAQuizQueryRepository} from './features/quiz/infrastructure/sa.quiz.query.repository';
-import {CreateAnswerUseCase} from './features/quiz/application/player.use.cases/create.answer.use.case';
-import {CreateGameUseCase} from './features/quiz/application/player.use.cases/create.game.use.case';
-import {CreateQuestionUseCase} from './features/quiz/application/sa.use.cases/create.question.use.case';
-import {UpdateQuestionUseCase} from './features/quiz/application/sa.use.cases/update.question.use.case';
-import {DeleteQuestionUseCase} from './features/quiz/application/sa.use.cases/delete.question.use.case';
-import {PublishQuestionUseCase} from './features/quiz/application/sa.use.cases/publish.question.use.case';
-import {GameQuestion} from './features/quiz/entity/game.question.entity';
+  Request,
+  RequestSchema,
+} from './infrastructure/guards/rate.limit/request.schema';
+import { CqrsModule } from '@nestjs/cqrs';
+import { BindBlogUseCase } from './features/blogs/application/sa.use.cases/bind.blog.use.case';
+import { CreateBlogUseCase } from './features/blogs/application/blogger.use.cases/create.blog.use.case';
+import { PublicBlogsController } from './features/blogs/api/controllers/public.blogs.controller';
+import { SABlogsController } from './features/blogs/api/controllers/sa.blogs.controller';
+import { CreatePostUseCase } from './features/posts/application/blogger.use.cases/create.post.use.case';
+import { CreateCommentUseCase } from './features/comments/application/use.cases/create.comment.use.case';
+import { BanBlogUseCase } from './features/blogs/application/sa.use.cases/ban.blog.use.case';
+import { UpdateBlogUseCase } from './features/blogs/application/blogger.use.cases/update.blog.use.case';
+import { BlogExistsConstraint } from './features/users/api/models/input/ban.user.current.blog.input.model';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UpdateCommentUseCase } from './features/comments/application/use.cases/update.comment.use.case';
+import { Users } from './features/users/entity/user.entity';
+import { BannedUsersForBlog } from './features/users/entity/banned.user.for.blog.entity';
+import { Devices } from './features/devices/entity/device.entity';
+import { Blogs } from './features/blogs/entity/blog.entity';
+import { Posts } from './features/posts/entity/post.entity';
+import { TypeOrmOptions } from './infrastructure/options/type.orm.options';
+import { Comments } from './features/comments/entity/сomment.entity';
+import { CommentLikes } from './features/comments/entity/comment.likes.entity';
+import { PostLikes } from './features/posts/entity/post.likes.entity';
+import { UpdateCommentLikesUseCase } from './features/comments/application/use.cases/update.comment.likes.use.case';
+import { DeleteCommentUseCase } from './features/comments/application/use.cases/delete.comment.use.case';
+import { BanUserUseCase } from './features/users/application/sa.users.use.cases/ban.user.use.case';
+import { UnbanUserUseCase } from './features/users/application/sa.users.use.cases/unban.user.use.case';
+import { DeleteUserUseCase } from './features/users/application/sa.users.use.cases/delete.user.use.case';
+import { ConfirmEmailUseCase } from './features/auth/application/use.cases/confirm.email.use.case';
+import { RegisterUserUseCase } from './features/auth/application/use.cases/register.user.use.case';
+import { RefreshTokenUseCase } from './features/auth/application/use.cases/refresh.token.use.case';
+import { UpdatePasswordUseCase } from './features/auth/application/use.cases/update.password.use.case';
+import { SendRecoveryCodeUseCase } from './features/auth/application/use.cases/send.recovery.code.use.case';
+import { CheckCredentialsUseCase } from './features/auth/application/use.cases/check.credentials.use.case';
+import { CreateUserByAdminUseCase } from './features/users/application/sa.users.use.cases/create.user.use.case';
+import { ResendConfirmationUseCase } from './features/auth/application/use.cases/resend.confirmation.use.case';
+import { BanUserForCurrentBlogUseCase } from './features/users/application/blogger.users.use.cases/ban.user.for.current.blog.use.case';
+import { UpdateConfirmationCodeUseCase } from './features/auth/application/use.cases/update.confirmation.code.use.case';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthController } from './features/auth/api/auth.controller';
+import { SaUsersController } from './features/users/api/controllers/sa.users.controller';
+import { BloggerUsersController } from './features/users/api/controllers/blogger.users.controller';
+import { DevicesController } from './features/devices/api/devices.controller';
+import { RequestService } from './infrastructure/services/request.service';
+import { TokensService } from './infrastructure/services/tokens.service';
+import { EmailAdapter } from './infrastructure/adapters/email.adapter';
+import { EmailManager } from './infrastructure/services/email.manager';
+import { HashService } from './infrastructure/services/hash.service';
+import { UsersRepository } from './features/users/infrastructure/users.repository';
+import { UsersQueryRepository } from './features/users/infrastructure/users.query.repository';
+import { BannedUsersForBlogRepository } from './features/users/infrastructure/banned.users.for.blog.repository';
+import { BannedUsersForBlogQueryRepository } from './features/users/infrastructure/banned.users.for.blog.query.repository';
+import { DevicesService } from './features/devices/application/devices.service';
+import { DevicesRepository } from './features/devices/infrastructure/devices.repository';
+import { DevicesQueryRepository } from './features/devices/infrastructure/devices.query.repository';
+import { Question } from './features/quiz/entity/question.entity';
+import { Answer } from './features/quiz/entity/answer.entity';
+import { Game } from './features/quiz/entity/game.entity';
+import { Player } from './features/quiz/entity/player.entity';
+import { SAQuizController } from './features/quiz/api/controllers/sa.quiz.controller';
+import { PlayerQuizController } from './features/quiz/api/controllers/player.quiz.controller';
+import { PlayerQuizQueryRepository } from './features/quiz/infrastructure/player.quiz.query.repository';
+import { PlayerQuizRepository } from './features/quiz/infrastructure/player.quiz.repository';
+import { SAQuizRepository } from './features/quiz/infrastructure/sa.quiz.repository';
+import { SAQuizQueryRepository } from './features/quiz/infrastructure/sa.quiz.query.repository';
+import { CreateAnswerUseCase } from './features/quiz/application/player.use.cases/create.answer.use.case';
+import { CreateGameUseCase } from './features/quiz/application/player.use.cases/create.game.use.case';
+import { CreateQuestionUseCase } from './features/quiz/application/sa.use.cases/create.question.use.case';
+import { UpdateQuestionUseCase } from './features/quiz/application/sa.use.cases/update.question.use.case';
+import { DeleteQuestionUseCase } from './features/quiz/application/sa.use.cases/delete.question.use.case';
+import { PublishQuestionUseCase } from './features/quiz/application/sa.use.cases/publish.question.use.case';
+import { GameQuestion } from './features/quiz/entity/game.question.entity';
 
-const entities = [Users,
+const entities = [
+  Users,
   BannedUsersForBlog,
   Devices,
   Blogs,
@@ -105,7 +105,8 @@ const entities = [Users,
   Player,
   Answer,
   Question,
-  GameQuestion,]
+  GameQuestion,
+];
 const useCases = [
   CreateGameUseCase,
   CreateAnswerUseCase,
@@ -183,7 +184,7 @@ const controllers = [
 
   PostsController,
   CommentsController,
-]
+];
 const services = [
   AppService,
 
@@ -197,7 +198,7 @@ const services = [
   BlogsService,
   BlogExistsConstraint,
   PostsService,
-]
+];
 
 @Module({
   imports: [
@@ -210,14 +211,12 @@ const services = [
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URL'),
       }),
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
-    MongooseModule.forFeature([
-      { name: Request.name, schema: RequestSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Request.name, schema: RequestSchema }]),
 
     TypeOrmModule.forRootAsync({ useClass: TypeOrmOptions }),
-    TypeOrmModule.forFeature([...entities])
+    TypeOrmModule.forFeature([...entities]),
   ],
   controllers: [...controllers],
   providers: [...useCases, ...services, ...repositories],

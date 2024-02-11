@@ -1,8 +1,15 @@
-import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {CommentLikes} from './comment.likes.entity';
-import {Posts} from '../../posts/entity/post.entity';
-import {Users} from '../../users/entity/user.entity';
-import {Blogs} from '../../blogs/entity/blog.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { CommentLikes } from './comment.likes.entity';
+import { Posts } from '../../posts/entity/post.entity';
+import { Users } from '../../users/entity/user.entity';
+import { Blogs } from '../../blogs/entity/blog.entity';
 
 @Entity()
 export class Comments {
@@ -13,7 +20,7 @@ export class Comments {
   @Column()
   createdAt: Date;
 
-  @ManyToOne(() => Users, u => u.comments)
+  @ManyToOne(() => Users, (u) => u.comments)
   @JoinColumn()
   user: Users;
   @Column()
@@ -21,7 +28,7 @@ export class Comments {
   @Column()
   userLogin: string;
 
-  @ManyToOne(() => Blogs, b => b.comments)
+  @ManyToOne(() => Blogs, (b) => b.comments)
   @JoinColumn()
   blog: Blogs;
   @Column()
@@ -29,7 +36,7 @@ export class Comments {
   @Column()
   blogName: string;
 
-  @ManyToOne(() => Posts, p => p.comments)
+  @ManyToOne(() => Posts, (p) => p.comments)
   @JoinColumn()
   post: Posts;
   @Column()
@@ -37,6 +44,6 @@ export class Comments {
   @Column()
   postTitle: string;
 
-  @OneToMany(() => CommentLikes, l => l.comment)
+  @OneToMany(() => CommentLikes, (l) => l.comment)
   likes: CommentLikes[];
 }

@@ -27,12 +27,24 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
   ) {}
 
-  async execute(command: CreateGameCommand) {
+  async execute(command: CreateGameCommand): Promise<ContractDto<any>> {
+    const { userId } = command;
+    let newGame;
+
+    // достаем логин текущего юзера
+    // todo - логин достается как null во время транзакции, тк создается какой-то отдельный экземпляр репозитория
+    const user = await this.usersQueryRepository.getUserForQuiz(userId);
+    if (user.hasError())
+      return new ContractDto(InternalCode.NotFound, null, 'user not found');
+
+    // вся сложность в том, что немозможно создать и первого игрока и игру одновременно
+    // а если мы хотим сохнить ограничения, то для создания игры нужен playerId, а для создания игрока нужен gameId
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    const { userId } = command;
+    // const manager = queryRunner.manager;
 
     try {
       const activeGame = await this.playerQuizQueryRepository.getActiveGame(
@@ -46,14 +58,12 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
 
       // смотрим, ждет ли кто-то пару
       const pendingGame = await this.playerQuizQueryRepository.getPendingGame();
-      const user = await this.usersQueryRepository.getUserById(userId);
 
       // создаем игрока
       const playerDTO: CreatePlayerDTO = {
         id: randomUUID(),
-        score: 0,
         userId,
-        login: user!.login,
+        login: user.payload!,
         answers: [],
         gameId: pendingGame.payload ? pendingGame.payload.id : 'mock',
       };
@@ -61,6 +71,17 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
 
       // если кто-то ждет пару, то
       if (pendingGame.code === InternalCode.Success && pendingGame.payload) {
+        // создаем игрока
+        // const playerDTO: CreatePlayerDTO = {
+        //   id: randomUUID(),
+        //   score: 0,
+        //   userId,
+        //   login: user.payload!,
+        //   answers: [],
+        //   gameId: pendingGame.payload?.id,
+        // };
+        // await this.playerQuizRepository.createPlayer(playerDTO);
+
         // добавляем 5 рандомных вопросов в игру
         const questionsId =
           await this.playerQuizQueryRepository.getFiveQuestionsId();
@@ -76,14 +97,9 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           startGameDate: new Date(),
           secondPlayerId: playerDTO.id,
         };
-        const activeGame = await this.playerQuizRepository.addPlayerToGame(dto);
+        newGame = await this.playerQuizRepository.addPlayerToGame(dto);
 
         await queryRunner.commitTransaction();
-
-        if (activeGame.hasError())
-          return new ContractDto(InternalCode.Internal_Server);
-
-        return new ContractDto(InternalCode.Success, activeGame.payload);
       }
 
       // если никто не ждет пару
@@ -100,20 +116,21 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           dto.id,
         );
 
-        const newGame = await this.playerQuizRepository.createGame(dto);
+        newGame = await this.playerQuizRepository.createGame(dto);
 
         await queryRunner.commitTransaction();
-
-        if (newGame.hasError())
-          return new ContractDto(InternalCode.Internal_Server);
-
-        return new ContractDto(InternalCode.Success, newGame.payload);
       }
     } catch (e) {
+      console.log({ create_game_error: e });
       await queryRunner.rollbackTransaction();
-      return new ContractDto(InternalCode.Internal_Server);
+      return new ContractDto(InternalCode.Internal_Server, null, 'rollback');
     } finally {
       await queryRunner.release();
     }
+
+    if (newGame.hasError())
+      return new ContractDto(InternalCode.Internal_Server, null, 'i dont know');
+
+    return new ContractDto(InternalCode.Success, newGame.payload);
   }
 }
