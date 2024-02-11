@@ -32,13 +32,13 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     let newGame;
 
     // достаем логин текущего юзера
-    // todo - логин достается как null во время транзакции, тк создается какой-то отдельный экземпляр репозитория
+    // логин достается как null во время транзакции, тк создается какой-то отдельный экземпляр репозитория
     const user = await this.usersQueryRepository.getUserForQuiz(userId);
     if (user.hasError())
       return new ContractDto(InternalCode.NotFound, null, 'user not found');
 
-    // вся сложность в том, что немозможно создать и первого игрока и игру одновременно
-    // а если мы хотим сохнить ограничения, то для создания игры нужен playerId, а для создания игрока нужен gameId
+    // при создании игрока база пишет, что userId не существует в этот момент в таблице!
+    // возможно надо как-то иначе организовать старт и окончание транзакции
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

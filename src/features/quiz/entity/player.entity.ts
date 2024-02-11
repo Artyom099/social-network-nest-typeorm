@@ -21,7 +21,7 @@ export class Player {
   @Column({ nullable: true })
   finishAnswersDate: Date;
 
-  @ManyToOne(() => Users, (u) => u.players)
+  @ManyToOne(() => Users, (u) => u.players, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: Users;
   @Column()

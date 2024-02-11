@@ -31,14 +31,14 @@ export class UsersQueryRepository {
   async getUserForQuiz(id: string): Promise<ContractDto<string | null>> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
-      .select('user.id', 'id')
-      .select('user.login', 'login')
-      .select('user.email', 'email')
-      .select('user.createdAt', 'createdAt')
+      // .select('user.id', 'id')
+      // .select('user.login', 'login')
+      // .select('user.email', 'email')
+      // .select('user.createdAt', 'createdAt')
       .where('user.id = :id', { id: id })
       .getOne();
 
-    console.log({ repo_user: user });
+    // console.log({ repo_user: user });
     console.log({ repo_login: user?.login });
 
     if (!user)
