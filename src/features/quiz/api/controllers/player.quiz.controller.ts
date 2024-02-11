@@ -71,18 +71,18 @@ export class PlayerQuizController extends ExceptionResponseHandler {
   @Post('connection')
   @HttpCode(HttpStatus.OK)
   async createGame(@Req() req: any) {
-    const createGemaResult = await this.commandBus.execute(
+    const createGameResult = await this.commandBus.execute(
       new CreateGameCommand(req.userId),
     );
 
-    return this.sendExceptionOrResponse(createGemaResult);
+    return this.sendExceptionOrResponse(createGameResult);
   }
 
   @Post('my-current/answers')
   @HttpCode(HttpStatus.OK)
-  async sendAnswer(@Req() req: any, @Body() inputModel: AnswerInputModel) {
+  async sendAnswer(@Req() req: any, @Body() body: AnswerInputModel) {
     const createAnswerResult = await this.commandBus.execute(
-      new CreateAnswerCommand(req.userId, inputModel.answer),
+      new CreateAnswerCommand(req.userId, body.answer),
     );
 
     return this.sendExceptionOrResponse(createAnswerResult);

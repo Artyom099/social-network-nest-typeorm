@@ -1,18 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource, UpdateResult } from "typeorm";
-import { Game } from "../entity/game.entity";
-import { GameStatus, InternalCode } from "../../../infrastructure/utils/enums";
-import { CreateGameDto } from "../api/models/dto/create.game.dto";
-import { Answer } from "../entity/answer.entity";
-import { CreateAnswerDTO } from "../api/models/dto/create.answer.dto";
-import { AnswerViewModel } from "../api/models/view/answer.view.model";
-import { GameViewModel } from "../api/models/view/game.view.model";
-import { Player } from "../entity/player.entity";
-import { CreatePlayerDTO } from "../api/models/dto/create.player.dto";
-import { AddQuestionsToGameDto } from "../api/models/dto/addQuestionsToGameDto";
-import { AddPlayerToGameDto } from "../api/models/dto/add.player.to.game.dto";
-import { ContractDto } from "../../../infrastructure/core/contract.dto";
+import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource, UpdateResult } from 'typeorm';
+import { Game } from '../entity/game.entity';
+import { GameStatus, InternalCode } from '../../../infrastructure/utils/enums';
+import { CreateGameDto } from '../api/models/dto/create.game.dto';
+import { Answer } from '../entity/answer.entity';
+import { CreateAnswerDTO } from '../api/models/dto/create.answer.dto';
+import { AnswerViewModel } from '../api/models/view/answer.view.model';
+import { GameViewModel } from '../api/models/view/game.view.model';
+import { Player } from '../entity/player.entity';
+import { CreatePlayerDTO } from '../api/models/dto/create.player.dto';
+import { AddQuestionsToGameDto } from '../api/models/dto/add.questions.to.game.dto';
+import { AddPlayerToGameDto } from '../api/models/dto/add.player.to.game.dto';
+import { ContractDto } from '../../../infrastructure/core/contract.dto';
 
 @Injectable()
 export class PlayerQuizRepository {
@@ -38,7 +38,7 @@ export class PlayerQuizRepository {
     from game g
     where g."id" = $1
     `,
-      [dto.id]
+      [dto.id],
     );
 
     const [player] = await this.dataSource.query(
@@ -48,7 +48,7 @@ export class PlayerQuizRepository {
     left join users u on pl."userId" = u.id
     where pl.id = $1
     `,
-      [game.firstPlayerId]
+      [game.firstPlayerId],
     );
 
     if (!game || !player) return new ContractDto(InternalCode.Internal_Server);
@@ -77,12 +77,12 @@ export class PlayerQuizRepository {
       .createQueryBuilder()
       .update(Game)
       .set({ status: GameStatus.finished, finishGameDate: new Date() })
-      .where("id = :id", { id })
+      .where('id = :id', { id })
       .execute();
   }
 
   async addPlayerToGame(
-    dto: AddPlayerToGameDto
+    dto: AddPlayerToGameDto,
   ): Promise<ContractDto<GameViewModel>> {
     await this.dataSource
       .createQueryBuilder()
@@ -92,7 +92,7 @@ export class PlayerQuizRepository {
         startGameDate: dto.startGameDate,
         status: GameStatus.active,
       })
-      .where("id = :id", { id: dto.id })
+      .where('id = :id', { id: dto.id })
       .execute();
 
     const [game] = await this.dataSource.query(
@@ -110,7 +110,7 @@ export class PlayerQuizRepository {
     from game g
     where g."id" = $1
     `,
-      [dto.id]
+      [dto.id],
     );
 
     if (!game) return new ContractDto(InternalCode.Internal_Server);
@@ -162,7 +162,7 @@ export class PlayerQuizRepository {
       .createQueryBuilder()
       .update(Player)
       .set({ gameId: gameId })
-      .where("id = :id", { id })
+      .where('id = :id', { id })
       .execute();
   }
 
@@ -171,7 +171,7 @@ export class PlayerQuizRepository {
       .createQueryBuilder()
       .update(Player)
       .set({ finishAnswersDate: new Date() })
-      .where("id = :id", { id })
+      .where('id = :id', { id })
       .execute();
   }
 
@@ -179,22 +179,22 @@ export class PlayerQuizRepository {
     return this.dataSource
       .createQueryBuilder()
       .update(Player)
-      .set({ score: () => "score + 1" })
-      .where("id = :id", { id })
+      .set({ score: () => 'score + 1' })
+      .where('id = :id', { id })
       .execute();
   }
   async increaseAnswersCount(id: string): Promise<UpdateResult> {
     return this.dataSource
       .createQueryBuilder()
       .update(Player)
-      .set({ answersCount: () => "answersCount + 1" })
-      .where("id = :id", { id })
+      .set({ answersCount: () => 'answersCount + 1' })
+      .where('id = :id', { id })
       .execute();
   }
 
   // answer
   async createAnswer(
-    dto: CreateAnswerDTO
+    dto: CreateAnswerDTO,
   ): Promise<ContractDto<AnswerViewModel>> {
     await this.dataSource
       .createQueryBuilder()
@@ -216,7 +216,7 @@ export class PlayerQuizRepository {
       from answer
       where "id" = $1
     `,
-      [dto.id]
+      [dto.id],
     );
 
     if (!answer) return new ContractDto(InternalCode.Internal_Server);
@@ -226,14 +226,6 @@ export class PlayerQuizRepository {
       answerStatus: answer.answerStatus,
       addedAt: answer.addedAt,
     });
-
-    // return answer
-    //   ? {
-    //       questionId: answer.questionId,
-    //       answerStatus: answer.answerStatus,
-    //       addedAt: answer.addedAt,
-    //     }
-    //   : null;
   }
 
   // game_question
@@ -255,16 +247,7 @@ export class PlayerQuizRepository {
         dto.questionsId[2],
         dto.questionsId[3],
         dto.questionsId[4],
-      ]
+      ],
     );
   }
-
-  // async updatePlayersAnswerId(id: string, answerId: string) {
-  //   return this.dataSource
-  //     .createQueryBuilder()
-  //     .update(Player)
-  //     .set({ answersId: () => `array_append('answersId', '${answerId}')` })
-  //     .where("id = :id", { id })
-  //     .execute();
-  // }
 }

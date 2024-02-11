@@ -1,30 +1,30 @@
 export enum LikeStatus {
-  None = "None",
-  Like = "Like",
-  Dislike = "Dislike",
+  None = 'None',
+  Like = 'Like',
+  Dislike = 'Dislike',
 }
 export enum SortDirection {
-  asc = "asc",
-  desc = "desc",
+  asc = 'asc',
+  desc = 'desc',
 }
 export enum SortBy {
-  default = "createdAt",
-  createdAt = "createdAt",
-  login = "login",
-  email = "email",
+  default = 'createdAt',
+  createdAt = 'createdAt',
+  login = 'login',
+  email = 'email',
 }
 export enum BanStatus {
-  banned = "banned",
-  notBanned = "notBanned",
+  banned = 'banned',
+  notBanned = 'notBanned',
 }
 export enum AnswerStatus {
-  correct = "Correct",
-  incorrect = "Incorrect",
+  correct = 'Correct',
+  incorrect = 'Incorrect',
 }
 export enum GameStatus {
-  pending = "PendingSecondPlayer",
-  active = "Active",
-  finished = "Finished",
+  pending = 'PendingSecondPlayer',
+  active = 'Active',
+  finished = 'Finished',
 }
 
 export enum InternalCode {
@@ -36,7 +36,7 @@ export enum InternalCode {
   Expired = -4,
 }
 export enum ApproachType {
-  http = "selectHttpException",
-  tcp = "selectTcpExceptions",
-  qraphql = "selectGraphQLExceptions",
+  http = 'selectHttpException',
+  tcp = 'selectTcpExceptions',
+  graphql = 'selectGraphQLExceptions',
 }

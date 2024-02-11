@@ -4,13 +4,14 @@ import { DataSource } from 'typeorm';
 import { GameStatus, InternalCode } from '../../../infrastructure/utils/enums';
 import { GameViewModel } from '../api/models/view/game.view.model';
 import { ContractDto } from '../../../infrastructure/core/contract.dto';
+import { Game } from '../entity/game.entity';
 
 @Injectable()
 export class PlayerQuizQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   // game
-  async getPendingGame() {
+  async getPendingGame(): Promise<ContractDto<Game>> {
     const [game] = await this.dataSource.query(
       `
     select *
@@ -20,7 +21,9 @@ export class PlayerQuizQueryRepository {
       [GameStatus.pending],
     );
 
-    return game ? game : null;
+    if (!game) return new ContractDto(InternalCode.NotFound);
+
+    return new ContractDto(InternalCode.Success, game);
   }
 
   async getGameById(id: string): Promise<GameViewModel | null> {
@@ -427,57 +430,4 @@ export class PlayerQuizQueryRepository {
     offset random()
     `);
   }
-
-  // async usersIdActiveGames() {
-  //   const usersId = await this.dataSource.query(
-  //     `
-  //   select u."id"
-  //   from player pl
-  //   left join users u on u.id = pl."userId"
-  //   left join game g on g."firstPlayerId" = pl.id
-  //   where g.status = $1 or g.status = $2
-  //
-  //   union
-  //
-  //   select u."id"
-  //   from player pl
-  //   left join users u on u.id = pl."userId"
-  //   left join game g on g."secondPlayerId" = pl.id
-  //   where g.status = $1 or g.status = $2
-  //   `,
-  //     [GameStatus.active, GameStatus.pending]
-  //   );
-  //
-  //   return usersId ? usersId : [];
-  // }
-  // async getPlayerId(userId: string, gameId: string): Promise<string> {
-  //   const [player] = await this.dataSource.query(
-  //     `
-  //   select *
-  //   from player
-  //   where "userId" = $1 and "gameId" = $2
-  //   `,
-  //     [userId, gameId]
-  //   );
-  //
-  //   return player ? player.id : null;
-  // }
-  // async getPlayerAnswersForGame(playerId: string): Promise<AnswerViewModel[]> {
-  //   const answers = await this.dataSource.query(
-  //     `
-  //   select "questionId", "answerStatus", "addedAt"
-  //   from answer
-  //   where "playerId" = $1
-  //   `,
-  //     [playerId]
-  //   );
-  //
-  //   return answers.map((a) => {
-  //     return {
-  //       questionId: a.questionId,
-  //       answerStatus: a.answerStatus,
-  //       addedAt: a.addedAt,
-  //     };
-  //   });
-  // }
 }

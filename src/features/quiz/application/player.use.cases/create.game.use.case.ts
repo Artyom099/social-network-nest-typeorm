@@ -9,7 +9,7 @@ import { CreateGameDto } from '../../api/models/dto/create.game.dto';
 import { randomUUID } from 'crypto';
 import { CreatePlayerDTO } from '../../api/models/dto/create.player.dto';
 import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
-import { AddQuestionsToGameDto } from '../../api/models/dto/addQuestionsToGameDto';
+import { AddQuestionsToGameDto } from '../../api/models/dto/add.questions.to.game.dto';
 import { AddPlayerToGameDto } from '../../api/models/dto/add.player.to.game.dto';
 import { DataSource } from 'typeorm';
 import { ContractDto } from '../../../../infrastructure/core/contract.dto';
@@ -55,24 +55,24 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         userId,
         login: user!.login,
         answers: [],
-        gameId: pendingGame?.id,
+        gameId: pendingGame.payload ? pendingGame.payload.id : 'mock',
       };
       await this.playerQuizRepository.createPlayer(playerDTO);
 
       // если кто-то ждет пару, то
-      if (pendingGame) {
-        // добавляем 5 рандомных вопросов
+      if (pendingGame.code === InternalCode.Success && pendingGame.payload) {
+        // добавляем 5 рандомных вопросов в игру
         const questionsId =
           await this.playerQuizQueryRepository.getFiveQuestionsId();
         const questionsDto: AddQuestionsToGameDto = {
-          gameId: pendingGame.id,
+          gameId: pendingGame.payload.id,
           questionsId: questionsId.map((q) => q.id),
         };
         await this.playerQuizRepository.crateFiveGameQuestions(questionsDto);
 
         // добавляем игрока в эту пару и начинаем игру
         const dto: AddPlayerToGameDto = {
-          id: pendingGame.id,
+          id: pendingGame.payload.id,
           startGameDate: new Date(),
           secondPlayerId: playerDTO.id,
         };
@@ -84,7 +84,10 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           return new ContractDto(InternalCode.Internal_Server);
 
         return new ContractDto(InternalCode.Success, activeGame.payload);
-      } else {
+      }
+
+      // если никто не ждет пару
+      if (pendingGame.code === InternalCode.NotFound) {
         // иначе создаем новую игру, первого игрока и ждем следующего игрока
         const dto: CreateGameDto = {
           id: randomUUID(),

@@ -1,15 +1,15 @@
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { PlayerQuizRepository } from "../../infrastructure/player.quiz.repository";
-import { PlayerQuizQueryRepository } from "../../infrastructure/player.quiz.query.repository";
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { PlayerQuizRepository } from '../../infrastructure/player.quiz.repository';
+import { PlayerQuizQueryRepository } from '../../infrastructure/player.quiz.query.repository';
 import {
   AnswerStatus,
   InternalCode,
-} from "../../../../infrastructure/utils/enums";
-import { CreateAnswerDTO } from "../../api/models/dto/create.answer.dto";
-import { randomUUID } from "crypto";
-import { ForbiddenException } from "@nestjs/common";
-import { DataSource } from "typeorm";
-import { ContractDto } from "../../../../infrastructure/core/contract.dto";
+} from '../../../../infrastructure/utils/enums';
+import { CreateAnswerDTO } from '../../api/models/dto/create.answer.dto';
+import { randomUUID } from 'crypto';
+import { ForbiddenException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { ContractDto } from '../../../../infrastructure/core/contract.dto';
 
 export class CreateAnswerCommand {
   constructor(public userId: string, public answer: string) {}
@@ -22,7 +22,7 @@ export class CreateAnswerUseCase
   constructor(
     private dataSource: DataSource,
     private playerQuizRepository: PlayerQuizRepository,
-    private playerQuizQueryRepository: PlayerQuizQueryRepository
+    private playerQuizQueryRepository: PlayerQuizQueryRepository,
   ) {}
 
   async execute(command: CreateAnswerCommand) {
@@ -35,40 +35,32 @@ export class CreateAnswerUseCase
     try {
       // достаем игру по userId
       const currentGame = await this.playerQuizQueryRepository.getActiveGame(
-        command.userId
+        command.userId,
       );
-      if (!currentGame) {
-        console.log("1---");
-        return new ContractDto(InternalCode.Forbidden);
-      }
+      if (!currentGame) return new ContractDto(InternalCode.Forbidden);
 
       // достаем игроков по userId и gameId
       const currentPlayer =
         await this.playerQuizQueryRepository.getCurrentPlayer(
           userId,
-          currentGame.id
+          currentGame.id,
         );
       const otherPlayer = await this.playerQuizQueryRepository.getOtherPlayer(
         userId,
-        currentGame.id
+        currentGame.id,
       );
 
       // если игрок ответил на все вопросы, возвращаем 403 - заменить 5 на количество вопросов?
-      if (currentPlayer.answersCount >= 5) {
-        console.log("2---");
+      if (currentPlayer.answersCount >= 5)
         return new ContractDto(InternalCode.Forbidden);
-      }
 
       // достаем вопрос по gameId и порядковому номеру
       const question = await this.playerQuizQueryRepository.getQuestion(
         currentGame.id,
-        currentPlayer.answersCount + 1
+        currentPlayer.answersCount + 1,
       );
       // есди такого вопроса нет, значит они закончились
-      if (!question) {
-        console.log("3---");
-        return new ContractDto(InternalCode.Forbidden);
-      }
+      if (!question) return new ContractDto(InternalCode.Forbidden);
 
       // проверяем правильность ответа
       const answerStatus = question.correctAnswers.includes(answer)
@@ -80,13 +72,13 @@ export class CreateAnswerUseCase
         await this.playerQuizRepository.increaseScore(currentPlayer.id);
       }
 
-      // увеличиваем игроку answersCount
+      // увеличиваем игроку количество ответов
       await this.playerQuizRepository.increaseAnswersCount(currentPlayer.id);
 
       // если этот вопрос был последним, ставим игроку finishAnswersDate
       if (currentPlayer.answersCount + 1 >= 5) {
         await this.playerQuizRepository.updateFinishAnswersDate(
-          currentPlayer.id
+          currentPlayer.id,
         );
       }
 
@@ -96,33 +88,43 @@ export class CreateAnswerUseCase
         otherPlayer.answersCount + 1 >= 5
       ) {
         await this.playerQuizRepository.finishGame(currentGame.id);
-      }
 
-      // достаем игроков, чтоб сравнить их время завершение игры
-      const current = await this.playerQuizQueryRepository.getCurrentPlayer(
-        userId,
-        currentGame.id
-      );
-      const other = await this.playerQuizQueryRepository.getOtherPlayer(
-        userId,
-        currentGame.id
-      );
+        // достаем игроков, чтоб сравнить их время завершение игры
+        const current = await this.playerQuizQueryRepository.getCurrentPlayer(
+          userId,
+          currentGame.id,
+        );
+        const other = await this.playerQuizQueryRepository.getOtherPlayer(
+          userId,
+          currentGame.id,
+        );
 
-      console.log({ current: current.finishAnswersDate });
-      console.log({ other: other.finishAnswersDate });
+        console.log(
+          { current: current.finishAnswersDate },
+          { other: other.finishAnswersDate },
+        );
+        console.log({
+          c_menishe_o: current.finishAnswersDate < other.finishAnswersDate,
+        });
+        console.log({
+          c_bolshe_o: current.finishAnswersDate > other.finishAnswersDate,
+        });
 
-      // если игрок ответил первым, и у него есть хотя бы 1 верный ответ, добавляем ему балл
-      if (
-        current.finishAnswersDate < other.finishAnswersDate &&
-        current.score > 0
-      ) {
-        await this.playerQuizRepository.increaseScore(currentPlayer.id);
-      }
-      if (
-        current.finishAnswersDate > other.finishAnswersDate &&
-        other.score > 0
-      ) {
-        await this.playerQuizRepository.increaseScore(otherPlayer.id);
+        // todo - как сравнивать время завершения ответов на вопросы, если там есть null?
+
+        // если игрок ответил первым, и у него есть хотя бы 1 верный ответ, добавляем ему балл
+        if (
+          current.finishAnswersDate < other.finishAnswersDate &&
+          current.score > 0
+        ) {
+          await this.playerQuizRepository.increaseScore(currentPlayer.id);
+        }
+        if (
+          current.finishAnswersDate > other.finishAnswersDate &&
+          other.score > 0
+        ) {
+          await this.playerQuizRepository.increaseScore(otherPlayer.id);
+        }
       }
 
       // возвращаем ответ
@@ -144,7 +146,7 @@ export class CreateAnswerUseCase
     } catch (e) {
       console.log({ error: e });
       await queryRunner.rollbackTransaction();
-      return new ContractDto(InternalCode.Internal_Server);
+      // return new ContractDto(InternalCode.Internal_Server);
     } finally {
       await queryRunner.release();
     }
