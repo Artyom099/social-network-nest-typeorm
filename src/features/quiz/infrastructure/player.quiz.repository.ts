@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, UpdateResult } from 'typeorm';
+import { DataSource, EntityManager, UpdateResult } from 'typeorm';
 import { Game } from '../entity/game.entity';
 import { GameStatus, InternalCode } from '../../../infrastructure/utils/enums';
 import { CreateGameDto } from '../api/models/dto/create.game.dto';
@@ -12,16 +12,31 @@ import { Player } from '../entity/player.entity';
 import { CreatePlayerDTO } from '../api/models/dto/create.player.dto';
 import { AddQuestionsToGameDto } from '../api/models/dto/add.questions.to.game.dto';
 import { AddPlayerToGameDto } from '../api/models/dto/add.player.to.game.dto';
-import { ContractDto } from '../../../infrastructure/core/contract.dto';
+import { Contract } from '../../../infrastructure/core/contract';
 
 @Injectable()
 export class PlayerQuizRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   // game
-  async createGame(dto: CreateGameDto): Promise<ContractDto<GameViewModel>> {
-    await this.dataSource
-      .createQueryBuilder()
+  async createGame(
+    dto: CreateGameDto,
+    manager?: EntityManager,
+  ): Promise<Contract<GameViewModel>> {
+    // await this.dataSource
+    //   .createQueryBuilder()
+    //   .insert()
+    //   .into(Game)
+    //   .values({
+    //     id: dto.id,
+    //     status: dto.status,
+    //     pairCreatedDate: dto.pairCreatedDate,
+    //     firstPlayerId: dto.firstPlayerId,
+    //   })
+    //   .execute();
+
+    await manager
+      ?.createQueryBuilder()
       .insert()
       .into(Game)
       .values({
@@ -51,9 +66,9 @@ export class PlayerQuizRepository {
       [game.firstPlayerId],
     );
 
-    if (!game || !player) return new ContractDto(InternalCode.Internal_Server);
+    if (!game || !player) return new Contract(InternalCode.Internal_Server);
 
-    return new ContractDto(InternalCode.Success, {
+    return new Contract(InternalCode.Success, {
       id: game.id,
       firstPlayerProgress: {
         answers: [],
@@ -83,7 +98,7 @@ export class PlayerQuizRepository {
 
   async addPlayerToGame(
     dto: AddPlayerToGameDto,
-  ): Promise<ContractDto<GameViewModel>> {
+  ): Promise<Contract<GameViewModel>> {
     await this.dataSource
       .createQueryBuilder()
       .update(Game)
@@ -113,9 +128,9 @@ export class PlayerQuizRepository {
       [dto.id],
     );
 
-    if (!game) return new ContractDto(InternalCode.Internal_Server);
+    if (!game) return new Contract(InternalCode.Internal_Server);
 
-    return new ContractDto(InternalCode.Success, {
+    return new Contract(InternalCode.Success, {
       id: game.id,
       firstPlayerProgress: {
         answers: [],
@@ -182,6 +197,7 @@ export class PlayerQuizRepository {
       .where('id = :id', { id })
       .execute();
   }
+
   async increaseAnswersCount(id: string): Promise<UpdateResult> {
     return this.dataSource
       .createQueryBuilder()
@@ -192,9 +208,7 @@ export class PlayerQuizRepository {
   }
 
   // answer
-  async createAnswer(
-    dto: CreateAnswerDTO,
-  ): Promise<ContractDto<AnswerViewModel>> {
+  async createAnswer(dto: CreateAnswerDTO): Promise<Contract<AnswerViewModel>> {
     await this.dataSource
       .createQueryBuilder()
       .insert()
@@ -204,7 +218,6 @@ export class PlayerQuizRepository {
         answer: dto.answer,
         questionId: dto.questionId,
         answerStatus: dto.answerStatus,
-        addedAt: dto.addedAt,
         playerId: dto.playerId,
       })
       .execute();
@@ -218,9 +231,9 @@ export class PlayerQuizRepository {
       [dto.id],
     );
 
-    if (!answer) return new ContractDto(InternalCode.Internal_Server);
+    if (!answer) return new Contract(InternalCode.Internal_Server);
 
-    return new ContractDto(InternalCode.Success, {
+    return new Contract(InternalCode.Success, {
       questionId: answer.questionId,
       answerStatus: answer.answerStatus,
       addedAt: answer.addedAt,

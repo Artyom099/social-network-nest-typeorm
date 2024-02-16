@@ -1,6 +1,6 @@
 import { InternalCode } from '../utils/enums';
 
-export class ContractDto<T> {
+export class Contract<T> {
   constructor(
     public code: InternalCode,
     public payload: T | null = null,

@@ -1,6 +1,6 @@
-import {NestFactory} from '@nestjs/core';
-import {AppModule} from './app.module';
-import {appSettings} from './infrastructure/settings/app.settings';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { appSettings } from './infrastructure/settings/app.settings';
 
 export const bootstrap = async () => {
   try {
@@ -13,5 +13,5 @@ export const bootstrap = async () => {
   } catch (e) {
     console.log('cant start', e);
   }
-}
+};
 bootstrap();

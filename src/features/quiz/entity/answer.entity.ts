@@ -1,6 +1,12 @@
-import {Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {AnswerStatus} from '../../../infrastructure/utils/enums';
-import {Player} from './player.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { AnswerStatus } from '../../../infrastructure/utils/enums';
+import { Player } from './player.entity';
 
 @Entity()
 export class Answer {
@@ -10,7 +16,7 @@ export class Answer {
   answer: string;
   @Column()
   answerStatus: AnswerStatus;
-  @Column()
+  @Column({ default: new Date() })
   addedAt: Date;
 
   // @ManyToOne(() => Question, q => q.answers)
@@ -19,7 +25,7 @@ export class Answer {
   @Column()
   questionId: string;
 
-  @OneToMany(() => Player, pl => pl.answers)
+  @OneToMany(() => Player, (pl) => pl.answers)
   @JoinColumn()
   player: Player;
   @Column({ type: 'uuid' })

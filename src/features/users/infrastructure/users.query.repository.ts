@@ -4,9 +4,9 @@ import { SAUserViewModel } from '../api/models/view/sa.user.view.model';
 import { UserViewModel } from '../api/models/view/user.view.model';
 import { PaginationViewModel } from '../../../infrastructure/models/pagination.view.model';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Users } from '../entity/user.entity';
-import { ContractDto } from '../../../infrastructure/core/contract.dto';
+import { Contract } from '../../../infrastructure/core/contract';
 import { InternalCode } from '../../../infrastructure/utils/enums';
 
 @Injectable()
@@ -28,28 +28,34 @@ export class UsersQueryRepository {
 
     return user ? user : null;
   }
-  async getUserForQuiz(id: string): Promise<ContractDto<string | null>> {
-    const user = await this.dataSource
-      .getRepository(Users)
-      .createQueryBuilder('user')
-      // .select('user.id', 'id')
-      // .select('user.login', 'login')
-      // .select('user.email', 'email')
-      // .select('user.createdAt', 'createdAt')
+
+  // todo создать все методы, используемые в транзакции и ентити менеджером
+  async getUserForQuiz(
+    id: string,
+    manager: EntityManager,
+  ): Promise<Contract<string | null>> {
+    const user = await manager
+      .createQueryBuilder()
       .where('user.id = :id', { id: id })
       .getOne();
+
+    // const user2 = await this.dataSource
+    //   .getRepository(Users)
+    //   .createQueryBuilder('user')
+    //   .where('user.id = :id', { id: id })
+    //   .getOne();
 
     // console.log({ repo_user: user });
     console.log({ repo_login: user?.login });
 
     if (!user)
-      return new ContractDto(
+      return new Contract(
         InternalCode.NotFound,
         user,
         'user & userLogin not found',
       );
 
-    return new ContractDto(InternalCode.Success, user.login);
+    return new Contract(InternalCode.Success, user.login);
   }
   async getUserById2(id: string): Promise<UserViewModel | null> {
     const user = await this.usersRepo

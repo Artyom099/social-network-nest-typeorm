@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { GameStatus, InternalCode } from '../../../infrastructure/utils/enums';
 import { GameViewModel } from '../api/models/view/game.view.model';
-import { ContractDto } from '../../../infrastructure/core/contract.dto';
+import { Contract } from '../../../infrastructure/core/contract';
 import { Game } from '../entity/game.entity';
 import { Question } from '../entity/question.entity';
 
@@ -12,7 +12,7 @@ export class PlayerQuizQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   // game
-  async getPendingGame(): Promise<ContractDto<Game | null>> {
+  async getPendingGame(): Promise<Contract<Game | null>> {
     const [game] = await this.dataSource.query(
       `
     select *
@@ -23,13 +23,13 @@ export class PlayerQuizQueryRepository {
     );
 
     if (!game)
-      return new ContractDto(
+      return new Contract(
         InternalCode.NotFound,
         null,
         'pending game not found',
       );
 
-    return new ContractDto(InternalCode.Success, game);
+    return new Contract(InternalCode.Success, game);
   }
 
   async getGameById(id: string): Promise<GameViewModel | null> {
@@ -147,7 +147,7 @@ export class PlayerQuizQueryRepository {
       : null;
   }
 
-  async getActiveGame(userId: string): Promise<GameViewModel | null> {
+  async getActiveGame(userId: string): Promise<Contract<GameViewModel | null>> {
     const [playerId] = await this.dataSource.query(
       `
     select p.id
@@ -158,7 +158,8 @@ export class PlayerQuizQueryRepository {
     `,
       [userId],
     );
-    if (!playerId) return null;
+    if (!playerId)
+      return new Contract(InternalCode.NotFound, null, 'playerId not found');
 
     const [game] = await this.dataSource.query(
       `
@@ -186,7 +187,8 @@ export class PlayerQuizQueryRepository {
     `,
       [playerId.id, GameStatus.active],
     );
-    if (!game) return null;
+    if (!game)
+      return new Contract(InternalCode.NotFound, null, 'game not found');
 
     const questions = await this.dataSource.query(
       `
@@ -217,37 +219,35 @@ export class PlayerQuizQueryRepository {
       [game.secondPlayerId],
     );
 
-    return game
-      ? {
-          id: game.id,
-          firstPlayerProgress: {
-            answers: firstPlayerAnswers,
-            player: {
-              id: game.firstPlayerId,
-              login: game.firstPlayerLogin,
-            },
-            score: game.firstPlayerScore,
-          },
-          secondPlayerProgress: {
-            answers: secondPlayerAnswers,
-            player: {
-              id: game.secondPlayerId,
-              login: game.secondPlayerLogin,
-            },
-            score: game.secondPlayerScore,
-          },
-          questions: questions,
-          status: game.status,
-          pairCreatedDate: game.pairCreatedDate,
-          startGameDate: game.startGameDate,
-          finishGameDate: game.finishGameDate,
-        }
-      : null;
+    return new Contract(InternalCode.Success, {
+      id: game.id,
+      firstPlayerProgress: {
+        answers: firstPlayerAnswers,
+        player: {
+          id: game.firstPlayerId,
+          login: game.firstPlayerLogin,
+        },
+        score: game.firstPlayerScore,
+      },
+      secondPlayerProgress: {
+        answers: secondPlayerAnswers,
+        player: {
+          id: game.secondPlayerId,
+          login: game.secondPlayerLogin,
+        },
+        score: game.secondPlayerScore,
+      },
+      questions: questions,
+      status: game.status,
+      pairCreatedDate: game.pairCreatedDate,
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
+    });
   }
 
   async getActiveOrPendingGame(
     userId: string,
-  ): Promise<ContractDto<GameViewModel | null>> {
+  ): Promise<Contract<GameViewModel | null>> {
     const playersId = await this.dataSource.query(
       `
     select p.id
@@ -258,7 +258,7 @@ export class PlayerQuizQueryRepository {
     `,
       [userId],
     );
-    if (!playersId) return new ContractDto(InternalCode.NotFound);
+    if (!playersId) return new Contract(InternalCode.NotFound);
     const arrOfPlayersId = playersId.map((pl) => pl.id);
 
     const [game] = await this.dataSource.query(
@@ -289,7 +289,7 @@ export class PlayerQuizQueryRepository {
     );
     // Поиск значения в массиве - g."firstPlayerId" = any($1);
     if (!game)
-      return new ContractDto(
+      return new Contract(
         InternalCode.NotFound,
         null,
         'active or pending game not found',
@@ -325,7 +325,7 @@ export class PlayerQuizQueryRepository {
     );
 
     if (!game.secondPlayerId)
-      return new ContractDto(InternalCode.Success, {
+      return new Contract(InternalCode.Success, {
         id: game.id,
         firstPlayerProgress: {
           answers: firstPlayerAnswers,
@@ -344,7 +344,7 @@ export class PlayerQuizQueryRepository {
       });
 
     if (game) {
-      return new ContractDto(InternalCode.Success, {
+      return new Contract(InternalCode.Success, {
         id: game.id,
         firstPlayerProgress: {
           answers: firstPlayerAnswers,
@@ -369,7 +369,7 @@ export class PlayerQuizQueryRepository {
         finishGameDate: game.finishGameDate,
       });
     } else {
-      return new ContractDto(InternalCode.Internal_Server);
+      return new Contract(InternalCode.Internal_Server);
     }
   }
 
@@ -413,6 +413,19 @@ export class PlayerQuizQueryRepository {
     return player ? player.userId : null;
   }
 
+  async getFinishTimeAndScore(id: string) {
+    const [player] = await this.dataSource.query(
+      `
+      select "finishAnswersDate", score
+      from player
+      where id = $1
+    `,
+      [id],
+    );
+
+    return player ? player : null;
+  }
+
   // question
   async getQuestion(
     gameId: string,
@@ -434,14 +447,23 @@ export class PlayerQuizQueryRepository {
     return question ? question : null;
   }
 
-  async getFiveQuestionsId() {
+  async getFiveQuestionsId(manager: EntityManager) {
     // достаем 5 случайнах вопросов
-    return this.dataSource.query(`
+
+    return manager.query(`
     select "id"
     from question
     order by random()
     limit 5
     offset random()
     `);
+
+    // return this.dataSource.query(`
+    // select "id"
+    // from question
+    // order by random()
+    // limit 5
+    // offset random()
+    // `);
   }
 }

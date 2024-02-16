@@ -5,7 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ContractDto } from './contract.dto';
+import { Contract } from './contract';
 
 export class ExceptionResponseHandler {
   private readonly typeExceptionMethod: ApproachType;
@@ -16,7 +16,7 @@ export class ExceptionResponseHandler {
     this.typeExceptionMethod = typeExceptionMethod;
   }
 
-  sendExceptionOrResponse(dto: ContractDto<any>) {
+  sendExceptionOrResponse(dto: Contract<any>) {
     if (dto.hasError()) {
       const ExceptionClass = this[this.typeExceptionMethod](
         this.typeExceptionMethod === ApproachType.tcp ? undefined : dto.code,

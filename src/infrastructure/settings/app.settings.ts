@@ -1,5 +1,6 @@
 import {
-  BadRequestException, DynamicModule,
+  BadRequestException,
+  DynamicModule,
   INestApplication,
   ValidationPipe,
 } from '@nestjs/common';
@@ -8,7 +9,7 @@ import { useContainer } from 'class-validator';
 import { HttpExceptionFilter } from '../exception-filters/exception.filter';
 
 export const appSettings = <T>(app: INestApplication, module: T) => {
-  useContainer(app.select(module as DynamicModule),  { fallbackOnErrors: true });
+  useContainer(app.select(module as DynamicModule), { fallbackOnErrors: true });
 
   // не получается перенести пайп в отдельный файл
   app.useGlobalPipes(

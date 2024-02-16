@@ -8,7 +8,7 @@ import {
 import { CreateAnswerDTO } from '../../api/models/dto/create.answer.dto';
 import { randomUUID } from 'crypto';
 import { DataSource } from 'typeorm';
-import { ContractDto } from '../../../../infrastructure/core/contract.dto';
+import { Contract } from '../../../../infrastructure/core/contract';
 import { Question } from '../../entity/question.entity';
 
 export class CreateAnswerCommand {
@@ -25,8 +25,9 @@ export class CreateAnswerUseCase
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
   ) {}
 
-  async execute(command: CreateAnswerCommand) {
+  async execute(command: CreateAnswerCommand): Promise<Contract<any>> {
     const { userId, answer } = command;
+    let answerResult;
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -37,30 +38,29 @@ export class CreateAnswerUseCase
       const currentGame = await this.playerQuizQueryRepository.getActiveGame(
         command.userId,
       );
-      if (!currentGame) return new ContractDto(InternalCode.Forbidden);
+      if (!currentGame.payload) return new Contract(InternalCode.Forbidden);
+
+      const gameId = currentGame.payload?.id;
 
       // достаем игроков по userId и gameId
       const currentPlayer =
-        await this.playerQuizQueryRepository.getCurrentPlayer(
-          userId,
-          currentGame.id,
-        );
+        await this.playerQuizQueryRepository.getCurrentPlayer(userId, gameId);
       const otherPlayer = await this.playerQuizQueryRepository.getOtherPlayer(
         userId,
-        currentGame.id,
+        gameId,
       );
 
       // если игрок ответил на все вопросы, возвращаем 403 - заменить 5 на количество вопросов?
       if (currentPlayer.answersCount >= 5)
-        return new ContractDto(InternalCode.Forbidden);
+        return new Contract(InternalCode.Forbidden);
 
       // достаем вопрос по gameId и порядковому номеру
       const question = await this.playerQuizQueryRepository.getQuestion(
-        currentGame.id,
+        gameId,
         currentPlayer.answersCount + 1,
       );
       // есди такого вопроса нет, значит они закончились
-      if (!question) return new ContractDto(InternalCode.Forbidden);
+      if (!question) return new Contract(InternalCode.Forbidden);
 
       // проверяем правильность ответа
       const answerStatus = this.getAnswerStatus(question, answer);
@@ -85,28 +85,17 @@ export class CreateAnswerUseCase
         currentPlayer.answersCount + 1 >= 5 &&
         otherPlayer.answersCount + 1 >= 5
       ) {
-        await this.playerQuizRepository.finishGame(currentGame.id);
+        await this.playerQuizRepository.finishGame(gameId);
 
         // достаем игроков, чтоб сравнить их время завершение игры
-        const current = await this.playerQuizQueryRepository.getCurrentPlayer(
-          userId,
-          currentGame.id,
-        );
-        const other = await this.playerQuizQueryRepository.getOtherPlayer(
-          userId,
-          currentGame.id,
-        );
-
-        console.log(
-          { current: current.finishAnswersDate },
-          { other: other.finishAnswersDate },
-        );
-        console.log({
-          c_menishe_o: current.finishAnswersDate < other.finishAnswersDate,
-        });
-        console.log({
-          c_bolshe_o: current.finishAnswersDate > other.finishAnswersDate,
-        });
+        const current =
+          await this.playerQuizQueryRepository.getFinishTimeAndScore(
+            currentPlayer.id,
+          );
+        const other =
+          await this.playerQuizQueryRepository.getFinishTimeAndScore(
+            otherPlayer.id,
+          );
 
         // если игрок ответил первым, и у него есть хотя бы 1 верный ответ, добавляем ему балл
         if (
@@ -126,26 +115,25 @@ export class CreateAnswerUseCase
       // возвращаем ответ
       const dto: CreateAnswerDTO = {
         id: randomUUID(),
-        answer: answer,
+        answer,
         answerStatus,
-        addedAt: new Date(),
         questionId: question.id,
         playerId: currentPlayer.id,
       };
-      const answerResult = await this.playerQuizRepository.createAnswer(dto);
+      answerResult = await this.playerQuizRepository.createAnswer(dto);
 
       await queryRunner.commitTransaction();
-
-      if (answerResult.hasError())
-        return new ContractDto(InternalCode.Internal_Server);
-
-      return new ContractDto(InternalCode.Success, answerResult.payload);
     } catch (e) {
       console.log({ create_ans_error: e });
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
     }
+
+    if (answerResult.hasError())
+      return new Contract(InternalCode.Internal_Server);
+
+    return new Contract(InternalCode.Success, answerResult.payload);
   }
 
   getAnswerStatus(question: Question, answer: string): AnswerStatus {
