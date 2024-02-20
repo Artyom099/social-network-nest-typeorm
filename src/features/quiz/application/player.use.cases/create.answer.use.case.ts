@@ -33,21 +33,31 @@ export class CreateAnswerUseCase
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    const manager = queryRunner.manager;
+
     try {
       // достаем игру по userId
       const currentGame = await this.playerQuizQueryRepository.getActiveGame(
         command.userId,
+        manager,
       );
-      if (!currentGame.payload) return new Contract(InternalCode.Forbidden);
+      if (currentGame.hasError() || !currentGame.payload)
+        return new Contract(InternalCode.Forbidden);
 
       const gameId = currentGame.payload?.id;
 
       // достаем игроков по userId и gameId
       const currentPlayer =
-        await this.playerQuizQueryRepository.getCurrentPlayer(userId, gameId);
+        await this.playerQuizQueryRepository.getCurrentPlayer(
+          userId,
+          gameId,
+          manager,
+        );
+
       const otherPlayer = await this.playerQuizQueryRepository.getOtherPlayer(
         userId,
         gameId,
+        manager,
       );
 
       // если игрок ответил на все вопросы, возвращаем 403 - заменить 5 на количество вопросов?
@@ -58,6 +68,7 @@ export class CreateAnswerUseCase
       const question = await this.playerQuizQueryRepository.getQuestion(
         gameId,
         currentPlayer.answersCount + 1,
+        manager,
       );
       // есди такого вопроса нет, значит они закончились
       if (!question) return new Contract(InternalCode.Forbidden);
@@ -67,16 +78,23 @@ export class CreateAnswerUseCase
 
       // если ответ верный, добавляем игроку балл
       if (answerStatus === AnswerStatus.correct) {
-        await this.playerQuizRepository.increaseScore(currentPlayer.id);
+        await this.playerQuizRepository.increaseScore(
+          currentPlayer.id,
+          manager,
+        );
       }
 
       // увеличиваем игроку количество ответов
-      await this.playerQuizRepository.increaseAnswersCount(currentPlayer.id);
+      await this.playerQuizRepository.increaseAnswersCount(
+        currentPlayer.id,
+        manager,
+      );
 
       // если этот вопрос был последним, ставим игроку finishAnswersDate
       if (currentPlayer.answersCount + 1 >= 5) {
         await this.playerQuizRepository.updateFinishAnswersDate(
           currentPlayer.id,
+          manager,
         );
       }
 
@@ -85,16 +103,18 @@ export class CreateAnswerUseCase
         currentPlayer.answersCount + 1 >= 5 &&
         otherPlayer.answersCount + 1 >= 5
       ) {
-        await this.playerQuizRepository.finishGame(gameId);
+        await this.playerQuizRepository.finishGame(gameId, manager);
 
         // достаем игроков, чтоб сравнить их время завершение игры
         const current =
           await this.playerQuizQueryRepository.getFinishTimeAndScore(
             currentPlayer.id,
+            manager,
           );
         const other =
           await this.playerQuizQueryRepository.getFinishTimeAndScore(
             otherPlayer.id,
+            manager,
           );
 
         // если игрок ответил первым, и у него есть хотя бы 1 верный ответ, добавляем ему балл
@@ -102,13 +122,19 @@ export class CreateAnswerUseCase
           current.finishAnswersDate < other.finishAnswersDate &&
           current.score > 0
         ) {
-          await this.playerQuizRepository.increaseScore(currentPlayer.id);
+          await this.playerQuizRepository.increaseScore(
+            currentPlayer.id,
+            manager,
+          );
         }
         if (
           current.finishAnswersDate > other.finishAnswersDate &&
           other.score > 0
         ) {
-          await this.playerQuizRepository.increaseScore(otherPlayer.id);
+          await this.playerQuizRepository.increaseScore(
+            otherPlayer.id,
+            manager,
+          );
         }
       }
 
@@ -120,7 +146,7 @@ export class CreateAnswerUseCase
         questionId: question.id,
         playerId: currentPlayer.id,
       };
-      answerResult = await this.playerQuizRepository.createAnswer(dto);
+      answerResult = await this.playerQuizRepository.createAnswer(dto, manager);
 
       await queryRunner.commitTransaction();
     } catch (e) {

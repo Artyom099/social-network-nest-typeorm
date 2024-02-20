@@ -29,34 +29,22 @@ export class UsersQueryRepository {
     return user ? user : null;
   }
 
-  // todo создать все методы, используемые в транзакции и ентити менеджером
   async getUserForQuiz(
     id: string,
     manager: EntityManager,
   ): Promise<Contract<string | null>> {
-    const user = await manager
-      .createQueryBuilder()
-      .where('user.id = :id', { id: id })
-      .getOne();
-
-    // const user2 = await this.dataSource
-    //   .getRepository(Users)
-    //   .createQueryBuilder('user')
-    //   .where('user.id = :id', { id: id })
-    //   .getOne();
-
-    // console.log({ repo_user: user });
-    console.log({ repo_login: user?.login });
+    const user = await manager.findOneBy(Users, { id });
 
     if (!user)
       return new Contract(
         InternalCode.NotFound,
-        user,
+        null,
         'user & userLogin not found',
       );
 
     return new Contract(InternalCode.Success, user.login);
   }
+
   async getUserById2(id: string): Promise<UserViewModel | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')

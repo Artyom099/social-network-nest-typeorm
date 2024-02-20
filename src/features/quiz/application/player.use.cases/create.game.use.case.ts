@@ -14,8 +14,6 @@ import { AddPlayerToGameDto } from '../../api/models/dto/add.player.to.game.dto'
 import { DataSource } from 'typeorm';
 import { Contract } from '../../../../infrastructure/core/contract';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Users } from '../../../users/entity/user.entity';
-import { Player } from '../../entity/player.entity';
 
 export class CreateGameCommand {
   constructor(public userId: string) {}
@@ -34,31 +32,16 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     const { userId } = command;
     let newGame;
 
-    // достаем логин текущего юзера
-    // логин достается как null во время транзакции, тк создается какой-то отдельный экземпляр репозитория
-    // const user = await this.usersQueryRepository.getUserForQuiz(userId);
-    // if (user.hasError())
-    //   return new Contract(InternalCode.NotFound, null, 'user not found');
-
-    // при создании игрока база пишет, что userId не существует в этот момент в таблице!
-    // возможно надо как-то иначе организовать старт и окончание транзакции
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     const manager = queryRunner.manager;
 
-    // const user = await this.usersQueryRepository.getUserForQuiz(
-    //   userId,
-    //   manager,
-    // );
-    // if (user.hasError())
-    //   return new Contract(InternalCode.NotFound, null, 'user not found');
-
     try {
       const activeGame = await this.playerQuizQueryRepository.getActiveGame(
         userId,
+        manager,
       );
 
       // если у юзера есть активная игра, то он не может подключиться к еще одной игре
@@ -67,23 +50,26 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
       }
 
       // смотрим, ждет ли кто-то пару
-      const pendingGame = await this.playerQuizQueryRepository.getPendingGame();
+      const pendingGame = await this.playerQuizQueryRepository.getPendingGame(
+        manager,
+      );
 
       // достаем логин текущего юзера
-      const user = await manager.findOneBy(Users, { id: userId });
-      if (!user)
-        return new Contract(InternalCode.NotFound, null, 'user2 not found');
-      console.log({ user2: user });
+      const login = await this.usersQueryRepository.getUserForQuiz(
+        userId,
+        manager,
+      );
+      if (login.hasError() || !login.payload)
+        return new Contract(InternalCode.NotFound, null, 'user not found');
 
       // создаем игрока
       const playerDTO: CreatePlayerDTO = {
         id: randomUUID(),
         userId,
-        login: user.login,
+        login: login.payload,
         gameId: pendingGame.payload ? pendingGame.payload.id : 'mock',
       };
-      // await this.playerQuizRepository.createPlayer(playerDTO);
-      manager.create(Player, playerDTO);
+      await this.playerQuizRepository.createPlayer(playerDTO, manager);
 
       // если кто-то ждет пару, то
       if (pendingGame.code === InternalCode.Success && pendingGame.payload) {
@@ -95,15 +81,17 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           gameId: pendingGame.payload.id,
           questionsId: questionsId.map((q) => q.id),
         };
-
-        await this.playerQuizRepository.crateFiveGameQuestions(questionsDto);
+        await this.playerQuizRepository.crateFiveGameQuestions(
+          questionsDto,
+          manager,
+        );
 
         // добавляем игрока в эту пару и начинаем игру
         const dto: AddPlayerToGameDto = {
           id: pendingGame.payload.id,
           secondPlayerId: playerDTO.id,
         };
-        newGame = await this.playerQuizRepository.addPlayerToGame(dto);
+        newGame = await this.playerQuizRepository.addPlayerToGame(dto, manager);
       }
 
       // если никто не ждет пару
@@ -118,10 +106,10 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         await this.playerQuizRepository.updatePlayersGameId(
           playerDTO.id,
           dto.id,
+          manager,
         );
 
         newGame = await this.playerQuizRepository.createGame(dto, manager);
-        // newGame = manager.create(Game, dto);
       }
 
       await queryRunner.commitTransaction();

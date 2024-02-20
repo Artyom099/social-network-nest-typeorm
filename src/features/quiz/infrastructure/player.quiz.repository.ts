@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, EntityManager, UpdateResult } from 'typeorm';
+import { DataSource, EntityManager, InsertResult, UpdateResult } from 'typeorm';
 import { Game } from '../entity/game.entity';
 import { GameStatus, InternalCode } from '../../../infrastructure/utils/enums';
 import { CreateGameDto } from '../api/models/dto/create.game.dto';
@@ -13,6 +13,7 @@ import { CreatePlayerDTO } from '../api/models/dto/create.player.dto';
 import { AddQuestionsToGameDto } from '../api/models/dto/add.questions.to.game.dto';
 import { AddPlayerToGameDto } from '../api/models/dto/add.player.to.game.dto';
 import { Contract } from '../../../infrastructure/core/contract';
+import { GameQuestion } from '../entity/game.question.entity';
 
 @Injectable()
 export class PlayerQuizRepository {
@@ -21,22 +22,10 @@ export class PlayerQuizRepository {
   // game
   async createGame(
     dto: CreateGameDto,
-    manager?: EntityManager,
+    manager: EntityManager,
   ): Promise<Contract<GameViewModel>> {
-    // await this.dataSource
-    //   .createQueryBuilder()
-    //   .insert()
-    //   .into(Game)
-    //   .values({
-    //     id: dto.id,
-    //     status: dto.status,
-    //     pairCreatedDate: dto.pairCreatedDate,
-    //     firstPlayerId: dto.firstPlayerId,
-    //   })
-    //   .execute();
-
     await manager
-      ?.createQueryBuilder()
+      .createQueryBuilder()
       .insert()
       .into(Game)
       .values({
@@ -47,7 +36,7 @@ export class PlayerQuizRepository {
       })
       .execute();
 
-    const [game] = await this.dataSource.query(
+    const [game] = await manager.query(
       `
     select *
     from game g
@@ -56,7 +45,7 @@ export class PlayerQuizRepository {
       [dto.id],
     );
 
-    const [player] = await this.dataSource.query(
+    const [player] = await manager.query(
       `
     select *
     from player pl
@@ -87,8 +76,8 @@ export class PlayerQuizRepository {
     });
   }
 
-  async finishGame(id: string): Promise<UpdateResult> {
-    return this.dataSource
+  async finishGame(id: string, manager: EntityManager): Promise<UpdateResult> {
+    return manager
       .createQueryBuilder()
       .update(Game)
       .set({ status: GameStatus.finished, finishGameDate: new Date() })
@@ -98,8 +87,9 @@ export class PlayerQuizRepository {
 
   async addPlayerToGame(
     dto: AddPlayerToGameDto,
+    manager: EntityManager,
   ): Promise<Contract<GameViewModel>> {
-    await this.dataSource
+    await manager
       .createQueryBuilder()
       .update(Game)
       .set({
@@ -110,7 +100,7 @@ export class PlayerQuizRepository {
       .where('id = :id', { id: dto.id })
       .execute();
 
-    const [game] = await this.dataSource.query(
+    const [game] = await manager.query(
       `
     select *,
     
@@ -157,8 +147,11 @@ export class PlayerQuizRepository {
   }
 
   // player
-  async createPlayer(dto: CreatePlayerDTO): Promise<void> {
-    await this.dataSource
+  async createPlayer(
+    dto: CreatePlayerDTO,
+    manager: EntityManager,
+  ): Promise<InsertResult> {
+    return manager
       .createQueryBuilder()
       .insert()
       .into(Player)
@@ -171,8 +164,12 @@ export class PlayerQuizRepository {
       .execute();
   }
 
-  async updatePlayersGameId(id: string, gameId: string): Promise<UpdateResult> {
-    return this.dataSource
+  async updatePlayersGameId(
+    id: string,
+    gameId: string,
+    manager: EntityManager,
+  ): Promise<UpdateResult> {
+    return manager
       .createQueryBuilder()
       .update(Player)
       .set({ gameId: gameId })
@@ -180,8 +177,11 @@ export class PlayerQuizRepository {
       .execute();
   }
 
-  async updateFinishAnswersDate(id: string): Promise<UpdateResult> {
-    return this.dataSource
+  async updateFinishAnswersDate(
+    id: string,
+    manager: EntityManager,
+  ): Promise<UpdateResult> {
+    return manager
       .createQueryBuilder()
       .update(Player)
       .set({ finishAnswersDate: new Date() })
@@ -189,8 +189,11 @@ export class PlayerQuizRepository {
       .execute();
   }
 
-  async increaseScore(id: string): Promise<UpdateResult> {
-    return this.dataSource
+  async increaseScore(
+    id: string,
+    manager: EntityManager,
+  ): Promise<UpdateResult> {
+    return manager
       .createQueryBuilder()
       .update(Player)
       .set({ score: () => 'score + 1' })
@@ -198,8 +201,11 @@ export class PlayerQuizRepository {
       .execute();
   }
 
-  async increaseAnswersCount(id: string): Promise<UpdateResult> {
-    return this.dataSource
+  async increaseAnswersCount(
+    id: string,
+    manager: EntityManager,
+  ): Promise<UpdateResult> {
+    return manager
       .createQueryBuilder()
       .update(Player)
       .set({ answersCount: () => 'answersCount + 1' })
@@ -208,8 +214,11 @@ export class PlayerQuizRepository {
   }
 
   // answer
-  async createAnswer(dto: CreateAnswerDTO): Promise<Contract<AnswerViewModel>> {
-    await this.dataSource
+  async createAnswer(
+    dto: CreateAnswerDTO,
+    manager: EntityManager,
+  ): Promise<Contract<AnswerViewModel>> {
+    await manager
       .createQueryBuilder()
       .insert()
       .into(Answer)
@@ -222,7 +231,7 @@ export class PlayerQuizRepository {
       })
       .execute();
 
-    const [answer] = await this.dataSource.query(
+    const [answer] = await manager.query(
       `
       select *
       from answer
@@ -241,25 +250,25 @@ export class PlayerQuizRepository {
   }
 
   // game_question
-  async crateFiveGameQuestions(dto: AddQuestionsToGameDto): Promise<void> {
-    return this.dataSource.query(
-      `
-    insert into game_question
-    ("gameId", "questionId", "questionNumber") values
-    ($1, $2, 1),
-    ($1, $3, 2),
-    ($1, $4, 3),
-    ($1, $5, 4),
-    ($1, $6, 5);
-    `,
-      [
-        dto.gameId,
-        dto.questionsId[0],
-        dto.questionsId[1],
-        dto.questionsId[2],
-        dto.questionsId[3],
-        dto.questionsId[4],
-      ],
-    );
+  async crateFiveGameQuestions(
+    dto: AddQuestionsToGameDto,
+    manager: EntityManager,
+  ): Promise<void> {
+    let questionNumber = 1;
+
+    for (const questionId of dto.questionsId) {
+      await manager
+        .createQueryBuilder()
+        .insert()
+        .into(GameQuestion)
+        .values({
+          gameId: dto.gameId,
+          questionId: questionId,
+          questionNumber: questionNumber,
+        })
+        .execute();
+
+      questionNumber++;
+    }
   }
 }

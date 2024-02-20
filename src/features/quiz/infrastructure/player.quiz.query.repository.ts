@@ -12,15 +12,10 @@ export class PlayerQuizQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   // game
-  async getPendingGame(): Promise<Contract<Game | null>> {
-    const [game] = await this.dataSource.query(
-      `
-    select *
-    from game
-    where "status" = $1
-    `,
-      [GameStatus.pending],
-    );
+  async getPendingGame(manager: EntityManager): Promise<Contract<Game | null>> {
+    const game = await manager.findOneBy(Game, {
+      status: GameStatus.pending,
+    });
 
     if (!game)
       return new Contract(
@@ -147,8 +142,11 @@ export class PlayerQuizQueryRepository {
       : null;
   }
 
-  async getActiveGame(userId: string): Promise<Contract<GameViewModel | null>> {
-    const [playerId] = await this.dataSource.query(
+  async getActiveGame(
+    userId: string,
+    manager: EntityManager,
+  ): Promise<Contract<GameViewModel | null>> {
+    const [playerId] = await manager.query(
       `
     select p.id
     from player p 
@@ -161,7 +159,7 @@ export class PlayerQuizQueryRepository {
     if (!playerId)
       return new Contract(InternalCode.NotFound, null, 'playerId not found');
 
-    const [game] = await this.dataSource.query(
+    const [game] = await manager.query(
       `
     select *,
 
@@ -190,7 +188,7 @@ export class PlayerQuizQueryRepository {
     if (!game)
       return new Contract(InternalCode.NotFound, null, 'game not found');
 
-    const questions = await this.dataSource.query(
+    const questions = await manager.query(
       `
     select q."id", q."body"
     from game_question gq
@@ -202,7 +200,7 @@ export class PlayerQuizQueryRepository {
       [game.id],
     );
 
-    const firstPlayerAnswers = await this.dataSource.query(
+    const firstPlayerAnswers = await manager.query(
       `
     select "questionId", "answerStatus", "addedAt"
     from answer
@@ -210,7 +208,7 @@ export class PlayerQuizQueryRepository {
     `,
       [game.firstPlayerId],
     );
-    const secondPlayerAnswers = await this.dataSource.query(
+    const secondPlayerAnswers = await manager.query(
       `
     select "questionId", "answerStatus", "addedAt"
     from answer
@@ -374,8 +372,12 @@ export class PlayerQuizQueryRepository {
   }
 
   // player
-  async getCurrentPlayer(userId: string, gameId: string) {
-    const [player] = await this.dataSource.query(
+  async getCurrentPlayer(
+    userId: string,
+    gameId: string,
+    manager: EntityManager,
+  ) {
+    const [player] = await manager.query(
       `
     select *
     from player
@@ -387,8 +389,8 @@ export class PlayerQuizQueryRepository {
     return player ? player : null;
   }
 
-  async getOtherPlayer(userId: string, gameId: string) {
-    const [player] = await this.dataSource.query(
+  async getOtherPlayer(userId: string, gameId: string, manager: EntityManager) {
+    const [player] = await manager.query(
       `
     select *
     from player
@@ -413,8 +415,8 @@ export class PlayerQuizQueryRepository {
     return player ? player.userId : null;
   }
 
-  async getFinishTimeAndScore(id: string) {
-    const [player] = await this.dataSource.query(
+  async getFinishTimeAndScore(id: string, manager: EntityManager) {
+    const [player] = await manager.query(
       `
       select "finishAnswersDate", score
       from player
@@ -430,10 +432,11 @@ export class PlayerQuizQueryRepository {
   async getQuestion(
     gameId: string,
     questionNumber: number,
+    manager: EntityManager,
   ): Promise<Question | null> {
     // достаем вопрос по айди игры и номеру вопроса
 
-    const [question] = await this.dataSource.query(
+    const [question] = await manager.query(
       `
     select *
     from question q
