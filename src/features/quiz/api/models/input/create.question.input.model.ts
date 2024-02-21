@@ -1,5 +1,5 @@
-import {IsArray, IsNotEmpty, IsString, Length} from 'class-validator';
-import {Transform} from 'class-transformer';
+import { IsArray, IsNotEmpty, IsString, Length } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateQuestionInputModel {
   @IsString()

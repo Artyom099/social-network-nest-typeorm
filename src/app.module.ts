@@ -90,6 +90,7 @@ import { UpdateQuestionUseCase } from './features/quiz/application/sa.use.cases/
 import { DeleteQuestionUseCase } from './features/quiz/application/sa.use.cases/delete.question.use.case';
 import { PublishQuestionUseCase } from './features/quiz/application/sa.use.cases/publish.question.use.case';
 import { GameQuestion } from './features/quiz/entity/game.question.entity';
+import { GameRepository } from './features/quiz/infrastructure/game.repository';
 
 const entities = [
   Users,
@@ -147,6 +148,7 @@ const repositories = [
   SAQuizQueryRepository,
   PlayerQuizRepository,
   PlayerQuizQueryRepository,
+  GameRepository,
 
   UsersRepository,
   UsersQueryRepository,

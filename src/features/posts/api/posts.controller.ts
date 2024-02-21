@@ -13,20 +13,20 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {PostsService} from '../application/posts.service';
-import {DefaultPaginationInput} from '../../../infrastructure/models/pagination.input.models';
-import {PostsQueryRepository} from '../infrastructure/posts.query.repository';
-import {CommentsQueryRepository} from '../../comments/infrastructure/comments.query.repository';
-import {BearerAuthGuard} from '../../../infrastructure/guards/bearer-auth.guard';
-import {CommentInputModel} from '../../comments/api/models/input/comment.input.model';
-import {CheckUserIdGuard} from '../../../infrastructure/guards/check-userId.guard';
-import {UsersQueryRepository} from '../../users/infrastructure/users.query.repository';
-import {CommandBus} from '@nestjs/cqrs';
-import {CreateCommentCommand} from '../../comments/application/use.cases/create.comment.use.case';
-import {LikeStatusInputModel} from '../../comments/api/models/input/like.status.input.model';
-import {BlogsQueryRepository} from '../../blogs/infrastructure/blogs.query.repository';
-import {BannedUsersForBlogQueryRepository} from '../../users/infrastructure/banned.users.for.blog.query.repository';
-import {CreateCommentDto} from '../../comments/api/models/dto/create.comment.dto';
+import { PostsService } from '../application/posts.service';
+import { DefaultPaginationInput } from '../../../infrastructure/models/pagination.input.models';
+import { PostsQueryRepository } from '../infrastructure/posts.query.repository';
+import { CommentsQueryRepository } from '../../comments/infrastructure/comments.query.repository';
+import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
+import { CommentInputModel } from '../../comments/api/models/input/comment.input.model';
+import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
+import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateCommentCommand } from '../../comments/application/use.cases/create.comment.use.case';
+import { LikeStatusInputModel } from '../../comments/api/models/input/like.status.input.model';
+import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';
+import { BannedUsersForBlogQueryRepository } from '../../users/infrastructure/banned.users.for.blog.query.repository';
+import { CreateCommentDto } from '../../comments/api/models/dto/create.comment.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -95,7 +95,10 @@ export class PostsController {
     if (!post || !user) throw new NotFoundException('user or post not found');
 
     const isUserBannedForBlog =
-      await this.bannedUsersForBlogQueryRepository.getBannedUserForBlog(user.id, post.blogId);
+      await this.bannedUsersForBlogQueryRepository.getBannedUserForBlog(
+        user.id,
+        post.blogId,
+      );
     if (isUserBannedForBlog) {
       throw new ForbiddenException();
     } else {

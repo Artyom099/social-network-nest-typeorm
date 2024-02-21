@@ -5,7 +5,6 @@ import { appSettings } from '../src/infrastructure/settings/app.settings';
 import request from 'supertest';
 import { getRefreshTokenByResponse } from '../src/infrastructure/utils/helpers';
 import { AnswerStatus, GameStatus } from '../src/infrastructure/utils/enums';
-import { DataSource } from 'typeorm';
 
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
@@ -13,7 +12,7 @@ const sleep = (seconds: number) =>
 describe('QuizController (e2e)', () => {
   let app: INestApplication;
   let server: any;
-  let manager: any;
+  // let manager: any;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -27,8 +26,8 @@ describe('QuizController (e2e)', () => {
 
     await request(server).delete('/testing/all-data');
 
-    const dataSource = await moduleFixture.resolve(DataSource);
-    manager = dataSource.manager;
+    // const dataSource = await moduleFixture.resolve(DataSource);
+    // manager = dataSource.manager;
     // await manager.query(`SELECT truncate_tables('postgres');`)
     // const queryRunner = dataSource.manager.connection.createQueryRunner()
     // await queryRunner.dropSchema('public', true, true);
@@ -304,7 +303,7 @@ describe('QuizController (e2e)', () => {
 
     expect.setState({ Q6, Q5, Q4, Q3, Q2, Q1 });
   });
-  it('7 – PUT:sa/quiz/questions/:id – 204 & publish 6 questions', async () => {
+  it('7 – PUT:sa/quiz/questions/:id/publish – 204 & publish 6 questions', async () => {
     const { Q6, Q5, Q4, Q3, Q2, Q1 } = expect.getState();
 
     const createResponse1 = await request(server)
@@ -615,6 +614,19 @@ describe('QuizController (e2e)', () => {
       startGameDate: null,
       finishGameDate: null,
     });
+  });
+
+  // 1й игрок не может отвечать, пока не подключиться 2й
+  it('12 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st pl cannot answer before start the game', async () => {
+    const { firstAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
   });
 
   // 2й игрок подключается к 1й игре
@@ -1037,7 +1049,31 @@ describe('QuizController (e2e)', () => {
     expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
   });
 
-  it('29 – GET:pair-game-quiz/pairs/my-current – 200 - 1st player get his current game', async () => {
+  // игра уже завершилась
+  it('29 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st pl, 6th question, correct ans, score1 = 4', async () => {
+    const { firstAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(firstAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+  it('28 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 2nd pl, 6th question, correct ans, score2 = 4', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const sendAnswer = await request(server)
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .auth(secondAccessToken.accessToken, { type: 'bearer' })
+      .send({ answer: 'ans2' });
+
+    expect(sendAnswer).toBeDefined();
+    expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+
+  it('29 – GET:pair-game-quiz/pairs/my-current – 404 - 1st player have no current game', async () => {
     const { firstAccessToken } = expect.getState();
 
     const getResponse = await request(server)

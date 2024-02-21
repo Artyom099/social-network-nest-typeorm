@@ -8,20 +8,21 @@ import {
   NotFoundException,
   Param,
   Post,
-  Put, Query,
-  UseGuards
+  Put,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import {BasicAuthGuard} from '../../../../infrastructure/guards/basic-auth.guard';
-import {CommandBus} from '@nestjs/cqrs';
-import {GamePairPaginationInput} from '../../../../infrastructure/models/pagination.input.models';
-import {SAQuizQueryRepository} from '../../infrastructure/sa.quiz.query.repository';
-import {CreateQuestionInputModel} from '../models/input/create.question.input.model';
-import {PublishQuestionInputModel} from '../models/input/publish.question.input.model';
-import {PublishQuestionCommand} from '../../application/sa.use.cases/publish.question.use.case';
-import {UpdateQuestionCommand} from '../../application/sa.use.cases/update.question.use.case';
-import {DeleteQuestionCommand} from '../../application/sa.use.cases/delete.question.use.case';
-import {CreateQuestionCommand} from '../../application/sa.use.cases/create.question.use.case';
-import {QuestionIdInputModel} from '../models/input/question.id.input.model';
+import { BasicAuthGuard } from '../../../../infrastructure/guards/basic-auth.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { GamePairPaginationInput } from '../../../../infrastructure/models/pagination.input.models';
+import { SAQuizQueryRepository } from '../../infrastructure/sa.quiz.query.repository';
+import { CreateQuestionInputModel } from '../models/input/create.question.input.model';
+import { PublishQuestionInputModel } from '../models/input/publish.question.input.model';
+import { PublishQuestionCommand } from '../../application/sa.use.cases/publish.question.use.case';
+import { UpdateQuestionCommand } from '../../application/sa.use.cases/update.question.use.case';
+import { DeleteQuestionCommand } from '../../application/sa.use.cases/delete.question.use.case';
+import { CreateQuestionCommand } from '../../application/sa.use.cases/create.question.use.case';
+import { QuestionIdInputModel } from '../models/input/question.id.input.model';
 
 @Controller('sa/quiz/questions')
 @UseGuards(BasicAuthGuard)
@@ -74,11 +75,15 @@ export class SAQuizController {
     @Param() param: QuestionIdInputModel,
     @Body() inputModel: PublishQuestionInputModel,
   ) {
-    const question = await this.saQuizQueryRepository.getQuestion(param.questionId);
+    const question = await this.saQuizQueryRepository.getQuestion(
+      param.questionId,
+    );
     if (!question) {
       throw new NotFoundException();
     } else {
-      return this.commandBus.execute(new PublishQuestionCommand(param.questionId, inputModel));
+      return this.commandBus.execute(
+        new PublishQuestionCommand(param.questionId, inputModel),
+      );
     }
   }
 }

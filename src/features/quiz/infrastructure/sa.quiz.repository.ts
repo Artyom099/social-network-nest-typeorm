@@ -1,9 +1,9 @@
-import {Injectable} from '@nestjs/common';
-import {InjectDataSource} from '@nestjs/typeorm';
-import {DataSource} from 'typeorm';
-import {Question} from '../entity/question.entity';
-import {CreateQuestionInputModel} from '../api/models/input/create.question.input.model';
-import {CreateQuestionDTO} from '../api/models/dto/create.question.dto';
+import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { Question } from '../entity/question.entity';
+import { CreateQuestionInputModel } from '../api/models/input/create.question.input.model';
+import { CreateQuestionDTO } from '../api/models/dto/create.question.dto';
 
 @Injectable()
 export class SAQuizRepository {
@@ -21,30 +21,37 @@ export class SAQuizRepository {
         published: dto.published,
         createdAt: dto.createdAt,
       })
-      .execute()
+      .execute();
   }
+
   async deleteQuestion(id: string) {
     return this.dataSource
       .createQueryBuilder()
       .delete()
       .from(Question)
-      .where("id = :id", { id })
-      .execute()
+      .where('id = :id', { id })
+      .execute();
   }
+
   async updateQuestion(id: string, dto: CreateQuestionInputModel) {
     return this.dataSource
       .createQueryBuilder()
       .update(Question)
-      .set({ body: dto.body, correctAnswers: dto.correctAnswers, updatedAt: new Date()})
-      .where("id = :id", { id })
-      .execute()
+      .set({
+        body: dto.body,
+        correctAnswers: dto.correctAnswers,
+        updatedAt: new Date(),
+      })
+      .where('id = :id', { id })
+      .execute();
   }
+
   async publishQuestion(id: string, published: boolean) {
     return this.dataSource
       .createQueryBuilder()
       .update(Question)
-      .set({ published: published, updatedAt: new Date() })
-      .where("id = :id", { id })
-      .execute()
+      .set({ published, updatedAt: new Date() })
+      .where('id = :id', { id })
+      .execute();
   }
 }

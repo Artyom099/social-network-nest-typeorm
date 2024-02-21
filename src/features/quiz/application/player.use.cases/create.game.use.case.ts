@@ -14,6 +14,7 @@ import { AddPlayerToGameDto } from '../../api/models/dto/add.player.to.game.dto'
 import { DataSource } from 'typeorm';
 import { Contract } from '../../../../infrastructure/core/contract';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { GameRepository } from '../../infrastructure/game.repository';
 
 export class CreateGameCommand {
   constructor(public userId: string) {}
@@ -26,6 +27,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     private usersQueryRepository: UsersQueryRepository,
     private playerQuizRepository: PlayerQuizRepository,
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
+    private gameRepository: GameRepository,
   ) {}
 
   async execute(command: CreateGameCommand): Promise<Contract<any>> {
@@ -102,7 +104,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           id: pendingGame.payload.id,
           secondPlayerId: playerDTO.id,
         };
-        newGame = await this.playerQuizRepository.addPlayerToGame(dto, manager);
+        newGame = await this.gameRepository.addPlayerToGame(dto, manager);
       }
 
       // если никто не ждет пару, то
@@ -120,7 +122,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           manager,
         );
 
-        newGame = await this.playerQuizRepository.createGame(dto, manager);
+        newGame = await this.gameRepository.createGame(dto, manager);
       }
 
       await queryRunner.commitTransaction();
@@ -131,7 +133,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
       await queryRunner.release();
     }
 
-    console.log({ newGame: newGame });
+    // console.log({ newGame: newGame });
     if (!newGame)
       return new Contract(InternalCode.Internal_Server, null, 'i dont know');
 

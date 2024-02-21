@@ -1,7 +1,6 @@
-import {PublishQuestionInputModel} from '../../api/models/input/publish.question.input.model';
-import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {SAQuizRepository} from '../../infrastructure/sa.quiz.repository';
-import {CreateQuestionInputModel} from '../../api/models/input/create.question.input.model';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { SAQuizRepository } from '../../infrastructure/sa.quiz.repository';
+import { CreateQuestionInputModel } from '../../api/models/input/create.question.input.model';
 
 export class UpdateQuestionCommand {
   constructor(
@@ -11,10 +10,13 @@ export class UpdateQuestionCommand {
 }
 
 @CommandHandler(UpdateQuestionCommand)
-export class UpdateQuestionUseCase implements ICommandHandler<UpdateQuestionCommand> {
+export class UpdateQuestionUseCase
+  implements ICommandHandler<UpdateQuestionCommand>
+{
   constructor(private saQuizRepository: SAQuizRepository) {}
 
   async execute(command: UpdateQuestionCommand) {
-    return this.saQuizRepository.updateQuestion(command.questionId, command.inputModel)
+    const { questionId, inputModel } = command;
+    return this.saQuizRepository.updateQuestion(questionId, inputModel);
   }
 }

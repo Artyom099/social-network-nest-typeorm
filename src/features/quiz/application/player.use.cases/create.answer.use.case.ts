@@ -10,6 +10,7 @@ import { randomUUID } from 'crypto';
 import { DataSource } from 'typeorm';
 import { Contract } from '../../../../infrastructure/core/contract';
 import { Question } from '../../entity/question.entity';
+import { GameRepository } from '../../infrastructure/game.repository';
 
 export class CreateAnswerCommand {
   constructor(public userId: string, public answer: string) {}
@@ -23,6 +24,7 @@ export class CreateAnswerUseCase
     private dataSource: DataSource,
     private playerQuizRepository: PlayerQuizRepository,
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
+    private gameRepository: GameRepository,
   ) {}
 
   async execute(command: CreateAnswerCommand): Promise<Contract<any>> {
@@ -113,7 +115,7 @@ export class CreateAnswerUseCase
         currentPlayer.answersCount + 1 >= 5 &&
         otherPlayer.answersCount + 1 >= 5
       ) {
-        await this.playerQuizRepository.finishGame(gameId, manager);
+        await this.gameRepository.finishGame(gameId, manager);
 
         // достаем игроков, чтоб сравнить их время завершение игры
         const current =

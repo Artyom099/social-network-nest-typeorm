@@ -47,7 +47,7 @@ export class PlayerQuizController extends ExceptionResponseHandler {
   @HttpCode(HttpStatus.OK)
   async getGame(
     @CurrentUserId() userId: string,
-    @Param('gameId') param: GameIdInputModel,
+    @Param() param: GameIdInputModel,
   ) {
     const game = await this.playerQuizQueryRepository.getGameById(param.gameId);
     if (!game) throw new NotFoundException();
