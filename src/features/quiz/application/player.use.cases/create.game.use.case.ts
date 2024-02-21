@@ -73,6 +73,17 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
 
       // если кто-то ждет пару, то
       if (pendingGame.code === InternalCode.Success && pendingGame.payload) {
+        // достаем всех игроков юэера
+        const playerIds = await this.playerQuizQueryRepository.getPlayerIds(
+          userId,
+          manager,
+        );
+
+        // если пару ждет юзер, который ее же создал - 403
+        if (playerIds.includes(pendingGame.payload?.firstPlayerId)) {
+          return new Contract(InternalCode.Forbidden);
+        }
+
         // добавляем 5 рандомных вопросов в игру
         const questionsId =
           await this.playerQuizQueryRepository.getFiveQuestionsId(manager);
@@ -81,7 +92,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           gameId: pendingGame.payload.id,
           questionsId: questionsId.map((q) => q.id),
         };
-        await this.playerQuizRepository.crateFiveGameQuestions(
+        await this.playerQuizRepository.createFiveGameQuestions(
           questionsDto,
           manager,
         );
@@ -94,9 +105,9 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         newGame = await this.playerQuizRepository.addPlayerToGame(dto, manager);
       }
 
-      // если никто не ждет пару
+      // если никто не ждет пару, то
       if (pendingGame.code === InternalCode.NotFound) {
-        // иначе создаем новую игру, первого игрока и ждем следующего игрока
+        // создаем новую игру, первого игрока и ждем следующего игрока
         const dto: CreateGameDto = {
           id: randomUUID(),
           status: GameStatus.pending,

@@ -8,7 +8,6 @@ import {
   NotFoundException,
   Param,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
@@ -35,16 +34,21 @@ export class PlayerQuizController extends ExceptionResponseHandler {
 
   @Get('my-current')
   @HttpCode(HttpStatus.OK)
-  async getCurrentGame(@Req() req: any): Promise<GameViewModel> {
+  async getCurrentGame(
+    @CurrentUserId() userId: string,
+  ): Promise<GameViewModel> {
     const currentGameResult =
-      await this.playerQuizQueryRepository.getActiveOrPendingGame(req.userId);
+      await this.playerQuizQueryRepository.getActiveOrPendingGame(userId);
 
     return this.sendExceptionOrResponse(currentGameResult);
   }
 
   @Get(':gameId')
   @HttpCode(HttpStatus.OK)
-  async getGame(@Req() req: any, @Param() param: GameIdInputModel) {
+  async getGame(
+    @CurrentUserId() userId: string,
+    @Param('gameId') param: GameIdInputModel,
+  ) {
     const game = await this.playerQuizQueryRepository.getGameById(param.gameId);
     if (!game) throw new NotFoundException();
 
@@ -62,7 +66,7 @@ export class PlayerQuizController extends ExceptionResponseHandler {
     }
 
     // если айди юзера не равно айди плеера1 и плеера2
-    if (req.userId !== firstPlayerUserId && req.userId !== secondPlayerUserId) {
+    if (userId !== firstPlayerUserId && userId !== secondPlayerUserId) {
       throw new ForbiddenException();
     } else {
       return game;
@@ -71,7 +75,7 @@ export class PlayerQuizController extends ExceptionResponseHandler {
 
   @Post('connection')
   @HttpCode(HttpStatus.OK)
-  async createGame(@Req() req: any, @CurrentUserId() userId: string) {
+  async createGame(@CurrentUserId() userId: string) {
     const createGameResult = await this.commandBus.execute(
       new CreateGameCommand(userId),
     );
@@ -81,9 +85,12 @@ export class PlayerQuizController extends ExceptionResponseHandler {
 
   @Post('my-current/answers')
   @HttpCode(HttpStatus.OK)
-  async sendAnswer(@Req() req: any, @Body() body: AnswerInputModel) {
+  async sendAnswer(
+    @CurrentUserId() userId: string,
+    @Body() body: AnswerInputModel,
+  ) {
     const createAnswerResult = await this.commandBus.execute(
-      new CreateAnswerCommand(req.userId, body.answer),
+      new CreateAnswerCommand(userId, body.answer),
     );
 
     return this.sendExceptionOrResponse(createAnswerResult);

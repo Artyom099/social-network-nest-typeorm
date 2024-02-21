@@ -38,11 +38,16 @@ export class CreateAnswerUseCase
     try {
       // достаем игру по userId
       const currentGame = await this.playerQuizQueryRepository.getActiveGame(
-        command.userId,
+        userId,
         manager,
       );
+
       if (currentGame.hasError() || !currentGame.payload)
-        return new Contract(InternalCode.Forbidden);
+        return new Contract(
+          InternalCode.Forbidden,
+          null,
+          'user have no active game',
+        );
 
       const gameId = currentGame.payload?.id;
 
@@ -60,9 +65,13 @@ export class CreateAnswerUseCase
         manager,
       );
 
-      // если игрок ответил на все вопросы, возвращаем 403 - заменить 5 на количество вопросов?
+      // если игрок ответил на все вопросы - 403 || заменить 5 на количество вопросов?
       if (currentPlayer.answersCount >= 5)
-        return new Contract(InternalCode.Forbidden);
+        return new Contract(
+          InternalCode.Forbidden,
+          null,
+          'user have answer all questions',
+        );
 
       // достаем вопрос по gameId и порядковому номеру
       const question = await this.playerQuizQueryRepository.getQuestion(
@@ -71,7 +80,8 @@ export class CreateAnswerUseCase
         manager,
       );
       // есди такого вопроса нет, значит они закончились
-      if (!question) return new Contract(InternalCode.Forbidden);
+      if (!question)
+        return new Contract(InternalCode.Forbidden, null, 'questions is over');
 
       // проверяем правильность ответа
       const answerStatus = this.getAnswerStatus(question, answer);
@@ -84,7 +94,7 @@ export class CreateAnswerUseCase
         );
       }
 
-      // увеличиваем игроку количество ответов
+      // увеличиваем игроку количество ответов на 1
       await this.playerQuizRepository.increaseAnswersCount(
         currentPlayer.id,
         manager,
@@ -142,7 +152,7 @@ export class CreateAnswerUseCase
       const dto: CreateAnswerDTO = {
         id: randomUUID(),
         answer,
-        answerStatus,
+        answerStatus: answerStatus,
         questionId: question.id,
         playerId: currentPlayer.id,
       };

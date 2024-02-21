@@ -250,7 +250,7 @@ export class PlayerQuizRepository {
   }
 
   // game_question
-  async crateFiveGameQuestions(
+  async createFiveGameQuestions(
     dto: AddQuestionsToGameDto,
     manager: EntityManager,
   ): Promise<void> {

@@ -617,6 +617,7 @@ describe('QuizController (e2e)', () => {
     });
   });
 
+  // 2й игрок подключается к 1й игре
   it('11 – POST:pair-game-quiz/pairs/connection – 200 connect 2nd player & start game', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser } =
       expect.getState();
@@ -653,6 +654,7 @@ describe('QuizController (e2e)', () => {
     });
   });
 
+  // 403 - оба игрока уже имеют активную игру
   it('12 – POST:pair-game-quiz/pairs/connection – 403 1st player is already participating in active pair', async () => {
     const { firstAccessToken } = expect.getState();
 
@@ -1100,5 +1102,15 @@ describe('QuizController (e2e)', () => {
       startGameDate: null,
       finishGameDate: null,
     });
+  });
+  it('33 – POST:pair-game-quiz/pairs/connection – 403 2nd player is already participating in active pair', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const connectResponse = await request(server)
+      .post(`/pair-game-quiz/pairs/connection`)
+      .auth(secondAccessToken.accessToken, { type: 'bearer' });
+
+    expect(connectResponse).toBeDefined();
+    expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
   });
 });

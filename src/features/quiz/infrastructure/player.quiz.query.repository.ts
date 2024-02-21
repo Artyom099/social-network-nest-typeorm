@@ -428,6 +428,19 @@ export class PlayerQuizQueryRepository {
     return player ? player : null;
   }
 
+  async getPlayerIds(userId: string, manager: EntityManager) {
+    const playerIds = await manager.query(
+      `
+    select id
+    from player
+    where "userId" = $1
+    `,
+      [userId],
+    );
+
+    return playerIds ? playerIds.map((el) => el.id) : null;
+  }
+
   // question
   async getQuestion(
     gameId: string,
