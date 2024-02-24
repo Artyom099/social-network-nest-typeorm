@@ -1,10 +1,9 @@
-import {Injectable} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import {SaltHashDto} from '../../features/users/api/models/dto/salt.hash.dto';
+import { SaltHashDto } from '../../features/users/api/models/dto/salt.hash.dto';
 
 @Injectable()
 export class HashService {
-
   async generateHash(password: string, salt: string): Promise<string> {
     return bcrypt.hash(password, salt);
   }

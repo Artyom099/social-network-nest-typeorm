@@ -96,12 +96,6 @@ export class CreateAnswerUseCase
         );
       }
 
-      // увеличиваем игроку количество ответов на 1
-      await this.playerQuizRepository.increaseAnswersCount(
-        currentPlayer.id,
-        manager,
-      );
-
       // если этот вопрос был последним, ставим игроку finishAnswersDate
       if (currentPlayer.answersCount + 1 >= 5) {
         await this.playerQuizRepository.updateFinishAnswersDate(
@@ -149,6 +143,12 @@ export class CreateAnswerUseCase
           );
         }
       }
+
+      // увеличиваем игроку количество ответов на 1
+      await this.playerQuizRepository.increaseAnswersCount(
+        currentPlayer.id,
+        manager,
+      );
 
       // возвращаем ответ
       const dto: CreateAnswerDTO = {

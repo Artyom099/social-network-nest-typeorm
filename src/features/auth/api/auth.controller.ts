@@ -11,25 +11,25 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import {TokensService} from '../../../infrastructure/services/tokens.service';
-import {DevicesService} from '../../devices/application/devices.service';
-import {CookieGuard} from '../../../infrastructure/guards/cookie.guard';
-import {BearerAuthGuard} from '../../../infrastructure/guards/bearer-auth.guard';
-import {RegisterUserCommand} from '../application/use.cases/register.user.use.case';
-import {CommandBus} from '@nestjs/cqrs';
-import {CreateUserInputModel} from '../../users/api/models/input/create.user.input.model';
-import {ConfirmEmailCommand} from '../application/use.cases/confirm.email.use.case';
-import {SendRecoveryCodeCommand} from '../application/use.cases/send.recovery.code.use.case';
-import {UpdatePasswordCommand} from '../application/use.cases/update.password.use.case';
-import {UsersQueryRepository} from '../../users/infrastructure/users.query.repository';
-import {AuthInputModel} from './models/input/auth.input.model';
-import {EmailInputModel} from './models/input/email.input.model';
-import {SetNewPasswordInputModel} from './models/input/set.new.password.input.model';
-import {ResendConfirmationCommand} from '../application/use.cases/resend.confirmation.use.case';
-import {CreateDeviceDTO} from '../../devices/api/models/create.device.dto';
-import {CheckCredentialsCommand} from '../application/use.cases/check.credentials.use.case';
-import {RefreshTokenCommand} from '../application/use.cases/refresh.token.use.case';
-import {RateLimitGuard} from '../../../infrastructure/guards/rate.limit/rate.limit.guard';
+import { TokensService } from '../../../infrastructure/services/tokens.service';
+import { DevicesService } from '../../devices/application/devices.service';
+import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
+import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
+import { RegisterUserCommand } from '../application/use.cases/register.user.use.case';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserInputModel } from '../../users/api/models/input/create.user.input.model';
+import { ConfirmEmailCommand } from '../application/use.cases/confirm.email.use.case';
+import { SendRecoveryCodeCommand } from '../application/use.cases/send.recovery.code.use.case';
+import { UpdatePasswordCommand } from '../application/use.cases/update.password.use.case';
+import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
+import { AuthInputModel } from './models/input/auth.input.model';
+import { EmailInputModel } from './models/input/email.input.model';
+import { SetNewPasswordInputModel } from './models/input/set.new.password.input.model';
+import { ResendConfirmationCommand } from '../application/use.cases/resend.confirmation.use.case';
+import { CreateDeviceDTO } from '../../devices/api/models/create.device.dto';
+import { CheckCredentialsCommand } from '../application/use.cases/check.credentials.use.case';
+import { RefreshTokenCommand } from '../application/use.cases/refresh.token.use.case';
+import { RateLimitGuard } from '../../../infrastructure/guards/rate.limit/rate.limit.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -58,31 +58,40 @@ export class AuthController {
   async login(
     @Req() req: any,
     @Res({ passthrough: true }) res: any,
-    @Body() inputModel: AuthInputModel,
+    @Body() body: AuthInputModel,
   ) {
-    const token = await this.commandBus.execute(new CheckCredentialsCommand(
-      inputModel.loginOrEmail,
-      inputModel.password,
-    ));
+    const { loginOrEmail, password } = body;
+
+    const token = await this.commandBus.execute(
+      new CheckCredentialsCommand(loginOrEmail, password),
+    );
     if (!token) throw new UnauthorizedException();
 
     //todo - move to IsUserBannedUseCase??
     // или можно проверять на бан в CheckCredentialsUseCase?
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.loginOrEmail);
+    const user = await this.usersQueryRepository.getUserByLoginOrEmail(
+      loginOrEmail,
+    );
+
     if (user?.banInfo.isBanned) {
       throw new UnauthorizedException();
     } else {
-      const payload = await this.tokensService.getTokenPayload(token.refreshToken);
+      const payload = await this.tokensService.getTokenPayload(
+        token.refreshToken,
+      );
       const dto: CreateDeviceDTO = {
         ip: req.ip,
         title: req.headers.host,
         lastActiveDate: new Date(payload.iat * 1000),
         deviceId: payload.deviceId,
         userId: payload.userId,
-      }
+      };
       await this.devicesService.createDevise(dto);
 
-      res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure: true });
+      res.cookie('refreshToken', token.refreshToken, {
+        httpOnly: true,
+        secure: true,
+      });
       return { accessToken: token.accessToken };
     }
   }
@@ -92,10 +101,16 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() req: any, @Res({ passthrough: true }) res: any) {
     const { deviceId, lastActiveDate, token } = await this.commandBus.execute(
-      new RefreshTokenCommand(req.cookies.refreshToken));
+      new RefreshTokenCommand(req.cookies.refreshToken),
+    );
 
     await this.devicesService.updateLastActiveDate(deviceId, lastActiveDate);
-    res.cookie('refreshToken', token.refreshToken, { httpOnly: true, secure: true });
+
+    res.cookie('refreshToken', token.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
     return { accessToken: token.accessToken };
   }
 
@@ -103,20 +118,27 @@ export class AuthController {
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req: any) {
-    const payload = await this.tokensService.getTokenPayload(req.cookies.refreshToken);
+    const payload = await this.tokensService.getTokenPayload(
+      req.cookies.refreshToken,
+    );
     return this.devicesService.deleteCurrentDevice(payload.deviceId);
   }
 
   @Post('new-password')
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async setNewPassword(@Body() inputModel: SetNewPasswordInputModel) {
-    const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(inputModel.recoveryCode);
+  async setNewPassword(@Body() body: SetNewPasswordInputModel) {
+    const { recoveryCode, newPassword } = body;
+
+    const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(
+      recoveryCode,
+    );
+
     if (!isUserConfirm) {
       throw new BadRequestException();
     } else {
       return this.commandBus.execute(
-        new UpdatePasswordCommand(inputModel.recoveryCode, inputModel.newPassword)
+        new UpdatePasswordCommand(recoveryCode, newPassword),
       );
     }
   }
@@ -125,24 +147,30 @@ export class AuthController {
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   //todo -> для моих тестов статус OK, по документации NO_CONTENT
-  async passwordRecovery(@Body() inputModel: EmailInputModel) {
+  async passwordRecovery(@Body() body: EmailInputModel) {
     return {
-      recoveryCode: await this.commandBus.execute(new SendRecoveryCodeCommand(inputModel.email))
+      recoveryCode: await this.commandBus.execute(
+        new SendRecoveryCodeCommand(body.email),
+      ),
     };
   }
 
   @Post('registration')
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async registration(@Body() inputModel: CreateUserInputModel) {
-    const emailExist = await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.email);
+  async registration(@Body() body: CreateUserInputModel) {
+    const emailExist = await this.usersQueryRepository.getUserByLoginOrEmail(
+      body.email,
+    );
     if (emailExist) throw new BadRequestException('email exist=>email');
 
-    const loginExist = await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.login);
+    const loginExist = await this.usersQueryRepository.getUserByLoginOrEmail(
+      body.login,
+    );
     if (loginExist) {
       throw new BadRequestException('login exist=>login');
     } else {
-      return this.commandBus.execute(new RegisterUserCommand(inputModel));
+      return this.commandBus.execute(new RegisterUserCommand(body));
     }
   }
 
@@ -151,9 +179,14 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   //todo - add validation to code
   async sendConfirmationEmail(@Body() body: { code: string }) {
-    const confirmEmail = await this.commandBus.execute(new ConfirmEmailCommand(body.code));
+    const confirmEmail = await this.commandBus.execute(
+      new ConfirmEmailCommand(body.code),
+    );
+
     if (!confirmEmail) {
-      throw new BadRequestException('code is incorrect, expired or already applied=>code');
+      throw new BadRequestException(
+        'code is incorrect, expired or already applied=>code',
+      );
     } else {
       return true;
     }
@@ -163,11 +196,15 @@ export class AuthController {
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: EmailInputModel) {
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(body.email);
+    const user = await this.usersQueryRepository.getUserByLoginOrEmail(
+      body.email,
+    );
     if (!user || user.isConfirmed) {
       throw new BadRequestException('email not exist or confirm=>email');
     } else {
-      return this.commandBus.execute(new ResendConfirmationCommand(body.email, user.id));
+      return this.commandBus.execute(
+        new ResendConfirmationCommand(body.email, user.id),
+      );
     }
   }
 }
