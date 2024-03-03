@@ -79,6 +79,7 @@ export class AuthController {
       const payload = await this.tokensService.getTokenPayload(
         token.refreshToken,
       );
+
       const dto: CreateDeviceDTO = {
         ip: req.ip,
         title: req.headers.host,

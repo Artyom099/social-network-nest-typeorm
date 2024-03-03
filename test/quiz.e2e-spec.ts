@@ -561,7 +561,7 @@ describe('QuizController (e2e)', () => {
 
     expect.setState({ gameId: connectResponse.body.id });
   });
-  it('10.2 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
+  it('11 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
     const { firstAccessToken, firstCreatedUser, gameId } = expect.getState();
 
     const getResponse = await request(server)
@@ -588,7 +588,7 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     });
   });
-  it('10.3 – GET:pair-game-quiz/pairs/my-current – 200 - 1st player get his current game', async () => {
+  it('12 – GET:pair-game-quiz/pairs/my-current – 200 - 1st player get his current game', async () => {
     const { firstAccessToken, firstCreatedUser } = expect.getState();
 
     const getResponse = await request(server)
@@ -617,7 +617,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // 1й игрок не может отвечать, пока не подключиться 2й
-  it('12 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st pl cannot answer before start the game', async () => {
+  it('13 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st pl cannot answer before start the game', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -630,7 +630,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // 2й игрок подключается к 1й игре
-  it('11 – POST:pair-game-quiz/pairs/connection – 200 connect 2nd player & start game', async () => {
+  it('14 – POST:pair-game-quiz/pairs/connection – 200 connect 2nd player & start game', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser } =
       expect.getState();
 
@@ -667,7 +667,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // 403 - оба игрока уже имеют активную игру
-  it('12 – POST:pair-game-quiz/pairs/connection – 403 1st player is already participating in active pair', async () => {
+  it('15 – POST:pair-game-quiz/pairs/connection – 403 1st player is already participating in active pair', async () => {
     const { firstAccessToken } = expect.getState();
 
     const connectResponse = await request(server)
@@ -677,7 +677,7 @@ describe('QuizController (e2e)', () => {
     expect(connectResponse).toBeDefined();
     expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
   });
-  it('13 – POST:pair-game-quiz/pairs/connection – 403 2nd player is already participating in active pair', async () => {
+  it('16 – POST:pair-game-quiz/pairs/connection – 403 2nd player is already participating in active pair', async () => {
     const { secondAccessToken } = expect.getState();
 
     const connectResponse = await request(server)
@@ -688,7 +688,7 @@ describe('QuizController (e2e)', () => {
     expect(connectResponse.status).toEqual(HttpStatus.FORBIDDEN);
   });
 
-  it('14 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
+  it('17 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser, gameId } =
       expect.getState();
 
@@ -723,7 +723,7 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     });
   });
-  it('15 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
+  it('18 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
     const { firstAccessToken, firstCreatedUser, secondCreatedUser, gameId } =
       expect.getState();
 
@@ -758,7 +758,7 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     });
   });
-  it('16 – GET:pair-game-quiz/pairs/:id – 403 - 3rd player cannot get game by id', async () => {
+  it('19 – GET:pair-game-quiz/pairs/:id – 403 - 3rd player cannot get game by id', async () => {
     const { thirdAccessToken, gameId } = expect.getState();
 
     const getResponse = await request(server)
@@ -770,7 +770,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // игроки начинают отвечать на вопросы
-  it('17 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 1st question, correct ans, score1 = 1', async () => {
+  it('20 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 1st question, correct ans, score1 = 1', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -786,7 +786,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('18 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 2nd question, incorrect ans, score1 = 1', async () => {
+  it('21 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 2nd question, incorrect ans, score1 = 1', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -803,7 +803,7 @@ describe('QuizController (e2e)', () => {
     });
   });
 
-  it('15 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
+  it('22 – GET:pair-game-quiz/pairs/:id – 200 - 1st player get game by id', async () => {
     const { firstAccessToken, firstCreatedUser, secondCreatedUser, gameId } =
       expect.getState();
 
@@ -849,7 +849,7 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     });
   });
-  it('14 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
+  it('23 – GET:pair-game-quiz/pairs/:id – 200 - 2nd player get game by id', async () => {
     const { secondAccessToken, firstCreatedUser, secondCreatedUser, gameId } =
       expect.getState();
 
@@ -896,7 +896,7 @@ describe('QuizController (e2e)', () => {
     });
   });
 
-  it('19 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 1st question, incorrect ans, score2 = 0', async () => {
+  it('24 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 1st question, incorrect ans, score2 = 0', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -912,7 +912,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('20 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 2nd question, correct ans, score2 = 1', async () => {
+  it('25 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 2nd question, correct ans, score2 = 1', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -929,7 +929,7 @@ describe('QuizController (e2e)', () => {
     });
   });
 
-  it('21 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 3rd question, correct ans, score1 = 2', async () => {
+  it('26 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 3rd question, correct ans, score1 = 2', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -945,7 +945,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('22 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 4th question, correct ans, score1 = 3', async () => {
+  it('27 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 4th question, correct ans, score1 = 3', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -961,7 +961,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('23 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 5th question, correct ans, score1 = 4', async () => {
+  it('28 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 1st pl, 5th question, correct ans, score1 = 4', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -977,7 +977,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('24 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st pl, 6th question, correct ans, score1 = 4', async () => {
+  it('29 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st pl, 6th question, correct ans, score1 = 4', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -989,7 +989,7 @@ describe('QuizController (e2e)', () => {
     expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
   });
 
-  it('25 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 3rd question, correct ans, score2 = 2', async () => {
+  it('30 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 3rd question, correct ans, score2 = 2', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -1005,7 +1005,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('26 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 4th question, correct ans, score2 = 3', async () => {
+  it('31 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 4th question, correct ans, score2 = 3', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -1021,7 +1021,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('27 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 5th question, correct ans, score2 = 4', async () => {
+  it('32 - POST:pair-game-quiz/pairs/my-current/answers - 200 - 2nd pl, 5th question, correct ans, score2 = 4', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -1037,7 +1037,7 @@ describe('QuizController (e2e)', () => {
       addedAt: expect.any(String),
     });
   });
-  it('28 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 2nd pl, 6th question, correct ans, score2 = 4', async () => {
+  it('33 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 2nd pl, 6th question, correct ans, score2 = 4', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -1050,7 +1050,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // игра уже завершилась
-  it('29 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st pl, 6th question, correct ans, score1 = 4', async () => {
+  it('34 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 1st pl, 6th question, correct ans, score1 = 4', async () => {
     const { firstAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -1061,7 +1061,7 @@ describe('QuizController (e2e)', () => {
     expect(sendAnswer).toBeDefined();
     expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
   });
-  it('28 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 2nd pl, 6th question, correct ans, score2 = 4', async () => {
+  it('35 - POST:pair-game-quiz/pairs/my-current/answers - 403 - 2nd pl, 6th question, correct ans, score2 = 4', async () => {
     const { secondAccessToken } = expect.getState();
 
     const sendAnswer = await request(server)
@@ -1073,7 +1073,7 @@ describe('QuizController (e2e)', () => {
     expect(sendAnswer.status).toEqual(HttpStatus.FORBIDDEN);
   });
 
-  it('29 – GET:pair-game-quiz/pairs/my-current – 404 - 1st player have no current game', async () => {
+  it('36 – GET:pair-game-quiz/pairs/my-current – 404 - 1st player have no current game', async () => {
     const { firstAccessToken } = expect.getState();
 
     const getResponse = await request(server)
@@ -1085,7 +1085,7 @@ describe('QuizController (e2e)', () => {
   });
 
   // 2й игрок создает 2ю игру
-  it('31 – POST:pair-game-quiz/pairs/connection – 200 connect 2nd pl waiting 1st player', async () => {
+  it('37 – POST:pair-game-quiz/pairs/connection – 200 connect 2nd pl waiting 1st player', async () => {
     const { secondAccessToken, secondCreatedUser } = expect.getState();
 
     const connectResponse = await request(server)
@@ -1112,7 +1112,7 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     });
   });
-  it('32 – GET:pair-game-quiz/pairs/my-current – 200 - 2nd pl get his current game', async () => {
+  it('38 – GET:pair-game-quiz/pairs/my-current – 200 - 2nd pl get his current game', async () => {
     const { secondAccessToken, secondCreatedUser } = expect.getState();
 
     const getResponse = await request(server)
@@ -1139,7 +1139,7 @@ describe('QuizController (e2e)', () => {
       finishGameDate: null,
     });
   });
-  it('33 – POST:pair-game-quiz/pairs/connection – 403 2nd player is already participating in active pair', async () => {
+  it('39 – POST:pair-game-quiz/pairs/connection – 403 2nd player is already participating in active pair', async () => {
     const { secondAccessToken } = expect.getState();
 
     const connectResponse = await request(server)
