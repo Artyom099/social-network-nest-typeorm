@@ -137,6 +137,8 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     if (!newGame)
       return new Contract(InternalCode.Internal_Server, null, 'i dont know');
 
+    console.log('create game successfully');
+
     return new Contract(InternalCode.Success, newGame.payload);
   }
 }

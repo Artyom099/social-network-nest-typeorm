@@ -44,12 +44,14 @@ export class CreateAnswerUseCase
         manager,
       );
 
-      if (currentGame.hasError() || !currentGame.payload)
+      if (currentGame.hasError() || !currentGame.payload) {
+        console.log({ userId }, 'user have no active game');
         return new Contract(
           InternalCode.Forbidden,
           null,
           'user have no active game',
         );
+      }
 
       const gameId = currentGame.payload?.id;
 
@@ -68,12 +70,14 @@ export class CreateAnswerUseCase
       );
 
       // если игрок ответил на все вопросы - 403 || заменить 5 на количество вопросов?
-      if (currentPlayer.answersCount >= 5)
+      if (currentPlayer.answersCount >= 5) {
+        console.log({ userId }, 'user have answer all questions');
         return new Contract(
           InternalCode.Forbidden,
           null,
           'user have answer all questions',
         );
+      }
 
       // достаем вопрос по gameId и порядковому номеру
       const question = await this.playerQuizQueryRepository.getQuestion(
@@ -82,8 +86,10 @@ export class CreateAnswerUseCase
         manager,
       );
       // есди такого вопроса нет, значит они закончились
-      if (!question)
+      if (!question) {
+        console.log({ userId }, 'questions is over');
         return new Contract(InternalCode.Forbidden, null, 'questions is over');
+      }
 
       // проверяем правильность ответа
       const answerStatus = this.getAnswerStatus(question, answer);
@@ -170,6 +176,8 @@ export class CreateAnswerUseCase
 
     if (answerResult.hasError())
       return new Contract(InternalCode.Internal_Server);
+
+    console.log('create answer successfully');
 
     return new Contract(InternalCode.Success, answerResult.payload);
   }
