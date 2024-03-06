@@ -1,11 +1,18 @@
-import {CanActivate, ExecutionContext, Injectable, UnauthorizedException,} from '@nestjs/common';
-import {JwtService} from '@nestjs/jwt';
-import {Request} from 'express';
-import {DevicesQueryRepository} from '../../features/devices/infrastructure/devices.query.repository';
-import {jwtConstants} from '../utils/settings';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+import { DevicesQueryRepository } from '../../features/devices/infrastructure/devices.query.repository';
+import { jwtConstants } from '../utils/settings';
 
 @Injectable()
 export class CookieGuard implements CanActivate {
+  private MILLISECONDS: 1000;
+
   constructor(
     private jwtService: JwtService,
     private devicesQueryRepository: DevicesQueryRepository,
@@ -17,17 +24,26 @@ export class CookieGuard implements CanActivate {
     if (!refreshToken) throw new UnauthorizedException();
 
     try {
-      const payload = await this.jwtService.verifyAsync(refreshToken, {secret: jwtConstants.refreshSecret});
-      const tokenIssuedAt = new Date(payload.iat * 1000).toString();
-      const lastActiveSession = await this.devicesQueryRepository.getDevice(payload.deviceId);
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: jwtConstants.refreshSecret,
+      });
 
-      if (!lastActiveSession || tokenIssuedAt !== lastActiveSession.lastActiveDate.toString()) {
+      const tokenIssuedAt = new Date(
+        payload.iat * this.MILLISECONDS,
+      ).toString();
+      const lastActiveSession = await this.devicesQueryRepository.getDevice(
+        payload.deviceId,
+      );
+
+      if (
+        !lastActiveSession ||
+        tokenIssuedAt !== lastActiveSession.lastActiveDate.toString()
+      ) {
         throw new UnauthorizedException();
       } else {
         request.userId = payload.userId;
         return true;
       }
-
     } catch (e) {
       throw new UnauthorizedException();
     }
