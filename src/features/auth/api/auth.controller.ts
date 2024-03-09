@@ -37,14 +37,14 @@ export class AuthController {
     private commandBus: CommandBus,
     private tokensService: TokensService,
     private devicesService: DevicesService,
-    private usersQueryRepository: UsersQueryRepository,
+    private userQueryRepository: UsersQueryRepository,
   ) {}
 
   @Get('me')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getMyInfo(@Req() req: any) {
-    const user = await this.usersQueryRepository.getUserById(req.userId);
+    const user = await this.userQueryRepository.getUserById(req.userId);
     return {
       email: user?.email,
       login: user?.login,
@@ -69,7 +69,7 @@ export class AuthController {
 
     //todo - move to IsUserBannedUseCase??
     // или можно проверять на бан в CheckCredentialsUseCase?
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(
+    const user = await this.userQueryRepository.getUserByLoginOrEmail(
       loginOrEmail,
     );
 
@@ -131,7 +131,7 @@ export class AuthController {
   async setNewPassword(@Body() body: SetNewPasswordInputModel) {
     const { recoveryCode, newPassword } = body;
 
-    const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(
+    const isUserConfirm = await this.userQueryRepository.getUserByRecoveryCode(
       recoveryCode,
     );
 
@@ -160,19 +160,19 @@ export class AuthController {
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() body: CreateUserInputModel) {
-    const emailExist = await this.usersQueryRepository.getUserByLoginOrEmail(
-      body.email,
+    const { email, login } = body;
+
+    const emailExist = await this.userQueryRepository.getUserByLoginOrEmail(
+      email,
     );
     if (emailExist) throw new BadRequestException('email exist=>email');
 
-    const loginExist = await this.usersQueryRepository.getUserByLoginOrEmail(
-      body.login,
+    const loginExist = await this.userQueryRepository.getUserByLoginOrEmail(
+      login,
     );
-    if (loginExist) {
-      throw new BadRequestException('login exist=>login');
-    } else {
-      return this.commandBus.execute(new RegisterUserCommand(body));
-    }
+    if (loginExist) throw new BadRequestException('login exist=>login');
+
+    return this.commandBus.execute(new RegisterUserCommand(body));
   }
 
   @Post('registration-confirmation')
@@ -197,7 +197,7 @@ export class AuthController {
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: EmailInputModel) {
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(
+    const user = await this.userQueryRepository.getUserByLoginOrEmail(
       body.email,
     );
     if (!user || user.isConfirmed) {

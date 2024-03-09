@@ -20,7 +20,7 @@ export class CookieGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const refreshToken = CookieGuard.extractTokenFromCookie(request);
+    const refreshToken = this.extractTokenFromCookie(request);
     if (!refreshToken) throw new UnauthorizedException();
 
     try {
@@ -31,6 +31,7 @@ export class CookieGuard implements CanActivate {
       const tokenIssuedAt = new Date(
         payload.iat * this.MILLISECONDS,
       ).toString();
+
       const lastActiveSession = await this.devicesQueryRepository.getDevice(
         payload.deviceId,
       );
@@ -49,7 +50,7 @@ export class CookieGuard implements CanActivate {
     }
   }
 
-  private static extractTokenFromCookie(request: Request): string | null {
+  private extractTokenFromCookie(request: Request): string | null {
     if (request.cookies && request.cookies.refreshToken) {
       return request.cookies.refreshToken;
     }

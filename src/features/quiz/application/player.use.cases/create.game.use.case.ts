@@ -57,7 +57,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
       );
 
       // достаем логин текущего юзера
-      const login = await this.usersQueryRepository.getUserForQuiz(
+      const login = await this.usersQueryRepository.getUserLogin(
         userId,
         manager,
       );

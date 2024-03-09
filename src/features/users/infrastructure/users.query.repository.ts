@@ -29,7 +29,7 @@ export class UsersQueryRepository {
     return user ? user : null;
   }
 
-  async getUserForQuiz(
+  async getUserLogin(
     id: string,
     manager: EntityManager,
   ): Promise<Contract<string | null>> {
