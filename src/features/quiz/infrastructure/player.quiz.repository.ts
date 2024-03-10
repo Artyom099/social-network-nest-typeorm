@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, EntityManager, InsertResult, UpdateResult } from 'typeorm';
+import { EntityManager, InsertResult, UpdateResult } from 'typeorm';
 import { InternalCode } from '../../../infrastructure/utils/enums';
 import { Answer } from '../entity/answer.entity';
 import { CreateAnswerDTO } from '../api/models/dto/create.answer.dto';
@@ -13,8 +12,6 @@ import { GameQuestion } from '../entity/game.question.entity';
 
 @Injectable()
 export class PlayerQuizRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
-
   // player
   async createPlayer(
     dto: CreatePlayerDTO,
