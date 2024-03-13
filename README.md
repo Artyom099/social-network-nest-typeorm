@@ -10,15 +10,15 @@
 
 ## Description
 
-Add short description about project
+Project stack: Nest, Postgres, Typeorm, Jest
 
 ## Distribute
 
-Try to [use app](https://freedomindz.site/auth/sign-in)
+In progress
 
 ## Documentation
 
-You can find swagger documentation [here](https://api.freedomindz.site/api/v1/swagger)
+In progress
 
 ## Developers
 
