@@ -25,6 +25,7 @@ jobs:
       - name: build project
         run: yarn run build
   test:
+    needs: [lint]
     runs-on: ubuntu-latest
     strategy:
       matrix:
