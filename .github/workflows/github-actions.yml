@@ -8,16 +8,16 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [ v21.x ]
+#    strategy:
+#      matrix:
+#        node-version: [ v21.x ]
     steps:
       - name: check out repository code
         uses: actions/checkout@v4
-      - name: starting Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
+#      - name: starting Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: ${{ matrix.node-version }}
       - name: install modules
         run: yarn install
       - name: lint project
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ v21.x, v18.x ]
+        node-version: [ v16.x, v18.x, v21.x  ]
     steps:
       - name: check out repository code
         uses: actions/checkout@v4
