@@ -1,5 +1,5 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+name: GitHub Actions CI
+run-name: CI run name
 on:
   push:
     branches: [ main ]
@@ -12,14 +12,16 @@ jobs:
       matrix:
         node-version: [ v21.x ]
     steps:
-      - name: Check out repository code
+      - name: check out repository code
         uses: actions/checkout@v4
-      - name: Starting Node.js ${{ matrix.node-version }}
+      - name: starting Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: install modules
         run: yarn install
+      - name: lint project
+        run: yarn run lint
       - name: build project
         run: yarn run build
 #      - name: run e2e tests

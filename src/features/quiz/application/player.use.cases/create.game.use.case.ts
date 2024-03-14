@@ -24,10 +24,10 @@ export class CreateGameCommand {
 export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
   constructor(
     @InjectDataSource() private dataSource: DataSource,
+    private gameRepository: GameRepository,
     private usersQueryRepository: UsersQueryRepository,
     private playerQuizRepository: PlayerQuizRepository,
     private playerQuizQueryRepository: PlayerQuizQueryRepository,
-    private gameRepository: GameRepository,
   ) {}
 
   async execute(command: CreateGameCommand): Promise<Contract<any>> {
