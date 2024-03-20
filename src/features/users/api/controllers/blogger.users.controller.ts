@@ -12,16 +12,14 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {CommandBus} from '@nestjs/cqrs';
-import {BannedUsersPaginationInput} from '../../../../infrastructure/models/pagination.input.models';
-import {UsersQueryRepository} from '../../infrastructure/users.query.repository';
-import {BanUserCurrentBlogInputModel} from '../models/input/ban.user.current.blog.input.model';
-import {
-  BanUserForCurrentBlogCommand
-} from '../../application/blogger.users.use.cases/ban.user.for.current.blog.use.case';
-import {BearerAuthGuard} from '../../../../infrastructure/guards/bearer-auth.guard';
-import {BlogsQueryRepository} from '../../../blogs/infrastructure/blogs.query.repository';
-import {BannedUsersForBlogQueryRepository} from '../../infrastructure/banned.users.for.blog.query.repository';
+import { CommandBus } from '@nestjs/cqrs';
+import { BannedUsersPaginationInput } from '../../../../infrastructure/models/pagination.input.models';
+import { UsersQueryRepository } from '../../infrastructure/users.query.repository';
+import { BanUserCurrentBlogInputModel } from '../models/input/ban.user.current.blog.input.model';
+import { BanUserForCurrentBlogCommand } from '../../application/blogger.users.use.cases/ban.user.for.current.blog.use.case';
+import { BearerAuthGuard } from '../../../../infrastructure/guards/bearer-auth.guard';
+import { BlogsQueryRepository } from '../../../blogs/infrastructure/blogs.query.repository';
+import { BannedUsersForBlogQueryRepository } from '../../infrastructure/banned.users.for.blog.query.repository';
 
 @Controller('blogger/users')
 @UseGuards(BearerAuthGuard)
@@ -46,7 +44,10 @@ export class BloggerUsersController {
     if (req.userId !== blog.blogOwnerInfo.userId) {
       throw new ForbiddenException();
     } else {
-      return this.bannedUsersForBlogQueryRepository.getBannedUsersForBlog(blogId, query);
+      return this.bannedUsersForBlogQueryRepository.getBannedUsersForBlog(
+        blogId,
+        query,
+      );
     }
   }
 
@@ -61,7 +62,8 @@ export class BloggerUsersController {
     if (!user) throw new NotFoundException();
 
     const blog = await this.blogsQueryRepository.getBlogSA(inputModel.blogId);
-    if (!blog || req.userId !== blog.blogOwnerInfo.userId) throw new ForbiddenException();
+    if (!blog || req.userId !== blog.blogOwnerInfo.userId)
+      throw new ForbiddenException();
 
     return this.commandBus.execute(
       new BanUserForCurrentBlogCommand(userId, inputModel),

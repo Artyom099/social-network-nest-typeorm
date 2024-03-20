@@ -1,13 +1,14 @@
-import {HashService} from '../../../../infrastructure/services/hash.service';
-import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {CreateUserInputModel} from '../../api/models/input/create.user.input.model';
-import {SAUserViewModel} from '../../api/models/view/sa.user.view.model';
-import {UsersRepository} from '../../infrastructure/users.repository';
+import { HashService } from '../../../../infrastructure/services/hash.service';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CreateUserInputModel } from '../../api/models/input/create.user.input.model';
+import { SAUserViewModel } from '../../api/models/view/sa.user.view.model';
+import { UserRepository } from '../../infrastructure/user.repository';
 import add from 'date-fns/add';
-import {randomUUID} from 'crypto';
+import { randomUUID } from 'crypto';
+import { CreateUserDTO } from '../../api/models/dto/create.user.dto';
 
 export class CreateUserByAdminCommand {
-  constructor(public InputModel: CreateUserInputModel) {}
+  constructor(public inputModel: CreateUserInputModel) {}
 }
 
 @CommandHandler(CreateUserByAdminCommand)
@@ -16,22 +17,25 @@ export class CreateUserByAdminUseCase
 {
   constructor(
     private usersService: HashService,
-    private usersRepository: UsersRepository,
+    private usersRepository: UserRepository,
   ) {}
 
   async execute(command: CreateUserByAdminCommand): Promise<SAUserViewModel> {
-    const { InputModel } = command;
-    const { salt, hash } = await this.usersService.generateSaltAndHash(InputModel.password);
+    const { login, email, password } = command.inputModel;
 
-    const createUserDTO = {
+    const { salt, hash } = await this.usersService.generateSaltAndHash(
+      password,
+    );
+
+    const dto: CreateUserDTO = {
       id: randomUUID(),
-      InputModel,
+      inputModel: command.inputModel,
       salt,
       hash,
       expirationDate: add(new Date(), { minutes: 20 }),
       confirmationCode: randomUUID(),
       isConfirmed: true,
-    }
-    return this.usersRepository.createUserByAdmin(createUserDTO);
+    };
+    return this.usersRepository.createUserByAdmin(dto);
   }
 }

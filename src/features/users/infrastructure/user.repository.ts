@@ -7,7 +7,7 @@ import { CreateUserDTO } from '../api/models/dto/create.user.dto';
 import { Users } from '../entity/user.entity';
 
 @Injectable()
-export class UsersRepository {
+export class UserRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async createUserByAdmin(dto: CreateUserDTO): Promise<SAUserViewModel> {
@@ -16,8 +16,8 @@ export class UsersRepository {
       .insert()
       .into(Users)
       .values({
-        login: dto.InputModel.login,
-        email: dto.InputModel.email,
+        login: dto.inputModel.login,
+        email: dto.inputModel.email,
         passwordSalt: dto.salt,
         passwordHash: dto.hash,
         createdAt: dto.expirationDate,
@@ -33,7 +33,7 @@ export class UsersRepository {
     from "users"
     where "login" = $1
     `,
-      [dto.InputModel.login],
+      [dto.inputModel.login],
     );
 
     return {
@@ -48,14 +48,15 @@ export class UsersRepository {
       // },
     };
   }
+
   async createUserBySelf(dto: CreateUserDTO): Promise<UserViewModel> {
     await this.dataSource
       .createQueryBuilder()
       .insert()
       .into(Users)
       .values({
-        login: dto.InputModel.login,
-        email: dto.InputModel.email,
+        login: dto.inputModel.login,
+        email: dto.inputModel.email,
         passwordSalt: dto.salt,
         passwordHash: dto.hash,
         createdAt: dto.expirationDate,
@@ -71,7 +72,7 @@ export class UsersRepository {
     from "users"
     where "login" = $1
     `,
-      [dto.InputModel.login],
+      [dto.inputModel.login],
     );
 
     return {
@@ -90,6 +91,7 @@ export class UsersRepository {
       .where('id = :id', { id })
       .execute();
   }
+
   async unbanUser(id: string) {
     return this.dataSource
       .createQueryBuilder()
@@ -98,6 +100,7 @@ export class UsersRepository {
       .where('id = :id', { id })
       .execute();
   }
+
   async confirmEmail(id: string) {
     const result = await this.dataSource
       .createQueryBuilder()
@@ -116,6 +119,7 @@ export class UsersRepository {
       .where('id = :id', { id })
       .execute();
   }
+
   async updateRecoveryCode(id: string, code: string) {
     return this.dataSource
       .createQueryBuilder()
@@ -124,6 +128,7 @@ export class UsersRepository {
       .where('id = :id', { id })
       .execute();
   }
+
   async updateConfirmationCode(id: string, code: string) {
     return this.dataSource
       .createQueryBuilder()

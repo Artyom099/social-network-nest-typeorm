@@ -1,8 +1,8 @@
-import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {EmailManager} from '../../../../infrastructure/services/email.manager';
-import {UsersRepository} from '../../../users/infrastructure/users.repository';
-import {randomUUID} from 'crypto';
-import {UsersQueryRepository} from '../../../users/infrastructure/users.query.repository';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { EmailManager } from '../../../../infrastructure/services/email.manager';
+import { UserRepository } from '../../../users/infrastructure/user.repository';
+import { randomUUID } from 'crypto';
+import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
 
 export class UpdateConfirmationCodeCommand {
   constructor(public email: string) {}
@@ -14,14 +14,16 @@ export class UpdateConfirmationCodeUseCase
 {
   constructor(
     private emailManager: EmailManager,
-    private usersRepository: UsersRepository,
+    private usersRepository: UserRepository,
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
   async execute(
     command: UpdateConfirmationCodeCommand,
   ): Promise<string | null> {
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(command.email);
+    const user = await this.usersQueryRepository.getUserByLoginOrEmail(
+      command.email,
+    );
     if (!user) return null;
 
     const newCode = randomUUID();

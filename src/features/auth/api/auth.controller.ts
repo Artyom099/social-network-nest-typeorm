@@ -45,6 +45,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async getMyInfo(@Req() req: any) {
     const user = await this.userQueryRepository.getUserById(req.userId);
+
     return {
       email: user?.email,
       login: user?.login,
@@ -67,8 +68,8 @@ export class AuthController {
     );
     if (!token) throw new UnauthorizedException();
 
-    //todo - move to IsUserBannedUseCase??
-    // или можно проверять на бан в CheckCredentialsUseCase?
+    //todo - move to IsUserBannedUseCase
+
     const user = await this.userQueryRepository.getUserByLoginOrEmail(
       loginOrEmail,
     );
@@ -122,6 +123,7 @@ export class AuthController {
     const payload = await this.tokensService.getTokenPayload(
       req.cookies.refreshToken,
     );
+
     return this.devicesService.deleteCurrentDevice(payload.deviceId);
   }
 
@@ -131,11 +133,11 @@ export class AuthController {
   async setNewPassword(@Body() body: SetNewPasswordInputModel) {
     const { recoveryCode, newPassword } = body;
 
-    const isUserConfirm = await this.userQueryRepository.getUserByRecoveryCode(
+    const userConfirm = await this.userQueryRepository.getUserByRecoveryCode(
       recoveryCode,
     );
 
-    if (!isUserConfirm) {
+    if (!userConfirm) {
       throw new BadRequestException();
     } else {
       return this.commandBus.execute(
@@ -197,15 +199,15 @@ export class AuthController {
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: EmailInputModel) {
-    const user = await this.userQueryRepository.getUserByLoginOrEmail(
-      body.email,
-    );
-    if (!user || user.isConfirmed) {
+    const { email } = body;
+
+    const user = await this.userQueryRepository.getUserByLoginOrEmail(email);
+
+    if (!user || user.isConfirmed)
       throw new BadRequestException('email not exist or confirm=>email');
-    } else {
-      return this.commandBus.execute(
-        new ResendConfirmationCommand(body.email, user.id),
-      );
-    }
+
+    return this.commandBus.execute(
+      new ResendConfirmationCommand(email, user.id),
+    );
   }
 }

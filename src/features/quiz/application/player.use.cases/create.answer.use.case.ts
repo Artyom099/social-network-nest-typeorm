@@ -85,6 +85,7 @@ export class CreateAnswerUseCase
         currentPlayer.answersCount + 1,
         manager,
       );
+
       // есди такого вопроса нет, значит они закончились
       if (!question) {
         console.log({ userId }, 'questions is over');

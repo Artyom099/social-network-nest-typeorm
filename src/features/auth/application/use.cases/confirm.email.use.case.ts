@@ -1,25 +1,34 @@
-import {CommandHandler, ICommandHandler} from '@nestjs/cqrs';
-import {UsersRepository} from '../../../users/infrastructure/users.repository';
-import {UsersQueryRepository} from '../../../users/infrastructure/users.query.repository';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { UserRepository } from '../../../users/infrastructure/user.repository';
+import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
 
 export class ConfirmEmailCommand {
   constructor(public code: string) {}
 }
 
 @CommandHandler(ConfirmEmailCommand)
-export class ConfirmEmailUseCase implements ICommandHandler<ConfirmEmailCommand>
+export class ConfirmEmailUseCase
+  implements ICommandHandler<ConfirmEmailCommand>
 {
   constructor(
-    private usersRepository: UsersRepository,
-    private usersQueryRepository: UsersQueryRepository,
+    private userRepository: UserRepository,
+    private userQueryRepository: UsersQueryRepository,
   ) {}
 
   async execute(command: ConfirmEmailCommand): Promise<boolean> {
-    const user = await this.usersQueryRepository.getUserByConfirmationCode(command.code);
-    if (!user || user.isConfirmed || user.confirmationCode !== command.code || user.expirationDate < new Date().toISOString()) {
+    const { code } = command;
+
+    const user = await this.userQueryRepository.getUserByConfirmationCode(code);
+
+    if (
+      !user ||
+      user.isConfirmed ||
+      user.confirmationCode !== code ||
+      user.expirationDate < new Date().toISOString()
+    ) {
       return false;
     } else {
-      return this.usersRepository.confirmEmail(user.id);
+      return this.userRepository.confirmEmail(user.id);
     }
   }
 }
