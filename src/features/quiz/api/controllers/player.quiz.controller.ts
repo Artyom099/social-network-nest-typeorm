@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { BearerAuthGuard } from '../../../../infrastructure/guards/bearer-auth.guard';
-import { PlayerQuizQueryRepository } from '../../infrastructure/player.quiz.query.repository';
+import { QuizQueryRepository } from '../../infrastructure/quiz.query.repository';
 import { AnswerInputModel } from '../models/input/answer.input.model';
 import { CreateGameCommand } from '../../application/player.use.cases/create.game.use.case';
 import { CreateAnswerCommand } from '../../application/player.use.cases/create.answer.use.case';
@@ -27,7 +27,7 @@ import { CurrentUserId } from '../../../../infrastructure/decorators/current.use
 export class PlayerQuizController extends ExceptionResponseHandler {
   constructor(
     private commandBus: CommandBus,
-    private playerQuizQueryRepository: PlayerQuizQueryRepository,
+    private playerQuizQueryRepository: QuizQueryRepository,
   ) {
     super(ApproachType.http);
   }

@@ -79,8 +79,8 @@ import { Game } from './features/quiz/entity/game.entity';
 import { Player } from './features/quiz/entity/player.entity';
 import { SAQuizController } from './features/quiz/api/controllers/sa.quiz.controller';
 import { PlayerQuizController } from './features/quiz/api/controllers/player.quiz.controller';
-import { PlayerQuizQueryRepository } from './features/quiz/infrastructure/player.quiz.query.repository';
-import { PlayerQuizRepository } from './features/quiz/infrastructure/player.quiz.repository';
+import { QuizQueryRepository } from './features/quiz/infrastructure/quiz.query.repository';
+import { QuizRepository } from './features/quiz/infrastructure/quiz.repository';
 import { SAQuizRepository } from './features/quiz/infrastructure/sa.quiz.repository';
 import { SAQuizQueryRepository } from './features/quiz/infrastructure/sa.quiz.query.repository';
 import { CreateAnswerUseCase } from './features/quiz/application/player.use.cases/create.answer.use.case';
@@ -91,6 +91,7 @@ import { DeleteQuestionUseCase } from './features/quiz/application/sa.use.cases/
 import { PublishQuestionUseCase } from './features/quiz/application/sa.use.cases/publish.question.use.case';
 import { GameQuestion } from './features/quiz/entity/game.question.entity';
 import { GameRepository } from './features/quiz/infrastructure/game.repository';
+import { PlayerRepository } from './features/quiz/infrastructure/player.repository';
 
 const entities = [
   Users,
@@ -108,6 +109,7 @@ const entities = [
   Question,
   GameQuestion,
 ];
+
 const useCases = [
   CreateGameUseCase,
   CreateAnswerUseCase,
@@ -141,14 +143,16 @@ const useCases = [
   BanUserForCurrentBlogUseCase,
   UpdateConfirmationCodeUseCase,
 ];
+
 const repositories = [
   TestRepository,
 
   SAQuizRepository,
   SAQuizQueryRepository,
-  PlayerQuizRepository,
-  PlayerQuizQueryRepository,
+  QuizRepository,
+  QuizQueryRepository,
   GameRepository,
+  PlayerRepository,
 
   UserRepository,
   UsersQueryRepository,
@@ -168,6 +172,7 @@ const repositories = [
   BannedUsersForBlogRepository,
   BannedUsersForBlogQueryRepository,
 ];
+
 const controllers = [
   SAQuizController,
   PlayerQuizController,
@@ -187,6 +192,7 @@ const controllers = [
   PostsController,
   CommentsController,
 ];
+
 const services = [
   AppService,
 

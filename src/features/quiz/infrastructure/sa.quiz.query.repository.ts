@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { GamePairPaginationInput } from '../../../infrastructure/models/pagination.input.models';
-import { Users } from '../../users/entity/user.entity';
 import { Question } from '../entity/question.entity';
 import { PaginationViewModel } from '../../../infrastructure/models/pagination.view.model';
 import { QuestionViewModel } from '../api/models/view/question.view.model';
 
 @Injectable()
 export class SAQuizQueryRepository {
-  constructor(
-    @InjectDataSource() private dataSource: DataSource,
-    @InjectRepository(Users) private questionRepo: Repository<Question>,
-  ) {}
+  constructor(private dataSource: DataSource) {}
 
   async getQuestion(id: string): Promise<Question | null> {
     const [question] = await this.dataSource.query(

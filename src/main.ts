@@ -6,7 +6,8 @@ export const bootstrap = async () => {
   try {
     const app = await NestFactory.create(AppModule, { abortOnError: false });
     appSettings<AppModule>(app, AppModule);
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || 3003;
+
     await app.listen(PORT, () => {
       console.log(`App started at http://localhost:${PORT}`);
     });

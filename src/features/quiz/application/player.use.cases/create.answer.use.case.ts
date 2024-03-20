@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PlayerQuizRepository } from '../../infrastructure/player.quiz.repository';
-import { PlayerQuizQueryRepository } from '../../infrastructure/player.quiz.query.repository';
+import { QuizRepository } from '../../infrastructure/quiz.repository';
+import { QuizQueryRepository } from '../../infrastructure/quiz.query.repository';
 import {
   AnswerStatus,
   InternalCode,
@@ -11,6 +11,7 @@ import { DataSource } from 'typeorm';
 import { Contract } from '../../../../infrastructure/core/contract';
 import { Question } from '../../entity/question.entity';
 import { GameRepository } from '../../infrastructure/game.repository';
+import { PlayerRepository } from '../../infrastructure/player.repository';
 
 export class CreateAnswerCommand {
   constructor(public userId: string, public answer: string) {}
@@ -23,8 +24,9 @@ export class CreateAnswerUseCase
   constructor(
     private dataSource: DataSource,
     private gameRepository: GameRepository,
-    private playerQuizRepository: PlayerQuizRepository,
-    private playerQuizQueryRepository: PlayerQuizQueryRepository,
+    private playerRepository: PlayerRepository,
+    private playerQuizRepository: QuizRepository,
+    private playerQuizQueryRepository: QuizQueryRepository,
   ) {}
 
   async execute(command: CreateAnswerCommand): Promise<Contract<any>> {
@@ -39,7 +41,7 @@ export class CreateAnswerUseCase
 
     try {
       // достаем игру по userId
-      const currentGame = await this.playerQuizQueryRepository.getActiveGame(
+      const currentGame = await this.gameRepository.getActiveGame(
         userId,
         manager,
       );
@@ -56,14 +58,13 @@ export class CreateAnswerUseCase
       const gameId = currentGame.payload?.id;
 
       // достаем игроков по userId и gameId
-      const currentPlayer =
-        await this.playerQuizQueryRepository.getCurrentPlayer(
-          userId,
-          gameId,
-          manager,
-        );
+      const currentPlayer = await this.playerRepository.getCurrentPlayer(
+        userId,
+        gameId,
+        manager,
+      );
 
-      const otherPlayer = await this.playerQuizQueryRepository.getOtherPlayer(
+      const otherPlayer = await this.playerRepository.getOtherPlayer(
         userId,
         gameId,
         manager,
@@ -97,15 +98,12 @@ export class CreateAnswerUseCase
 
       // если ответ верный, добавляем игроку балл
       if (answerStatus === AnswerStatus.correct) {
-        await this.playerQuizRepository.increaseScore(
-          currentPlayer.id,
-          manager,
-        );
+        await this.playerRepository.increaseScore(currentPlayer.id, manager);
       }
 
       // если этот вопрос был последним, ставим игроку finishAnswersDate
       if (currentPlayer.answersCount + 1 >= 5) {
-        await this.playerQuizRepository.updateFinishAnswersDate(
+        await this.playerRepository.updateFinishAnswersDate(
           currentPlayer.id,
           manager,
         );
@@ -119,40 +117,32 @@ export class CreateAnswerUseCase
         await this.gameRepository.finishGame(gameId, manager);
 
         // достаем игроков, чтоб сравнить их время завершение игры
-        const current =
-          await this.playerQuizQueryRepository.getFinishTimeAndScore(
-            currentPlayer.id,
-            manager,
-          );
-        const other =
-          await this.playerQuizQueryRepository.getFinishTimeAndScore(
-            otherPlayer.id,
-            manager,
-          );
+        const current = await this.playerRepository.getFinishTimeAndScore(
+          currentPlayer.id,
+          manager,
+        );
+        const other = await this.playerRepository.getFinishTimeAndScore(
+          otherPlayer.id,
+          manager,
+        );
 
         // если игрок ответил первым, и у него есть хотя бы 1 верный ответ, добавляем ему балл
         if (
           current.finishAnswersDate < other.finishAnswersDate &&
           current.score > 0
         ) {
-          await this.playerQuizRepository.increaseScore(
-            currentPlayer.id,
-            manager,
-          );
+          await this.playerRepository.increaseScore(currentPlayer.id, manager);
         }
         if (
           current.finishAnswersDate > other.finishAnswersDate &&
           other.score > 0
         ) {
-          await this.playerQuizRepository.increaseScore(
-            otherPlayer.id,
-            manager,
-          );
+          await this.playerRepository.increaseScore(otherPlayer.id, manager);
         }
       }
 
       // увеличиваем игроку количество ответов на 1
-      await this.playerQuizRepository.increaseAnswersCount(
+      await this.playerRepository.increaseAnswersCount(
         currentPlayer.id,
         manager,
       );

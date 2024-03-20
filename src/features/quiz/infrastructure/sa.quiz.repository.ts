@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Question } from '../entity/question.entity';
 import { CreateQuestionInputModel } from '../api/models/input/create.question.input.model';
@@ -7,7 +6,7 @@ import { CreateQuestionDTO } from '../api/models/dto/create.question.dto';
 
 @Injectable()
 export class SAQuizRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) {}
 
   async createQuestion(dto: CreateQuestionDTO) {
     await this.dataSource

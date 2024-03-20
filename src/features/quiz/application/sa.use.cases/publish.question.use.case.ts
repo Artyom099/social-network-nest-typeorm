@@ -17,6 +17,7 @@ export class PublishQuestionUseCase
 
   async execute(command: PublishQuestionCommand) {
     const { questionId, inputModel } = command;
+
     return this.saQuizRepository.publishQuestion(
       questionId,
       inputModel.published,

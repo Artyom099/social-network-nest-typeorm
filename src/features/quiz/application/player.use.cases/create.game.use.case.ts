@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PlayerQuizRepository } from '../../infrastructure/player.quiz.repository';
-import { PlayerQuizQueryRepository } from '../../infrastructure/player.quiz.query.repository';
+import { QuizRepository } from '../../infrastructure/quiz.repository';
+import { QuizQueryRepository } from '../../infrastructure/quiz.query.repository';
 import {
   GameStatus,
   InternalCode,
@@ -13,8 +13,8 @@ import { AddQuestionsToGameDto } from '../../api/models/dto/add.questions.to.gam
 import { AddPlayerToGameDto } from '../../api/models/dto/add.player.to.game.dto';
 import { DataSource } from 'typeorm';
 import { Contract } from '../../../../infrastructure/core/contract';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { GameRepository } from '../../infrastructure/game.repository';
+import { PlayerRepository } from '../../infrastructure/player.repository';
 
 export class CreateGameCommand {
   constructor(public userId: string) {}
@@ -23,11 +23,12 @@ export class CreateGameCommand {
 @CommandHandler(CreateGameCommand)
 export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
   constructor(
-    @InjectDataSource() private dataSource: DataSource,
+    private dataSource: DataSource,
     private gameRepository: GameRepository,
+    private playerRepository: PlayerRepository,
     private usersQueryRepository: UsersQueryRepository,
-    private playerQuizRepository: PlayerQuizRepository,
-    private playerQuizQueryRepository: PlayerQuizQueryRepository,
+    private playerQuizRepository: QuizRepository,
+    private playerQuizQueryRepository: QuizQueryRepository,
   ) {}
 
   async execute(command: CreateGameCommand): Promise<Contract<any>> {
@@ -41,7 +42,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     const manager = queryRunner.manager;
 
     try {
-      const activeGame = await this.playerQuizQueryRepository.getActiveGame(
+      const activeGame = await this.gameRepository.getActiveGame(
         userId,
         manager,
       );
@@ -52,9 +53,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
       }
 
       // смотрим, ждет ли кто-то пару
-      const pendingGame = await this.playerQuizQueryRepository.getPendingGame(
-        manager,
-      );
+      const pendingGame = await this.gameRepository.getPendingGame(manager);
 
       // достаем логин текущего юзера
       const login = await this.usersQueryRepository.getUserLogin(
@@ -71,12 +70,12 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         login: login.payload,
         gameId: pendingGame.payload ? pendingGame.payload.id : 'mock',
       };
-      await this.playerQuizRepository.createPlayer(playerDTO, manager);
+      await this.playerRepository.createPlayer(playerDTO, manager);
 
       // если кто-то ждет пару, то
       if (pendingGame.code === InternalCode.Success && pendingGame.payload) {
         // достаем всех игроков юэера
-        const playerIds = await this.playerQuizQueryRepository.getPlayerIds(
+        const playerIds = await this.playerRepository.getPlayerIds(
           userId,
           manager,
         );
@@ -116,7 +115,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           pairCreatedDate: new Date(),
           firstPlayerId: playerDTO.id,
         };
-        await this.playerQuizRepository.updatePlayersGameId(
+        await this.playerRepository.updatePlayersGameId(
           playerDTO.id,
           dto.id,
           manager,
