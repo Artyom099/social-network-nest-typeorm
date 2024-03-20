@@ -1,6 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { QuizRepository } from '../../infrastructure/quiz.repository';
-import { QuizQueryRepository } from '../../infrastructure/quiz.query.repository';
 import {
   AnswerStatus,
   InternalCode,
@@ -25,8 +24,7 @@ export class CreateAnswerUseCase
     private dataSource: DataSource,
     private gameRepository: GameRepository,
     private playerRepository: PlayerRepository,
-    private playerQuizRepository: QuizRepository,
-    private playerQuizQueryRepository: QuizQueryRepository,
+    private quizRepository: QuizRepository,
   ) {}
 
   async execute(command: CreateAnswerCommand): Promise<Contract<any>> {
@@ -81,7 +79,7 @@ export class CreateAnswerUseCase
       }
 
       // достаем вопрос по gameId и порядковому номеру
-      const question = await this.playerQuizQueryRepository.getQuestion(
+      const question = await this.quizRepository.getQuestion(
         gameId,
         currentPlayer.answersCount + 1,
         manager,
@@ -155,7 +153,7 @@ export class CreateAnswerUseCase
         questionId: question.id,
         playerId: currentPlayer.id,
       };
-      answerResult = await this.playerQuizRepository.createAnswer(dto, manager);
+      answerResult = await this.quizRepository.createAnswer(dto, manager);
 
       await queryRunner.commitTransaction();
     } catch (e) {

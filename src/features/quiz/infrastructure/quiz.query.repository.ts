@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { GameStatus, InternalCode } from '../../../infrastructure/utils/enums';
 import { GameViewModel } from '../api/models/view/game.view.model';
 import { Contract } from '../../../infrastructure/core/contract';
-import { Question } from '../entity/question.entity';
 
 @Injectable()
 export class QuizQueryRepository {
@@ -268,47 +267,5 @@ export class QuizQueryRepository {
     );
 
     return player ? player.userId : null;
-  }
-
-  // question
-  async getQuestion(
-    gameId: string,
-    questionNumber: number,
-    manager: EntityManager,
-  ): Promise<Question | null> {
-    // достаем вопрос по айди игры и номеру вопроса
-
-    const [question] = await manager.query(
-      `
-    select *
-    from question q
-    left join game_question gq
-    on q."id" = gq."questionId"
-    where gq."gameId" = $1 and gq."questionNumber" = $2
-    `,
-      [gameId, questionNumber],
-    );
-
-    return question ? question : null;
-  }
-
-  async getFiveQuestionsId(manager: EntityManager) {
-    // достаем 5 случайнах вопросов
-
-    return manager.query(`
-    select "id"
-    from question
-    order by random()
-    limit 5
-    offset random()
-    `);
-
-    // return this.dataSource.query(`
-    // select "id"
-    // from question
-    // order by random()
-    // limit 5
-    // offset random()
-    // `);
   }
 }

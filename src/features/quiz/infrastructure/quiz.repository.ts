@@ -7,10 +7,12 @@ import { AnswerViewModel } from '../api/models/view/answer.view.model';
 import { AddQuestionsToGameDto } from '../api/models/dto/add.questions.to.game.dto';
 import { Contract } from '../../../infrastructure/core/contract';
 import { GameQuestion } from '../entity/game.question.entity';
+import { Question } from '../entity/question.entity';
 
 @Injectable()
 export class QuizRepository {
   // answer
+
   async createAnswer(
     dto: CreateAnswerDTO,
     manager: EntityManager,
@@ -47,6 +49,7 @@ export class QuizRepository {
   }
 
   // game_question
+
   async createFiveGameQuestions(
     dto: AddQuestionsToGameDto,
     manager: EntityManager,
@@ -67,5 +70,48 @@ export class QuizRepository {
 
       questionNumber++;
     }
+  }
+
+  // question
+
+  async getQuestion(
+    gameId: string,
+    questionNumber: number,
+    manager: EntityManager,
+  ): Promise<Question | null> {
+    // достаем вопрос по айди игры и номеру вопроса
+
+    const [question] = await manager.query(
+      `
+    select *
+    from question q
+    left join game_question gq
+    on q."id" = gq."questionId"
+    where gq."gameId" = $1 and gq."questionNumber" = $2
+    `,
+      [gameId, questionNumber],
+    );
+
+    return question ? question : null;
+  }
+
+  async getFiveQuestionsId(manager: EntityManager) {
+    // достаем 5 случайнах вопросов
+
+    return manager.query(`
+    select "id"
+    from question
+    order by random()
+    limit 5
+    offset random()
+    `);
+
+    // return this.dataSource.query(`
+    // select "id"
+    // from question
+    // order by random()
+    // limit 5
+    // offset random()
+    // `);
   }
 }

@@ -1,6 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { QuizRepository } from '../../infrastructure/quiz.repository';
-import { QuizQueryRepository } from '../../infrastructure/quiz.query.repository';
 import {
   GameStatus,
   InternalCode,
@@ -25,10 +24,9 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
   constructor(
     private dataSource: DataSource,
     private gameRepository: GameRepository,
+    private quizRepository: QuizRepository,
     private playerRepository: PlayerRepository,
-    private usersQueryRepository: UsersQueryRepository,
-    private playerQuizRepository: QuizRepository,
-    private playerQuizQueryRepository: QuizQueryRepository,
+    private userQueryRepository: UsersQueryRepository,
   ) {}
 
   async execute(command: CreateGameCommand): Promise<Contract<any>> {
@@ -56,7 +54,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
       const pendingGame = await this.gameRepository.getPendingGame(manager);
 
       // достаем логин текущего юзера
-      const login = await this.usersQueryRepository.getUserLogin(
+      const login = await this.userQueryRepository.getUserLogin(
         userId,
         manager,
       );
@@ -86,14 +84,15 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         }
 
         // добавляем 5 рандомных вопросов в игру
-        const questionsId =
-          await this.playerQuizQueryRepository.getFiveQuestionsId(manager);
+        const questionsId = await this.quizRepository.getFiveQuestionsId(
+          manager,
+        );
 
         const questionsDto: AddQuestionsToGameDto = {
           gameId: pendingGame.payload.id,
           questionsId: questionsId.map((q) => q.id),
         };
-        await this.playerQuizRepository.createFiveGameQuestions(
+        await this.quizRepository.createFiveGameQuestions(
           questionsDto,
           manager,
         );
