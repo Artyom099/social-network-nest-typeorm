@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BanUserCurrentBlogInputModel } from '../../api/models/input/ban.user.current.blog.input.model';
 import { BannedUsersForBlogRepository } from '../../infrastructure/banned.users.for.blog.repository';
 import { BannedUsersForBlogQueryRepository } from '../../infrastructure/banned.users.for.blog.query.repository';
-import { UsersQueryRepository } from '../../infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../infrastructure/user.query.repository';
 
 export class BanUserForCurrentBlogCommand {
   constructor(
@@ -16,7 +16,7 @@ export class BanUserForCurrentBlogUseCase
   implements ICommandHandler<BanUserForCurrentBlogCommand>
 {
   constructor(
-    private usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepository: UserQueryRepository,
     private bannedUsersForBlogRepository: BannedUsersForBlogRepository,
     private bannedUsersForBlogQueryRepository: BannedUsersForBlogQueryRepository,
   ) {}

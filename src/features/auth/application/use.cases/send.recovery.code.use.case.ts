@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailManager } from '../../../../infrastructure/services/email.manager';
 import { UserRepository } from '../../../users/infrastructure/user.repository';
 import { randomUUID } from 'crypto';
-import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
 
 export class SendRecoveryCodeCommand {
   constructor(public email: string) {}
@@ -15,7 +15,7 @@ export class SendRecoveryCodeUseCase
   constructor(
     private emailManager: EmailManager,
     private usersRepository: UserRepository,
-    private usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepository: UserQueryRepository,
   ) {}
 
   async execute(command: SendRecoveryCodeCommand): Promise<string | null> {

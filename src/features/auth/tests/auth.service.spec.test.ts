@@ -37,7 +37,7 @@
 //   });
 //
 //   // const usersRepository = new UsersRepository();
-//   // const usersQueryRepository = new UsersQueryRepository();
+//   // const usersQueryRepository = new UserQueryRepository();
 //   // const emailAdapter = new EmailAdapter();
 //   // const jwtService = new JwtService();
 //   // const emailManager = new EmailManager(emailAdapterMock);

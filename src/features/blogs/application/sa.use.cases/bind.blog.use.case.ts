@@ -1,5 +1,5 @@
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
-import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class BindBlogCommand {
@@ -10,7 +10,7 @@ export class BindBlogCommand {
 export class BindBlogUseCase implements ICommandHandler<BindBlogCommand> {
   constructor(
     private blogsRepository: BlogsRepository,
-    private userQueryRepository: UsersQueryRepository,
+    private userQueryRepository: UserQueryRepository,
   ) {}
 
   async execute(command: BindBlogCommand) {

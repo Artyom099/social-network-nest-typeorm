@@ -21,7 +21,7 @@ import { CreateUserInputModel } from '../../users/api/models/input/create.user.i
 import { ConfirmEmailCommand } from '../application/use.cases/confirm.email.use.case';
 import { SendRecoveryCodeCommand } from '../application/use.cases/send.recovery.code.use.case';
 import { UpdatePasswordCommand } from '../application/use.cases/update.password.use.case';
-import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../users/infrastructure/user.query.repository';
 import { AuthInputModel } from './models/input/auth.input.model';
 import { EmailInputModel } from './models/input/email.input.model';
 import { SetNewPasswordInputModel } from './models/input/set.new.password.input.model';
@@ -37,7 +37,7 @@ export class AuthController {
     private commandBus: CommandBus,
     private tokensService: TokensService,
     private devicesService: DevicesService,
-    private userQueryRepository: UsersQueryRepository,
+    private userQueryRepository: UserQueryRepository,
   ) {}
 
   @Get('me')

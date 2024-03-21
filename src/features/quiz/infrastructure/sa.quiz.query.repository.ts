@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { GamePairPaginationInput } from '../../../infrastructure/models/pagination.input.models';
 import { Question } from '../entity/question.entity';
-import { PaginationViewModel } from '../../../infrastructure/models/pagination.view.model';
+import { Pagination } from '../../../infrastructure/models/pagination';
 import { QuestionViewModel } from '../api/models/view/question.view.model';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class SAQuizQueryRepository {
 
   async getQuestions(
     query: GamePairPaginationInput,
-  ): Promise<PaginationViewModel<QuestionViewModel>> {
+  ): Promise<Pagination<QuestionViewModel>> {
     const [totalCount] = await this.dataSource.query(
       `
       select count(*)

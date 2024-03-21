@@ -12,24 +12,23 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {CommentInputModel} from './models/input/comment.input.model';
-import {BearerAuthGuard} from '../../../infrastructure/guards/bearer-auth.guard';
-import {CheckUserIdGuard} from '../../../infrastructure/guards/check-userId.guard';
-import {CommentsQueryRepository} from '../infrastructure/comments.query.repository';
-import {CommentViewModel} from './models/view/comment.view.model';
-import {LikeStatusInputModel} from './models/input/like.status.input.model';
-import {CommandBus} from '@nestjs/cqrs';
-import {UpdateCommentCommand} from '../application/use.cases/update.comment.use.case';
-import {DeleteCommentCommand} from '../application/use.cases/delete.comment.use.case';
-import {UpdateCommentLikesCommand} from '../application/use.cases/update.comment.likes.use.case';
-import {UsersQueryRepository} from '../../users/infrastructure/users.query.repository';
-
+import { CommentInputModel } from './models/input/comment.input.model';
+import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
+import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
+import { CommentsQueryRepository } from '../infrastructure/comments.query.repository';
+import { CommentViewModel } from './models/view/comment.view.model';
+import { LikeStatusInputModel } from './models/input/like.status.input.model';
+import { CommandBus } from '@nestjs/cqrs';
+import { UpdateCommentCommand } from '../application/use.cases/update.comment.use.case';
+import { DeleteCommentCommand } from '../application/use.cases/delete.comment.use.case';
+import { UpdateCommentLikesCommand } from '../application/use.cases/update.comment.likes.use.case';
+import { UserQueryRepository } from '../../users/infrastructure/user.query.repository';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     private commandBus: CommandBus,
-    private usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepository: UserQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
@@ -74,10 +73,9 @@ export class CommentsController {
     if (req.userId !== comment.commentatorInfo.userId) {
       throw new ForbiddenException();
     } else {
-      return this.commandBus.execute(new UpdateCommentCommand(
-        commentId,
-        InputModel.content
-      ));
+      return this.commandBus.execute(
+        new UpdateCommentCommand(commentId, InputModel.content),
+      );
     }
   }
 
@@ -110,11 +108,13 @@ export class CommentsController {
     if (!comment) {
       throw new NotFoundException();
     } else {
-      return this.commandBus.execute(new UpdateCommentLikesCommand(
-        commentId,
-        req.userId,
-        inputModel.likeStatus,
-      ));
+      return this.commandBus.execute(
+        new UpdateCommentLikesCommand(
+          commentId,
+          req.userId,
+          inputModel.likeStatus,
+        ),
+      );
     }
   }
 }

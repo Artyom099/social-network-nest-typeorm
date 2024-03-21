@@ -23,8 +23,8 @@ export class CreateAnswerUseCase
   constructor(
     private dataSource: DataSource,
     private gameRepository: GameRepository,
-    private playerRepository: PlayerRepository,
     private quizRepository: QuizRepository,
+    private playerRepository: PlayerRepository,
   ) {}
 
   async execute(command: CreateAnswerCommand): Promise<Contract<any>> {

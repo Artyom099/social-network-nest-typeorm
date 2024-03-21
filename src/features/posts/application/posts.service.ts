@@ -1,15 +1,15 @@
-import {Injectable} from '@nestjs/common';
-import {PostsRepository} from '../infrastructure/posts.repository';
-import {PostInputModel} from '../api/models/input/post.input.model';
-import {LikeStatus} from '../../../infrastructure/utils/enums';
-import {UsersQueryRepository} from '../../users/infrastructure/users.query.repository';
-import {UpdatePostLikesModel} from '../api/models/dto/update.post.likes.model';
+import { Injectable } from '@nestjs/common';
+import { PostsRepository } from '../infrastructure/posts.repository';
+import { PostInputModel } from '../api/models/input/post.input.model';
+import { LikeStatus } from '../../../infrastructure/utils/enums';
+import { UserQueryRepository } from '../../users/infrastructure/user.query.repository';
+import { UpdatePostLikesModel } from '../api/models/dto/update.post.likes.model';
 
 @Injectable()
 export class PostsService {
   constructor(
     protected postsRepository: PostsRepository,
-    protected usersQueryRepository: UsersQueryRepository,
+    protected usersQueryRepository: UserQueryRepository,
   ) {}
 
   //todo - переписать на use cases
@@ -20,7 +20,11 @@ export class PostsService {
     return this.postsRepository.deletePost(postId);
   }
 
-  async updatePostLikes(postId: string, userId: string, likeStatus: LikeStatus,) {
+  async updatePostLikes(
+    postId: string,
+    userId: string,
+    likeStatus: LikeStatus,
+  ) {
     const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) return null;
 
@@ -30,7 +34,7 @@ export class PostsService {
       likeStatus,
       addedAt: new Date(),
       login: user.login,
-    }
+    };
     await this.postsRepository.setPostNone(dto);
 
     if (likeStatus !== LikeStatus.None) {

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserRepository } from '../../../users/infrastructure/user.repository';
 import { HashService } from '../../../../infrastructure/services/hash.service';
-import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
 
 export class UpdatePasswordCommand {
   constructor(public code: string, public password: string) {}
@@ -14,7 +14,7 @@ export class UpdatePasswordUseCase
   constructor(
     private hashService: HashService,
     private usersRepository: UserRepository,
-    private usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepository: UserQueryRepository,
   ) {}
 
   async execute(command: UpdatePasswordCommand) {

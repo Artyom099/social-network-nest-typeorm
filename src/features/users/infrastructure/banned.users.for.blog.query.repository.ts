@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BannedUsersPaginationInput } from '../../../infrastructure/models/pagination.input.models';
-import { PaginationViewModel } from '../../../infrastructure/models/pagination.view.model';
+import { Pagination } from '../../../infrastructure/models/pagination';
 import { BannedUserForBlogViewModel } from '../api/models/view/banned.user.for.blog.view.model';
 
 @Injectable()
 export class BannedUsersForBlogQueryRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) {}
 
   async getBannedUserForBlog(id: string, blogId: string) {
     const [user] = await this.dataSource.query(
@@ -25,7 +24,7 @@ export class BannedUsersForBlogQueryRepository {
   async getBannedUsersForBlog(
     blogId: string,
     query: BannedUsersPaginationInput,
-  ): Promise<PaginationViewModel<BannedUserForBlogViewModel[]>> {
+  ): Promise<Pagination<BannedUserForBlogViewModel[]>> {
     const [totalCount] = await this.dataSource.query(
       `
     select count(*)

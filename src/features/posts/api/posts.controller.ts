@@ -20,7 +20,7 @@ import { CommentsQueryRepository } from '../../comments/infrastructure/comments.
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { CommentInputModel } from '../../comments/api/models/input/comment.input.model';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
-import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../users/infrastructure/user.query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentCommand } from '../../comments/application/use.cases/create.comment.use.case';
 import { LikeStatusInputModel } from '../../comments/api/models/input/like.status.input.model';
@@ -35,7 +35,7 @@ export class PostsController {
     private postsService: PostsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
-    private usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepository: UserQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
     private bannedUsersForBlogQueryRepository: BannedUsersForBlogQueryRepository,
   ) {}

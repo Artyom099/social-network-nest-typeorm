@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BanUserForBlogModel } from '../api/models/dto/ban.user.for.blog.model';
 import { BannedUsersForBlog } from '../entity/banned.user.for.blog.entity';
 
 @Injectable()
 export class BannedUsersForBlogRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) {}
 
   async banUserForBlog(dto: BanUserForBlogModel) {
     return this.dataSource

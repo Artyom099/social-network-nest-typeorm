@@ -67,7 +67,7 @@ import { EmailAdapter } from './infrastructure/adapters/email.adapter';
 import { EmailManager } from './infrastructure/services/email.manager';
 import { HashService } from './infrastructure/services/hash.service';
 import { UserRepository } from './features/users/infrastructure/user.repository';
-import { UsersQueryRepository } from './features/users/infrastructure/users.query.repository';
+import { UserQueryRepository } from './features/users/infrastructure/user.query.repository';
 import { BannedUsersForBlogRepository } from './features/users/infrastructure/banned.users.for.blog.repository';
 import { BannedUsersForBlogQueryRepository } from './features/users/infrastructure/banned.users.for.blog.query.repository';
 import { DevicesService } from './features/devices/application/devices.service';
@@ -155,7 +155,7 @@ const repositories = [
   PlayerRepository,
 
   UserRepository,
-  UsersQueryRepository,
+  UserQueryRepository,
 
   BlogsRepository,
   BlogsQueryRepository,

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserRepository } from '../../../users/infrastructure/user.repository';
-import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
 
 export class ConfirmEmailCommand {
   constructor(public code: string) {}
@@ -12,7 +12,7 @@ export class ConfirmEmailUseCase
 {
   constructor(
     private userRepository: UserRepository,
-    private userQueryRepository: UsersQueryRepository,
+    private userQueryRepository: UserQueryRepository,
   ) {}
 
   async execute(command: ConfirmEmailCommand): Promise<boolean> {

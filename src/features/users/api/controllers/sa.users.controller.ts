@@ -12,17 +12,17 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import {UsersQueryRepository} from '../../infrastructure/users.query.repository';
-import {BasicAuthGuard} from '../../../../infrastructure/guards/basic-auth.guard';
-import {CreateUserByAdminCommand} from '../../application/sa.users.use.cases/create.user.use.case';
-import {BanUserCommand} from '../../application/sa.users.use.cases/ban.user.use.case';
-import {CommandBus} from '@nestjs/cqrs';
-import {UnbanUserCommand} from '../../application/sa.users.use.cases/unban.user.use.case';
-import {DevicesService} from '../../../devices/application/devices.service';
-import {UsersPaginationInput} from '../../../../infrastructure/models/pagination.input.models';
-import {DeleteUserCommand} from '../../application/sa.users.use.cases/delete.user.use.case';
-import {BanUserInputModel} from '../models/input/ban.user.input.model';
-import {CreateUserInputModel} from '../models/input/create.user.input.model';
+import { UserQueryRepository } from '../../infrastructure/user.query.repository';
+import { BasicAuthGuard } from '../../../../infrastructure/guards/basic-auth.guard';
+import { CreateUserByAdminCommand } from '../../application/sa.users.use.cases/create.user.use.case';
+import { BanUserCommand } from '../../application/sa.users.use.cases/ban.user.use.case';
+import { CommandBus } from '@nestjs/cqrs';
+import { UnbanUserCommand } from '../../application/sa.users.use.cases/unban.user.use.case';
+import { DevicesService } from '../../../devices/application/devices.service';
+import { UsersPaginationInput } from '../../../../infrastructure/models/pagination.input.models';
+import { DeleteUserCommand } from '../../application/sa.users.use.cases/delete.user.use.case';
+import { BanUserInputModel } from '../models/input/ban.user.input.model';
+import { CreateUserInputModel } from '../models/input/create.user.input.model';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa/users')
@@ -30,7 +30,7 @@ export class SaUsersController {
   constructor(
     private commandBus: CommandBus,
     private devicesService: DevicesService,
-    private usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepository: UserQueryRepository,
   ) {}
 
   @Get()

@@ -7,7 +7,7 @@ import {
 import { CreateGameDto } from '../../api/models/dto/create.game.dto';
 import { randomUUID } from 'crypto';
 import { CreatePlayerDTO } from '../../api/models/dto/create.player.dto';
-import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
 import { AddQuestionsToGameDto } from '../../api/models/dto/add.questions.to.game.dto';
 import { AddPlayerToGameDto } from '../../api/models/dto/add.player.to.game.dto';
 import { DataSource } from 'typeorm';
@@ -26,7 +26,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     private gameRepository: GameRepository,
     private quizRepository: QuizRepository,
     private playerRepository: PlayerRepository,
-    private userQueryRepository: UsersQueryRepository,
+    private userQueryRepository: UserQueryRepository,
   ) {}
 
   async execute(command: CreateGameCommand): Promise<Contract<any>> {

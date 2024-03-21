@@ -1,7 +1,7 @@
-import {BanStatus, SortBy, SortDirection} from '../utils/enums';
-import {IsBoolean, IsOptional, IsString} from 'class-validator';
-import {Transform} from 'class-transformer';
-import {isNil} from '@nestjs/common/utils/shared.utils';
+import { BanStatus, SortBy, SortDirection } from '../utils/enums';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { isNil } from '@nestjs/common/utils/shared.utils';
 
 export class DefaultPaginationInput {
   @IsString()
@@ -33,7 +33,7 @@ export class DefaultPaginationInput {
     return Math.ceil(parseInt(pgCount.count, 10) / this.pageSize);
   }
   totalCountSql(pgCount: { count: string }): number {
-    return parseInt(pgCount.count, 10)
+    return parseInt(pgCount.count, 10);
   }
 }
 
@@ -42,7 +42,7 @@ export class BlogsPaginationInput extends DefaultPaginationInput {
     return !isNil(value) ? value : '';
   })
   @IsOptional()
-  searchNameTerm: string = '';
+  searchNameTerm = '';
 }
 
 export class UsersPaginationInput extends DefaultPaginationInput {
@@ -52,20 +52,20 @@ export class UsersPaginationInput extends DefaultPaginationInput {
     return value === BanStatus.banned
       ? true
       : value === BanStatus.notBanned
-        ? false
-        : null;
+      ? false
+      : null;
   })
   banStatus: boolean | null = null;
   @IsOptional()
   @Transform(({ value }): string => {
     return !isNil(value) ? value : '';
   })
-  searchLoginTerm: string = '';
+  searchLoginTerm = '';
   @IsOptional()
   @Transform(({ value }) => {
     return !isNil(value) ? value : '';
   })
-  searchEmailTerm: string = '';
+  searchEmailTerm = '';
 }
 
 export class BannedUsersPaginationInput extends DefaultPaginationInput {
@@ -73,7 +73,7 @@ export class BannedUsersPaginationInput extends DefaultPaginationInput {
   @Transform(({ value }) => {
     return !isNil(value) ? value : '';
   })
-  searchLoginTerm: string = '';
+  searchLoginTerm = '';
 }
 
 export class GamePairPaginationInput extends DefaultPaginationInput {
@@ -81,15 +81,15 @@ export class GamePairPaginationInput extends DefaultPaginationInput {
   @Transform(({ value }) => {
     return !isNil(value) ? value : '';
   })
-  bodySearchTerm: string = '';
+  bodySearchTerm = '';
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }): boolean | null => {
     return value === BanStatus.banned
       ? true
       : value === BanStatus.notBanned
-        ? false
-        : null;
+      ? false
+      : null;
   })
   publishedStatus: boolean | null = null;
 }

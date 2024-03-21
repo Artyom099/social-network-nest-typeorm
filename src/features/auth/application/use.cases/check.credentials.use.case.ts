@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { TokensService } from '../../../../infrastructure/services/tokens.service';
 import { HashService } from '../../../../infrastructure/services/hash.service';
-import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
 
 export class CheckCredentialsCommand {
   constructor(public loginOrEmail: string, public password: string) {}
@@ -15,7 +15,7 @@ export class CheckCredentialsUseCase
   constructor(
     private hashService: HashService,
     private tokensService: TokensService,
-    private usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepository: UserQueryRepository,
   ) {}
 
   async execute(command: CheckCredentialsCommand) {
