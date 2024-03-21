@@ -95,7 +95,7 @@ export class QuizRepository {
     return question ? question : null;
   }
 
-  async getFiveQuestionsId(manager: EntityManager) {
+  async getFiveQuestionId(manager: EntityManager) {
     // достаем 5 случайнах вопросов
 
     return manager.query(`
@@ -105,13 +105,5 @@ export class QuizRepository {
     limit 5
     offset random()
     `);
-
-    // return this.dataSource.query(`
-    // select "id"
-    // from question
-    // order by random()
-    // limit 5
-    // offset random()
-    // `);
   }
 }

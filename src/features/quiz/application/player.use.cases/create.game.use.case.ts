@@ -84,7 +84,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
         }
 
         // добавляем 5 рандомных вопросов в игру
-        const questionsId = await this.quizRepository.getFiveQuestionsId(
+        const questionsId = await this.quizRepository.getFiveQuestionId(
           manager,
         );
 
