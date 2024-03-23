@@ -6,7 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Users } from '../../users/entity/user.entity';
+import { Users } from '../../user/entity/user.entity';
 import { Answer } from './answer.entity';
 import { Game } from './game.entity';
 

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UserRepository } from '../../../users/infrastructure/user.repository';
+import { UserRepository } from '../../../user/infrastructure/user.repository';
 import { HashService } from '../../../../infrastructure/services/hash.service';
-import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
+import { UserQueryRepository } from '../../../user/infrastructure/user.query.repository';
 
 export class UpdatePasswordCommand {
   constructor(public code: string, public password: string) {}

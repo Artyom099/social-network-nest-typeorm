@@ -1,10 +1,13 @@
-import {Test, TestingModule} from '@nestjs/testing';
-import {HttpStatus, INestApplication} from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import {AppModule} from '../src/app.module';
-import {LikeStatus} from '../src/infrastructure/utils/enums';
-import {appSettings} from '../src/infrastructure/settings/app.settings';
-import {getRefreshTokenByResponse, getRefreshTokenByResponseWithTokenName,} from '../src/infrastructure/utils/helpers';
+import { AppModule } from '../src/app.module';
+import { LikeStatus } from '../src/infrastructure/utils/enums';
+import { appSettings } from '../src/infrastructure/settings/app.settings';
+import {
+  getRefreshTokenByResponse,
+  getRefreshTokenByResponseWithTokenName,
+} from '../src/infrastructure/utils/helpers';
 
 describe('PostsController (e2e)', () => {
   let app: INestApplication;
@@ -24,7 +27,7 @@ describe('PostsController (e2e)', () => {
   });
 
   // создаю 5 пользователей
-  it('1 – POST:/sa/users – create 1st user by admin', async () => {
+  it('1 – POST:/sa/user – create 1st user by admin', async () => {
     const firstUserInputModel = {
       login: 'lg-111111',
       password: 'qwerty1',
@@ -71,7 +74,7 @@ describe('PostsController (e2e)', () => {
       firstCreatedUser,
     });
   });
-  it('2 – POST:/sa/users – create 2nd user by admin', async () => {
+  it('2 – POST:/sa/user – create 2nd user by admin', async () => {
     const { firstCreatedUser } = expect.getState();
     const secondUserInputModel = {
       login: 'lg-222222',
@@ -119,7 +122,7 @@ describe('PostsController (e2e)', () => {
       secondCreateResponse: secondCreateResponse,
     });
   });
-  it('3 – POST:/sa/users – create 3rd user by admin', async () => {
+  it('3 – POST:/sa/user – create 3rd user by admin', async () => {
     const thirdUserInputModel = {
       login: 'lg-333333',
       password: 'qwerty3',
@@ -140,7 +143,7 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ thirdUserInputModel, thirdCreatedUser });
   });
-  it('4 – POST:/sa/users – create 4th user by admin', async () => {
+  it('4 – POST:/sa/user – create 4th user by admin', async () => {
     const fourthUserInputModel = {
       login: 'lg-444444',
       password: 'qwerty4',
@@ -161,7 +164,7 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ fourthUserInputModel, fourthCreatedUser });
   });
-  it('5 – POST:/sa/users – create 5th user by admin', async () => {
+  it('5 – POST:/sa/user – create 5th user by admin', async () => {
     const fifthUserInputModel = {
       login: 'lg-555555',
       password: 'qwerty5',
@@ -211,7 +214,7 @@ describe('PostsController (e2e)', () => {
   });
 
   // создаю ему блог и пост
-  it('7 – POST:/blogger/blogs – return 201 & create blog by 1st user', async () => {
+  it('7 – POST:/blogger/blog – return 201 & create blog by 1st user', async () => {
     const { firstAccessToken } = expect.getState();
     const firstBlog = {
       name: 'valid-blog',
@@ -242,7 +245,7 @@ describe('PostsController (e2e)', () => {
     expect.setState({ firstCreatedBlog: createBlogResponse.body });
   });
 
-  it('8 – POST:/blogger/blogs/:id/posts – return 201 & create post by 1st user', async () => {
+  it('8 – POST:/blogger/blog/:id/post – return 201 & create post by 1st user', async () => {
     const { firstAccessToken, firstCreatedBlog } = expect.getState();
     const firstPost = {
       title: 'valid-title',
@@ -281,7 +284,7 @@ describe('PostsController (e2e)', () => {
     expect.setState({ firstPost: createPostResponse.body });
   });
 
-  it('9 – GET:/posts – return 200 and 1st post', async () => {
+  it('9 – GET:/post – return 200 and 1st post', async () => {
     const { firstAccessToken, firstPost, firstCreatedBlog } = expect.getState();
 
     const getPosts = await request(server)
@@ -314,14 +317,14 @@ describe('PostsController (e2e)', () => {
       ],
     });
   });
-  it('10 – GET:/posts/:id – return 404 with not existing postId', async () => {
+  it('10 – GET:/post/:id – return 404 with not existing postId', async () => {
     const { firstAccessToken } = expect.getState();
     await request(server)
       .get('/posts/862cd5fa-dd4d-4d6f-a78b-339ed319b77d')
       .auth(firstAccessToken, { type: 'bearer' })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it('11 – PUT:/posts/:id – return 404 with not existing postId', async () => {
+  it('11 – PUT:/post/:id – return 404 with not existing postId', async () => {
     const { firstAccessToken } = expect.getState();
     const firstUpdatePost = {
       title: 'valid-title-update',
@@ -339,7 +342,7 @@ describe('PostsController (e2e)', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it('12 – PUT:/blogger/blogs/:id/posts/:id – return 204 & update post', async () => {
+  it('12 – PUT:/blogger/blog/:id/post/:id – return 204 & update post', async () => {
     const { firstPost, firstCreatedBlog, firstAccessToken } = expect.getState();
     const firstUpdatePost = {
       title: 'valid-title-update',
@@ -360,7 +363,7 @@ describe('PostsController (e2e)', () => {
     expect.setState({ firstUpdatePost: firstUpdatePost });
   });
 
-  it('13 – DELETE:/blogger/blogs/:id/posts/:id – return 404 with not existing postId', async () => {
+  it('13 – DELETE:/blogger/blog/:id/post/:id – return 404 with not existing postId', async () => {
     const { firstAccessToken } = expect.getState();
 
     await request(server)
@@ -368,7 +371,7 @@ describe('PostsController (e2e)', () => {
       .auth(firstAccessToken, { type: 'bearer' })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it('14 – DELETE:/blogger/blogs/:id/posts/:id – return 204 & delete post', async () => {
+  it('14 – DELETE:/blogger/blog/:id/post/:id – return 204 & delete post', async () => {
     const { firstPost, firstCreatedBlog, firstAccessToken } = expect.getState();
 
     await request(server)
@@ -377,7 +380,7 @@ describe('PostsController (e2e)', () => {
       .expect(HttpStatus.NO_CONTENT);
   });
 
-  it('15 – POST:/blogger/blogs/:id/posts – return 201 & create 1st post by 1st user', async () => {
+  it('15 – POST:/blogger/blog/:id/post – return 201 & create 1st post by 1st user', async () => {
     const { firstCreatedBlog, firstPost, firstAccessToken } = expect.getState();
 
     const createPostResponse = await request(server)
@@ -409,7 +412,7 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ firstPost: createPostResponse.body });
   });
-  it('16 – POST:/blogger/blogs/:id/posts – return 201 & create 2nd post by 1st user', async () => {
+  it('16 – POST:/blogger/blog/:id/post – return 201 & create 2nd post by 1st user', async () => {
     const { firstCreatedBlog, firstPost, firstAccessToken } = expect.getState();
 
     const createPostResponse = await request(server)
@@ -443,7 +446,7 @@ describe('PostsController (e2e)', () => {
   });
 
   // лайк -> дизлайк -> удаление дизлайка
-  it('16 – PUT:/posts/:id/like-status – return 204 & set like', async () => {
+  it('16 – PUT:/post/:id/like-status – return 204 & set like', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
 
     const setLike = await request(server)
@@ -454,7 +457,7 @@ describe('PostsController (e2e)', () => {
     expect(setLike).toBeDefined();
     expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('17 – GET:/posts/:id – return 200 & get post with 1 like', async () => {
+  it('17 – GET:/post/:id – return 200 & get post with 1 like', async () => {
     const { firstAccessToken, firstPost, firstCreatedUser } = expect.getState();
 
     const getPost = await request(server)
@@ -485,7 +488,7 @@ describe('PostsController (e2e)', () => {
       },
     });
   });
-  it('18 – PUT:/posts/:id/like-status – return 204 & set dislike', async () => {
+  it('18 – PUT:/post/:id/like-status – return 204 & set dislike', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
 
     const setDislike = await request(server)
@@ -496,7 +499,7 @@ describe('PostsController (e2e)', () => {
     expect(setDislike).toBeDefined();
     expect(setDislike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('19 – GET:/posts/:id – return 200 & get post with 1 dislike', async () => {
+  it('19 – GET:/post/:id – return 200 & get post with 1 dislike', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
 
     const getPost = await request(server)
@@ -521,7 +524,7 @@ describe('PostsController (e2e)', () => {
       },
     });
   });
-  it('20 – PUT:/posts/:id/like-status – return 204 & delete dislike', async () => {
+  it('20 – PUT:/post/:id/like-status – return 204 & delete dislike', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
 
     const setNone = await request(server)
@@ -532,7 +535,7 @@ describe('PostsController (e2e)', () => {
     expect(setNone).toBeDefined();
     expect(setNone.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('21 – GET:/posts/:id – return 200 & get post', async () => {
+  it('21 – GET:/post/:id – return 200 & get post', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
 
     const getPost = await request(server)
@@ -626,7 +629,7 @@ describe('PostsController (e2e)', () => {
   });
 
   // они лайкают пост 1го пользователя
-  it('26 – PUT:/posts/:id/like-status – return 204 & set like by 2nd user', async () => {
+  it('26 – PUT:/post/:id/like-status – return 204 & set like by 2nd user', async () => {
     const { secondAccessToken, firstPost } = expect.getState();
     const setLike = await request(server)
       .put(`/posts/${firstPost.id}/like-status`)
@@ -636,7 +639,7 @@ describe('PostsController (e2e)', () => {
     expect(setLike).toBeDefined();
     expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('27 – PUT:/posts/:id/like-status – return 204 & set like by 3rd user', async () => {
+  it('27 – PUT:/post/:id/like-status – return 204 & set like by 3rd user', async () => {
     const { thirdAccessToken, firstPost } = expect.getState();
     const setLike = await request(server)
       .put(`/posts/${firstPost.id}/like-status`)
@@ -646,7 +649,7 @@ describe('PostsController (e2e)', () => {
     expect(setLike).toBeDefined();
     expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('28 – PUT:/posts/:id/like-status – return 204 & set like by 4th user', async () => {
+  it('28 – PUT:/post/:id/like-status – return 204 & set like by 4th user', async () => {
     const { fourthAccessToken, firstPost } = expect.getState();
     const setLike = await request(server)
       .put(`/posts/${firstPost.id}/like-status`)
@@ -656,7 +659,7 @@ describe('PostsController (e2e)', () => {
     expect(setLike).toBeDefined();
     expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('29 – PUT:/posts/:id/like-status – return 204 & set like by 5th user', async () => {
+  it('29 – PUT:/post/:id/like-status – return 204 & set like by 5th user', async () => {
     const { fifthAccessToken, firstPost } = expect.getState();
     const setLike = await request(server)
       .put(`/posts/${firstPost.id}/like-status`)
@@ -668,7 +671,7 @@ describe('PostsController (e2e)', () => {
   });
 
   // баню 2го пользователя
-  it('30 – PUT:/sa/users/:id/ban – return 204 & ban 2nd user', async () => {
+  it('30 – PUT:/sa/user/:id/ban – return 204 & ban 2nd user', async () => {
     const {
       fifthCreatedUser,
       fourthCreatedUser,
@@ -721,7 +724,7 @@ describe('PostsController (e2e)', () => {
     expect.setState({ secondBannedUser });
   });
 
-  it('31 – GET:/posts/:id – return 200 & get post by 1st user with 3 likes', async () => {
+  it('31 – GET:/post/:id – return 200 & get post by 1st user with 3 likes', async () => {
     const {
       firstAccessToken,
       firstPost,
@@ -768,7 +771,7 @@ describe('PostsController (e2e)', () => {
       },
     });
   });
-  it('32 – GET:/posts – return 200 & get post by 1st user with 3 likes', async () => {
+  it('32 – GET:/post – return 200 & get post by 1st user with 3 likes', async () => {
     const {
       firstAccessToken,
       firstPost,

@@ -1,12 +1,12 @@
 import { HashService } from '../../../../infrastructure/services/hash.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateUserInputModel } from '../../../users/api/models/input/create.user.input.model';
-import { UserViewModel } from '../../../users/api/models/view/user.view.model';
-import { UserRepository } from '../../../users/infrastructure/user.repository';
+import { CreateUserInputModel } from '../../../user/api/models/input/create.user.input.model';
+import { UserViewModel } from '../../../user/api/models/view/user.view.model';
+import { UserRepository } from '../../../user/infrastructure/user.repository';
 import add from 'date-fns/add';
 import { randomUUID } from 'crypto';
 import { EmailManager } from '../../../../infrastructure/services/email.manager';
-import { CreateUserDTO } from '../../../users/api/models/dto/create.user.dto';
+import { CreateUserDTO } from '../../../user/api/models/dto/create.user.dto';
 
 export class RegisterUserCommand {
   constructor(public inputModel: CreateUserInputModel) {}

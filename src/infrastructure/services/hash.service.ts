@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { SaltHashDto } from '../../features/users/api/models/dto/salt.hash.dto';
+import { SaltHashDto } from '../../features/user/api/models/dto/salt.hash.dto';
 
 @Injectable()
 export class HashService {

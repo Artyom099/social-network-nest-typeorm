@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailManager } from '../../../../infrastructure/services/email.manager';
-import { UserRepository } from '../../../users/infrastructure/user.repository';
+import { UserRepository } from '../../../user/infrastructure/user.repository';
 import { randomUUID } from 'crypto';
-import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
+import { UserQueryRepository } from '../../../user/infrastructure/user.query.repository';
 
 export class UpdateConfirmationCodeCommand {
   constructor(public email: string) {}

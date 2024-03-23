@@ -12,21 +12,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TokensService } from '../../../infrastructure/services/tokens.service';
-import { DevicesService } from '../../devices/application/devices.service';
+import { DevicesService } from '../../device/application/devices.service';
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { RegisterUserCommand } from '../application/use.cases/register.user.use.case';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateUserInputModel } from '../../users/api/models/input/create.user.input.model';
+import { CreateUserInputModel } from '../../user/api/models/input/create.user.input.model';
 import { ConfirmEmailCommand } from '../application/use.cases/confirm.email.use.case';
 import { SendRecoveryCodeCommand } from '../application/use.cases/send.recovery.code.use.case';
 import { UpdatePasswordCommand } from '../application/use.cases/update.password.use.case';
-import { UserQueryRepository } from '../../users/infrastructure/user.query.repository';
+import { UserQueryRepository } from '../../user/infrastructure/user.query.repository';
 import { AuthInputModel } from './models/input/auth.input.model';
 import { EmailInputModel } from './models/input/email.input.model';
 import { SetNewPasswordInputModel } from './models/input/set.new.password.input.model';
 import { ResendConfirmationCommand } from '../application/use.cases/resend.confirmation.use.case';
-import { CreateDeviceDTO } from '../../devices/api/models/create.device.dto';
+import { CreateDeviceDTO } from '../../device/api/models/create.device.dto';
 import { CheckCredentialsCommand } from '../application/use.cases/check.credentials.use.case';
 import { RefreshTokenCommand } from '../application/use.cases/refresh.token.use.case';
 import { RateLimitGuard } from '../../../infrastructure/guards/rate.limit/rate.limit.guard';

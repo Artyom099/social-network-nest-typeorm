@@ -1,9 +1,12 @@
-import {Test, TestingModule} from '@nestjs/testing';
-import {HttpStatus, INestApplication} from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import {AppModule} from '../src/app.module';
-import {appSettings} from '../src/infrastructure/settings/app.settings';
-import {getRefreshTokenByResponse, getRefreshTokenByResponseWithTokenName,} from '../src/infrastructure/utils/helpers';
+import { AppModule } from '../src/app.module';
+import { appSettings } from '../src/infrastructure/settings/app.settings';
+import {
+  getRefreshTokenByResponse,
+  getRefreshTokenByResponseWithTokenName,
+} from '../src/infrastructure/utils/helpers';
 
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
@@ -41,7 +44,7 @@ describe('AuthController (e2e)', () => {
   });
 
   // создаю 1го пользователя как админ
-  it('3 – POST:/sa/users – create 1st user by admin', async () => {
+  it('3 – POST:/sa/user – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-1111',
       password: 'qwerty1',
@@ -50,7 +53,7 @@ describe('AuthController (e2e)', () => {
 
     const firstCreateResponse = await request(server)
       .post('/sa/users')
-      .auth('admin', 'qwerty', {type: 'basic'})
+      .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: firstUser.login,
         password: firstUser.password,
@@ -73,7 +76,7 @@ describe('AuthController (e2e)', () => {
 
     await request(server)
       .get('/sa/users')
-      .auth('admin', 'qwerty', {type: 'basic'})
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
@@ -82,10 +85,10 @@ describe('AuthController (e2e)', () => {
         items: [firstCreatedUser],
       });
 
-    expect.setState({firstUser, firstCreateResponse});
+    expect.setState({ firstUser, firstCreateResponse });
   });
   it('4 – GET:/auth/me – return created 1st user', async () => {
-    const {firstUser, firstCreateResponse} = expect.getState();
+    const { firstUser, firstCreateResponse } = expect.getState();
     //чтобы .split не ругался на возможный undefined
     if (!firstCreateResponse.headers.authorization) return new Error();
     const accessToken =
@@ -93,21 +96,21 @@ describe('AuthController (e2e)', () => {
 
     await request(server)
       .get('/auth/me')
-      .auth('accessToken', {type: 'bearer'})
+      .auth('accessToken', { type: 'bearer' })
       .expect(HttpStatus.OK, {
         email: firstUser.email,
         login: firstUser.login,
         userId: firstUser.userId,
       });
 
-    expect.setState({firstAccessToken: accessToken});
+    expect.setState({ firstAccessToken: accessToken });
   });
 
   // негативные тесты
-  it('5 – POST:/auth/registration-email-resending – return 400 if email doesn\'t exist', async () => {
+  it("5 – POST:/auth/registration-email-resending – return 400 if email doesn't exist", async () => {
     await request(server)
       .post('/auth/registration-email-resending')
-      .send({email: 'unknown-email@mail.com'})
+      .send({ email: 'unknown-email@mail.com' })
       .expect(HttpStatus.BAD_REQUEST, {
         errorsMessages: [
           {
@@ -118,11 +121,11 @@ describe('AuthController (e2e)', () => {
       });
   });
   it('6 – POST:/auth/registration-email-resending – return 400 if email already confirm', async () => {
-    const {firstUser} = expect.getState();
+    const { firstUser } = expect.getState();
 
     await request(server)
       .post('/auth/registration-email-resending')
-      .send({email: firstUser.email})
+      .send({ email: firstUser.email })
       .expect(HttpStatus.BAD_REQUEST, {
         errorsMessages: [
           {
@@ -133,8 +136,8 @@ describe('AuthController (e2e)', () => {
       });
   });
 
-  it('7 – POST:/auth/registration – return 400 if user\'s email already exist', async () => {
-    const {firstUser} = expect.getState();
+  it("7 – POST:/auth/registration – return 400 if user's email already exist", async () => {
+    const { firstUser } = expect.getState();
 
     await request(server)
       .post('/auth/registration')
@@ -152,8 +155,8 @@ describe('AuthController (e2e)', () => {
         ],
       });
   });
-  it('8 – POST:/auth/registration – return 400 if user\'s login already exist', async () => {
-    const {firstUser} = expect.getState();
+  it("8 – POST:/auth/registration – return 400 if user's login already exist", async () => {
+    const { firstUser } = expect.getState();
 
     await request(server)
       .post('/auth/registration')
@@ -189,21 +192,21 @@ describe('AuthController (e2e)', () => {
       })
       .expect(HttpStatus.NO_CONTENT);
 
-    expect.setState({secondUser: secondUser});
+    expect.setState({ secondUser: secondUser });
   });
   it('10 – POST:/auth/registration-email-resending – return 204 if user exist & send confirmation code', async () => {
-    const {secondUser} = expect.getState();
+    const { secondUser } = expect.getState();
 
     await request(server)
       .post('/auth/registration-email-resending')
-      .send({email: secondUser.email})
+      .send({ email: secondUser.email })
       .expect(HttpStatus.NO_CONTENT);
   });
 
-  it('11 – POST:/auth/registration-confirmation – return 400 if confirmation code doesn\'t exist', async () => {
+  it("11 – POST:/auth/registration-confirmation – return 400 if confirmation code doesn't exist", async () => {
     await request(server)
       .post('/auth/registration-confirmation')
-      .send({code: 'invalid code'})
+      .send({ code: 'invalid code' })
       .expect(HttpStatus.BAD_REQUEST, {
         errorsMessages: [
           {
@@ -223,35 +226,33 @@ describe('AuthController (e2e)', () => {
 
   // логиню первого пользователя
   it('13 – POST:/auth/login – return 200 and login 1st user', async () => {
-    const {firstUser} = expect.getState();
+    const { firstUser } = expect.getState();
 
-    const loginResponse = await request(server)
-      .post('/auth/login')
-      .send({
-        loginOrEmail: firstUser.login,
-        password: firstUser.password,
-      });
+    const loginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: firstUser.login,
+      password: firstUser.password,
+    });
 
     expect(loginResponse).toBeDefined();
     expect(loginResponse.status).toBe(HttpStatus.OK);
-    expect(loginResponse.body).toEqual({accessToken: expect.any(String)});
-    const {accessToken} = loginResponse.body;
+    expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
+    const { accessToken } = loginResponse.body;
 
     const refreshToken = getRefreshTokenByResponse(loginResponse);
     expect(refreshToken).toBeDefined();
     expect(refreshToken).toEqual(expect.any(String));
 
-    expect.setState({accessToken, firstRefreshToken: refreshToken});
+    expect.setState({ accessToken, firstRefreshToken: refreshToken });
   });
 
   // получаю новую пру токенов
   it('14 – POST:/auth/refresh-token – return 200, new pair of tokens', async () => {
-    const {accessToken, firstRefreshToken} = expect.getState();
+    const { accessToken, firstRefreshToken } = expect.getState();
     await sleep(1.1);
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/refresh-token')
       .set('cookie', `refreshToken=${firstRefreshToken}`);
-      // .set('cookie', `${firstRefreshToken}`);
+    // .set('cookie', `${firstRefreshToken}`);
 
     expect(goodRefreshTokenResponse).toBeDefined();
     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.OK);
@@ -276,13 +277,15 @@ describe('AuthController (e2e)', () => {
   });
 
   it('15 – POST:/auth/refresh-token – return 401 with no token', async () => {
-    const goodRefreshTokenResponse = await request(server).post('/auth/refresh-token');
+    const goodRefreshTokenResponse = await request(server).post(
+      '/auth/refresh-token',
+    );
 
     expect(goodRefreshTokenResponse).toBeDefined();
     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
   });
   it('16 – POST:/auth/refresh-token – return 401 with old token', async () => {
-    const {firstRefreshToken} = expect.getState();
+    const { firstRefreshToken } = expect.getState();
     await sleep(1.1);
 
     const goodRefreshTokenResponse = await request(server)
@@ -294,7 +297,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it('17 – POST:/auth/password-recovery – return 400 with no email in body', async () => {
-    const {secondRefreshToken} = expect.getState();
+    const { secondRefreshToken } = expect.getState();
     const recoveryResponse = await request(server)
       .post('/auth/password-recovery')
       .set('cookie', `refreshToken=${secondRefreshToken}`);
@@ -303,19 +306,19 @@ describe('AuthController (e2e)', () => {
     expect(recoveryResponse.status).toBe(HttpStatus.BAD_REQUEST);
   });
   it('18 – POST:/auth/password-recovery – return 204 & send recovery code to email', async () => {
-    const {firstUser, secondRefreshToken} = expect.getState();
+    const { firstUser, secondRefreshToken } = expect.getState();
 
     const recoveryResponse = await request(server)
       .post('/auth/password-recovery')
       .set('cookie', secondRefreshToken)
-      .send({email: firstUser.email});
+      .send({ email: firstUser.email });
 
     expect(recoveryResponse).toBeDefined();
     //для тестов здесть OK, поставить такой же статус в контроллере
     expect(recoveryResponse.status).toBe(HttpStatus.OK);
-    expect.setState({recoveryCode: recoveryResponse.body.recoveryCode});
+    expect.setState({ recoveryCode: recoveryResponse.body.recoveryCode });
 
-    console.log({recoveryCode_body: recoveryResponse.body.recoveryCode});
+    console.log({ recoveryCode_body: recoveryResponse.body.recoveryCode });
   });
 
   it('19 – POST:/auth/new-password – return 400 with incorrect recoveryCode', async () => {
@@ -330,7 +333,7 @@ describe('AuthController (e2e)', () => {
     expect(newPasswordResponse.status).toBe(HttpStatus.BAD_REQUEST);
   });
   it('20 – POST:/auth/new-password – return 204 & update password', async () => {
-    const {recoveryCode} = expect.getState();
+    const { recoveryCode } = expect.getState();
     //todo - достаю recoveryCode прямо из базы по userId
     // const code = userModel.findOne();
 
@@ -430,7 +433,7 @@ describe('AuthController (e2e)', () => {
   // });
 
   it('23 – POST:/auth/logout – return 204 & logout 1st user', async () => {
-    const {secondRefreshToken} = expect.getState();
+    const { secondRefreshToken } = expect.getState();
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/logout')
       .set('cookie', secondRefreshToken);
@@ -439,7 +442,7 @@ describe('AuthController (e2e)', () => {
     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.NO_CONTENT);
   });
   it('24 – POST:/auth/refresh-token – return 401 with old token', async () => {
-    const {secondRefreshToken} = expect.getState();
+    const { secondRefreshToken } = expect.getState();
 
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/logout')
@@ -450,7 +453,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it('25 – POST:/auth/login – return 200 and login 1st user', async () => {
-    const {firstUser} = expect.getState();
+    const { firstUser } = expect.getState();
 
     const loginResponse = await request(server).post('/auth/login').send({
       loginOrEmail: firstUser.login,
@@ -459,17 +462,17 @@ describe('AuthController (e2e)', () => {
 
     expect(loginResponse).toBeDefined();
     expect(loginResponse.status).toBe(HttpStatus.OK);
-    expect(loginResponse.body).toEqual({accessToken: expect.any(String)});
-    const {accessToken} = loginResponse.body;
+    expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
+    const { accessToken } = loginResponse.body;
 
     const refreshToken = getRefreshTokenByResponse(loginResponse);
     expect(refreshToken).toBeDefined();
     expect(refreshToken).toEqual(expect.any(String));
 
-    expect.setState({accessToken, thirdRefreshToken: refreshToken});
+    expect.setState({ accessToken, thirdRefreshToken: refreshToken });
   });
   it('26 – POST:/auth/refresh-token – return 401 with old token', async () => {
-    const {thirdRefreshToken} = expect.getState();
+    const { thirdRefreshToken } = expect.getState();
     await sleep(21.1);
 
     const goodRefreshTokenResponse = await request(server)

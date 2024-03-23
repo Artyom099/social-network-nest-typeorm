@@ -1,10 +1,10 @@
-import {Test, TestingModule} from '@nestjs/testing';
-import {HttpStatus, INestApplication} from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import {AppModule} from '../src/app.module';
-import {LikeStatus} from '../src/infrastructure/utils/enums';
-import {appSettings} from '../src/infrastructure/settings/app.settings';
-import {getRefreshTokenByResponse} from '../src/infrastructure/utils/helpers';
+import { AppModule } from '../src/app.module';
+import { LikeStatus } from '../src/infrastructure/utils/enums';
+import { appSettings } from '../src/infrastructure/settings/app.settings';
+import { getRefreshTokenByResponse } from '../src/infrastructure/utils/helpers';
 
 describe('BlogsController (e2e)', () => {
   let app: INestApplication;
@@ -23,7 +23,7 @@ describe('BlogsController (e2e)', () => {
     await request(server).delete('/testing/all-data');
   });
 
-  it('1-1 – POST:/sa/users – create 1st user by admin', async () => {
+  it('1-1 – POST:/sa/user – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-1111',
       password: 'qwerty1',
@@ -86,7 +86,7 @@ describe('BlogsController (e2e)', () => {
 
     expect.setState({ accessToken, firstRefreshToken: refreshToken });
   });
-  it('1-3 – GET:/blogger/blogs – return 200 and empty array', async () => {
+  it('1-3 – GET:/blogger/blog – return 200 and empty array', async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -101,10 +101,10 @@ describe('BlogsController (e2e)', () => {
       });
   });
   //негативные тесты
-  it('2 – GET:/blogger/blogs/:id – return 404 for not existing blog', async () => {
+  it('2 – GET:/blogger/blog/:id – return 404 for not existing blog', async () => {
     await request(server).get('/blogger/blogs/1').expect(HttpStatus.NOT_FOUND);
   });
-  it("3 – GET:/blogger/blogs/:id/posts – return 404 & can't get posts of not existing blog", async () => {
+  it("3 – GET:/blogger/blog/:id/post – return 404 & can't get post of not existing blog", async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -112,7 +112,7 @@ describe('BlogsController (e2e)', () => {
       .auth(firstRefreshToken, { type: 'bearer' })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it("4 – POST:/blogger/blogs/:id/posts – return 404 & can't create posts of not existing blog", async () => {
+  it("4 – POST:/blogger/blog/:id/post – return 404 & can't create post of not existing blog", async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -126,7 +126,7 @@ describe('BlogsController (e2e)', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it("5 – POST:/blogger/blogs – return 401 – shouldn't create blog – NO Auth", async () => {
+  it("5 – POST:/blogger/blog – return 401 – shouldn't create blog – NO Auth", async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -150,7 +150,7 @@ describe('BlogsController (e2e)', () => {
       });
   });
 
-  it("6 – POST:/blogger/blogs – shouldn't create blog – name = null", async () => {
+  it("6 – POST:/blogger/blog – shouldn't create blog – name = null", async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -177,7 +177,7 @@ describe('BlogsController (e2e)', () => {
         items: [],
       });
   });
-  it("7 – POST:/blogger/blogs – shouldn't create blog – short description", async () => {
+  it("7 – POST:/blogger/blog – shouldn't create blog – short description", async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -208,7 +208,7 @@ describe('BlogsController (e2e)', () => {
         items: [],
       });
   });
-  it("8 – POST:/blogger/blogs – shouldn't create blog – invalid websiteUrl", async () => {
+  it("8 – POST:/blogger/blog – shouldn't create blog – invalid websiteUrl", async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -237,7 +237,7 @@ describe('BlogsController (e2e)', () => {
       });
   });
 
-  it('9 – POST:/blogger/blogs – return 201 & create first blog', async () => {
+  it('9 – POST:/blogger/blog – return 201 & create first blog', async () => {
     const { firstRefreshToken } = expect.getState();
     const firstBlog = {
       name: 'valid-blog',
@@ -278,7 +278,7 @@ describe('BlogsController (e2e)', () => {
 
     expect.setState({ firstCreatedBlog: firstCreatedBlog });
   });
-  it('10 – POST:/blogger/blogs – return 201 & create second blog', async () => {
+  it('10 – POST:/blogger/blog – return 201 & create second blog', async () => {
     const { firstRefreshToken } = expect.getState();
 
     const { firstCreatedBlog } = expect.getState();
@@ -321,7 +321,7 @@ describe('BlogsController (e2e)', () => {
     expect.setState({ secondCreatedBlog: secondCreatedBlog });
   });
 
-  it("11 – PUT:/blogger/blogs/:id – return 404 shouldn't update blog that not exist", async () => {
+  it("11 – PUT:/blogger/blog/:id – return 404 shouldn't update blog that not exist", async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -334,7 +334,7 @@ describe('BlogsController (e2e)', () => {
       })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it("12 – PUT:/blogger/blogs/:id – return 400 shouldn't update blog with long name", async () => {
+  it("12 – PUT:/blogger/blog/:id – return 400 shouldn't update blog with long name", async () => {
     const { firstRefreshToken, firstCreatedBlog, secondCreatedBlog } =
       expect.getState();
 
@@ -360,7 +360,7 @@ describe('BlogsController (e2e)', () => {
       });
   });
 
-  it('13 – PUT:/blogger/blogs/:id – return 204 & update blog', async () => {
+  it('13 – PUT:/blogger/blog/:id – return 204 & update blog', async () => {
     const { firstRefreshToken, firstCreatedBlog, secondCreatedBlog } =
       expect.getState();
     const firstUpdateBlog = {
@@ -401,7 +401,7 @@ describe('BlogsController (e2e)', () => {
     expect.setState({ firstUpdateBlog: firstUpdateBlog });
   });
 
-  it('14 – DELETE:/blogger/blogs/:id – return 404 for delete non-exist blog', async () => {
+  it('14 – DELETE:/blogger/blog/:id – return 404 for delete non-exist blog', async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -410,7 +410,7 @@ describe('BlogsController (e2e)', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it('15 – POST:/blogger/blogs/:id/posts – return 201 & create posts current blog', async () => {
+  it('15 – POST:/blogger/blog/:id/post – return 201 & create post current blog', async () => {
     const { firstRefreshToken, firstCreatedBlog, firstUpdateBlog } =
       expect.getState();
     const firstPost = {
@@ -448,7 +448,7 @@ describe('BlogsController (e2e)', () => {
 
     expect.setState({ createdPost: createPostResponse.body });
   });
-  it('16 – GET:/blogger/blogs/:id/posts – return 200 & get posts current blog', async () => {
+  it('16 – GET:/blogger/blog/:id/post – return 200 & get post current blog', async () => {
     const { firstRefreshToken, firstCreatedBlog, createdPost } =
       expect.getState();
 
@@ -467,7 +467,7 @@ describe('BlogsController (e2e)', () => {
     });
   });
 
-  it('17 – GET:/blogs/:id – return 200 & get posts current blog', async () => {
+  it('17 – GET:/blog/:id – return 200 & get post current blog', async () => {
     const { firstRefreshToken, firstCreatedBlog, firstUpdateBlog } =
       expect.getState();
 
@@ -487,7 +487,7 @@ describe('BlogsController (e2e)', () => {
     });
   });
 
-  it('18 – DELETE:/blogger/blogs/:id – delete both blogs', async () => {
+  it('18 – DELETE:/blogger/blog/:id – delete both blog', async () => {
     const { firstRefreshToken, firstCreatedBlog, secondCreatedBlog } =
       expect.getState();
     await request(server)

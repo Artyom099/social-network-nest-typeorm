@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { TokensService } from '../../../../infrastructure/services/tokens.service';
 import { HashService } from '../../../../infrastructure/services/hash.service';
-import { UserQueryRepository } from '../../../users/infrastructure/user.query.repository';
+import { UserQueryRepository } from '../../../user/infrastructure/user.query.repository';
 
 export class CheckCredentialsCommand {
   constructor(public loginOrEmail: string, public password: string) {}

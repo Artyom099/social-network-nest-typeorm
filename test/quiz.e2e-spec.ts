@@ -392,7 +392,7 @@ describe('QuizController (e2e)', () => {
     });
   });
 
-  it('8 – POST:sa/users – create 1, 2, 3 users by admin & login them', async () => {
+  it('8 – POST:sa/user – create 1, 2, 3 user by admin & login them', async () => {
     const firstUser = {
       login: 'lg-1111',
       password: 'qwerty1',

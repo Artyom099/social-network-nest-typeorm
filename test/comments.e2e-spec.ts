@@ -1,10 +1,13 @@
-import {Test, TestingModule} from '@nestjs/testing';
-import {HttpStatus, INestApplication} from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import {AppModule} from '../src/app.module';
-import {LikeStatus} from '../src/infrastructure/utils/enums';
-import {appSettings} from '../src/infrastructure/settings/app.settings';
-import {getRefreshTokenByResponse, getRefreshTokenByResponseWithTokenName,} from '../src/infrastructure/utils/helpers';
+import { AppModule } from '../src/app.module';
+import { LikeStatus } from '../src/infrastructure/utils/enums';
+import { appSettings } from '../src/infrastructure/settings/app.settings';
+import {
+  getRefreshTokenByResponse,
+  getRefreshTokenByResponseWithTokenName,
+} from '../src/infrastructure/utils/helpers';
 
 describe('CommentsController (e2e)', () => {
   let app: INestApplication;
@@ -23,7 +26,7 @@ describe('CommentsController (e2e)', () => {
     await request(server).delete('/testing/all-data');
   });
 
-  it('1 – POST:/sa/users – create 1st user by admin', async () => {
+  it('1 – POST:/sa/user – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-111111',
       password: 'qwerty1',
@@ -66,7 +69,7 @@ describe('CommentsController (e2e)', () => {
 
     expect.setState({ firstUser, firstCreateResponse, firstCreatedUser });
   });
-  it('2 – POST:/sa/users – create 2nd user by admin', async () => {
+  it('2 – POST:/sa/user – create 2nd user by admin', async () => {
     const { firstCreatedUser } = expect.getState();
     const secondUser = {
       login: 'lg-222222',
@@ -134,7 +137,7 @@ describe('CommentsController (e2e)', () => {
       firstRefreshTokenWithName: refreshTokenWithName,
     });
   });
-  it('4 – POST:/blogger/blogs – return 201 & create blog', async () => {
+  it('4 – POST:/blogger/blog – return 201 & create blog', async () => {
     const { firstAccessToken } = expect.getState();
 
     const createBlogResponse = await request(server)
@@ -150,7 +153,7 @@ describe('CommentsController (e2e)', () => {
     expect(createBlogResponse.status).toEqual(HttpStatus.CREATED);
     expect.setState({ blog: createBlogResponse.body });
   });
-  it('5 – POST:/blogger/blogs/:id/posts – return 201 & create post', async () => {
+  it('5 – POST:/blogger/blog/:id/post – return 201 & create post', async () => {
     const { firstAccessToken, blog } = expect.getState();
 
     const createPostResponse = await request(server)
@@ -166,7 +169,7 @@ describe('CommentsController (e2e)', () => {
     expect(createPostResponse.status).toEqual(HttpStatus.CREATED);
     expect.setState({ post: createPostResponse.body });
   });
-  it('6 – POST:/posts/:postId/comments – return 201 & create comment', async () => {
+  it('6 – POST:/post/:postId/comment – return 201 & create comment', async () => {
     const { post, firstAccessToken, firstUser } = expect.getState();
 
     const createCommentResponse = await request(server)
@@ -194,7 +197,7 @@ describe('CommentsController (e2e)', () => {
     expect.setState({ comment: createCommentResponse.body });
   });
 
-  it('7 – PUT:/comments/:commentId/like-status – return 404 – non exist comment', async () => {
+  it('7 – PUT:/comment/:commentId/like-status – return 404 – non exist comment', async () => {
     const { firstAccessToken } = expect.getState();
 
     const setLike = await request(server)
@@ -205,7 +208,7 @@ describe('CommentsController (e2e)', () => {
     expect(setLike).toBeDefined();
     expect(setLike.status).toEqual(HttpStatus.NOT_FOUND);
   });
-  it('8 – PUT:/comments/:commentId/like-status – return 400 – likeStatus: invalid', async () => {
+  it('8 – PUT:/comment/:commentId/like-status – return 400 – likeStatus: invalid', async () => {
     const { commentId, firstAccessToken } = expect.getState();
 
     const setLike = await request(server)
@@ -216,7 +219,7 @@ describe('CommentsController (e2e)', () => {
     expect(setLike).toBeDefined();
     expect(setLike.status).toEqual(HttpStatus.BAD_REQUEST);
   });
-  it('9 – PUT:/comments/:commentId/like-status – return 401', async () => {
+  it('9 – PUT:/comment/:commentId/like-status – return 401', async () => {
     const { commentId } = expect.getState();
     const setLike = await request(server)
       .put(`/comments/${commentId}/like-status`)
@@ -226,11 +229,10 @@ describe('CommentsController (e2e)', () => {
     expect(setLike.status).toEqual(HttpStatus.UNAUTHORIZED);
   });
 
-  it('10 – GET:/comments/:id – return 200 & found comment', async () => {
+  it('10 – GET:/comment/:id – return 200 & found comment', async () => {
     const { comment, firstUser, firstCreatedUser } = expect.getState();
 
-    const getComment = await request(server)
-      .get(`/comments/${comment.id}`);
+    const getComment = await request(server).get(`/comments/${comment.id}`);
 
     expect(getComment).toBeDefined();
     expect(getComment.status).toEqual(HttpStatus.OK);
@@ -250,7 +252,7 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  it('11 – PUT:/comments/:commentId/like-status – return 204 & set like', async () => {
+  it('11 – PUT:/comment/:commentId/like-status – return 204 & set like', async () => {
     const { comment, firstAccessToken } = expect.getState();
     const setLike = await request(server)
       .put(`/comments/${comment.id}/like-status`)
@@ -260,8 +262,9 @@ describe('CommentsController (e2e)', () => {
     expect(setLike).toBeDefined();
     expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('12 – GET:/comments/:id – return 200 & found comment', async () => {
-    const { comment, firstUser, firstCreatedUser, firstAccessToken } = expect.getState();
+  it('12 – GET:/comment/:id – return 200 & found comment', async () => {
+    const { comment, firstUser, firstCreatedUser, firstAccessToken } =
+      expect.getState();
 
     const getComment = await request(server)
       .get(`/comments/${comment.id}`)
@@ -285,7 +288,7 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  it('13 – PUT:/comments/:commentId/like-status – return 204 & set dislike', async () => {
+  it('13 – PUT:/comment/:commentId/like-status – return 204 & set dislike', async () => {
     const { comment, firstAccessToken } = expect.getState();
     const setDislike = await request(server)
       .put(`/comments/${comment.id}/like-status`)
@@ -295,8 +298,9 @@ describe('CommentsController (e2e)', () => {
     expect(setDislike).toBeDefined();
     expect(setDislike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('14 – GET:/comments/:id – return 200 & found comment', async () => {
-    const { comment, firstUser, firstCreatedUser, firstAccessToken } = expect.getState();
+  it('14 – GET:/comment/:id – return 200 & found comment', async () => {
+    const { comment, firstUser, firstCreatedUser, firstAccessToken } =
+      expect.getState();
 
     const getComment = await request(server)
       .get(`/comments/${comment.id}`)
@@ -320,7 +324,7 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  it('15 – PUT:/comments/:commentId/like-status – return 204 & delete dislike', async () => {
+  it('15 – PUT:/comment/:commentId/like-status – return 204 & delete dislike', async () => {
     const { comment, firstAccessToken } = expect.getState();
 
     const deleteDislike = await request(server)
@@ -331,8 +335,9 @@ describe('CommentsController (e2e)', () => {
     expect(deleteDislike).toBeDefined();
     expect(deleteDislike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('16 – GET:/comments/:id – return 200 & found comment', async () => {
-    const { comment, firstUser, firstCreatedUser, firstAccessToken } = expect.getState();
+  it('16 – GET:/comment/:id – return 200 & found comment', async () => {
+    const { comment, firstUser, firstCreatedUser, firstAccessToken } =
+      expect.getState();
 
     const getComment = await request(server)
       .get(`/comments/${comment.id}`)
@@ -359,13 +364,10 @@ describe('CommentsController (e2e)', () => {
   it('17 – POST:/auth/login – return 200, 2nd login and refreshToken', async () => {
     const { secondUser } = expect.getState();
 
-    const loginResponse = await request(server)
-      .post('/auth/login')
-      .send({
-        loginOrEmail: secondUser.login,
-        password: secondUser.password,
-      }
-    );
+    const loginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: secondUser.login,
+      password: secondUser.password,
+    });
 
     expect(loginResponse).toBeDefined();
     expect(loginResponse.status).toBe(HttpStatus.OK);
@@ -385,7 +387,7 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  it('18 – PUT:/comments/:commentId/like-status – return 204 & set like by 1st user', async () => {
+  it('18 – PUT:/comment/:commentId/like-status – return 204 & set like by 1st user', async () => {
     const { comment, firstAccessToken } = expect.getState();
 
     const setLikeByFirstUser = await request(server)
@@ -396,8 +398,14 @@ describe('CommentsController (e2e)', () => {
     expect(setLikeByFirstUser).toBeDefined();
     expect(setLikeByFirstUser.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('19 – GET:/comments/:id – return 200 & found comment with 1 like', async () => {
-    const { comment, firstUser, firstCreatedUser, firstAccessToken, secondAccessToken } = expect.getState();
+  it('19 – GET:/comment/:id – return 200 & found comment with 1 like', async () => {
+    const {
+      comment,
+      firstUser,
+      firstCreatedUser,
+      firstAccessToken,
+      secondAccessToken,
+    } = expect.getState();
 
     const getCommentByFirstUser = await request(server)
       .get(`/comments/${comment.id}`)
@@ -441,7 +449,7 @@ describe('CommentsController (e2e)', () => {
       },
     });
   });
-  it('20 – PUT:/comments/:commentId/like-status – return 204 & set like by 1st user again', async () => {
+  it('20 – PUT:/comment/:commentId/like-status – return 204 & set like by 1st user again', async () => {
     const { comment, firstAccessToken } = expect.getState();
 
     const setLikeByFirstUserAgain = await request(server)
@@ -452,8 +460,14 @@ describe('CommentsController (e2e)', () => {
     expect(setLikeByFirstUserAgain).toBeDefined();
     expect(setLikeByFirstUserAgain.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('21 – GET:/comments/:id – return 200 & found comment with 1 like', async () => {
-    const { comment, firstUser, firstCreatedUser, firstAccessToken, secondAccessToken } = expect.getState();
+  it('21 – GET:/comment/:id – return 200 & found comment with 1 like', async () => {
+    const {
+      comment,
+      firstUser,
+      firstCreatedUser,
+      firstAccessToken,
+      secondAccessToken,
+    } = expect.getState();
     const getCommentByFirstUser = await request(server)
       .get(`/comments/${comment.id}`)
       .auth(firstAccessToken, { type: 'bearer' });
@@ -497,7 +511,7 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  it('22 – PUT:/comments/:commentId/like-status – return 204 & set like by 2nd user', async () => {
+  it('22 – PUT:/comment/:commentId/like-status – return 204 & set like by 2nd user', async () => {
     const { comment, secondAccessToken } = expect.getState();
 
     const setLikeBySecondUser = await request(server)
@@ -508,8 +522,14 @@ describe('CommentsController (e2e)', () => {
     expect(setLikeBySecondUser).toBeDefined();
     expect(setLikeBySecondUser.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('23 – GET:/comments/:id – return 200 & found comment with 2 likes', async () => {
-    const { comment, firstUser, firstCreatedUser, firstAccessToken, secondAccessToken } = expect.getState();
+  it('23 – GET:/comment/:id – return 200 & found comment with 2 likes', async () => {
+    const {
+      comment,
+      firstUser,
+      firstCreatedUser,
+      firstAccessToken,
+      secondAccessToken,
+    } = expect.getState();
 
     const getCommentByFirstUser = await request(server)
       .get(`/comments/${comment.id}`)
@@ -554,7 +574,7 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  it('24 – PUT:/comments/:commentId/like-status – return 204 & set like by 2nd user again', async () => {
+  it('24 – PUT:/comment/:commentId/like-status – return 204 & set like by 2nd user again', async () => {
     const { comment, secondAccessToken } = expect.getState();
 
     const setLikeBySecondUserAgain = await request(server)
@@ -565,8 +585,14 @@ describe('CommentsController (e2e)', () => {
     expect(setLikeBySecondUserAgain).toBeDefined();
     expect(setLikeBySecondUserAgain.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('25 – GET:/comments/:id – return 200 & found comment with 2 likes', async () => {
-    const { comment, firstUser, firstCreatedUser, firstAccessToken, secondAccessToken } = expect.getState();
+  it('25 – GET:/comment/:id – return 200 & found comment with 2 likes', async () => {
+    const {
+      comment,
+      firstUser,
+      firstCreatedUser,
+      firstAccessToken,
+      secondAccessToken,
+    } = expect.getState();
 
     const getCommentByFirstUser = await request(server)
       .get(`/comments/${comment.id}`)
@@ -611,8 +637,9 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  it('26 – GET:/posts/:id/comments – return 200 & sorted comment with paging & 2 likes', async () => {
-    const { post, comment, firstUser, firstCreatedUser, firstAccessToken } = expect.getState();
+  it('26 – GET:/post/:id/comment – return 200 & sorted comment with paging & 2 likes', async () => {
+    const { post, comment, firstUser, firstCreatedUser, firstAccessToken } =
+      expect.getState();
 
     const getComment = await request(server)
       .get(`/posts/${post.id}/comments`)
@@ -627,8 +654,8 @@ describe('CommentsController (e2e)', () => {
       totalCount: 1,
       items: expect.any(Array),
     });
-    expect(getComment.body.items).toEqual(
-      [{
+    expect(getComment.body.items).toEqual([
+      {
         id: comment.id,
         content: 'valid-super-long-content',
         commentatorInfo: {
@@ -645,7 +672,7 @@ describe('CommentsController (e2e)', () => {
     ]);
   });
 
-  it('27 – PUT:/comments/:commentId/like-status – return 204, set 1 dislike & 1 none', async () => {
+  it('27 – PUT:/comment/:commentId/like-status – return 204, set 1 dislike & 1 none', async () => {
     const { comment, firstAccessToken, secondAccessToken } = expect.getState();
 
     const setLikeFirstUser = await request(server)
@@ -664,8 +691,14 @@ describe('CommentsController (e2e)', () => {
     expect(setLikeSecondUser).toBeDefined();
     expect(setLikeSecondUser.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('28 – GET:/comments/:id – return 200 & found comment with 1 dislike', async () => {
-    const { comment, firstUser, firstCreatedUser, firstAccessToken, secondAccessToken } = expect.getState();
+  it('28 – GET:/comment/:id – return 200 & found comment with 1 dislike', async () => {
+    const {
+      comment,
+      firstUser,
+      firstCreatedUser,
+      firstAccessToken,
+      secondAccessToken,
+    } = expect.getState();
 
     const getComment = await request(server)
       .get(`/comments/${comment.id}`)
