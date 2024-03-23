@@ -7,13 +7,13 @@ import {
 import { CreateGameDto } from '../../api/models/dto/create.game.dto';
 import { randomUUID } from 'crypto';
 import { CreatePlayerDTO } from '../../api/models/dto/create.player.dto';
-import { UserQueryRepository } from '../../../user/infrastructure/user.query.repository';
 import { AddQuestionsToGameDto } from '../../api/models/dto/add.questions.to.game.dto';
 import { AddPlayerToGameDto } from '../../api/models/dto/add.player.to.game.dto';
 import { DataSource } from 'typeorm';
 import { Contract } from '../../../../infrastructure/core/contract';
 import { GameRepository } from '../../infrastructure/game.repository';
 import { PlayerRepository } from '../../infrastructure/player.repository';
+import { UserRepository } from '../../../user/infrastructure/user.repository';
 
 export class CreateGameCommand {
   constructor(public userId: string) {}
@@ -26,7 +26,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     private gameRepository: GameRepository,
     private quizRepository: QuizRepository,
     private playerRepository: PlayerRepository,
-    private userQueryRepository: UserQueryRepository,
+    private userRepository: UserRepository,
   ) {}
 
   async execute(command: CreateGameCommand): Promise<Contract<any>> {
@@ -54,10 +54,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
       const pendingGame = await this.gameRepository.getPendingGame(manager);
 
       // достаем логин текущего юзера
-      const login = await this.userQueryRepository.getUserLogin(
-        userId,
-        manager,
-      );
+      const login = await this.userRepository.getUserLogin(userId, manager);
       if (login.hasError() || !login.payload)
         return new Contract(InternalCode.NotFound, null, 'user not found');
 

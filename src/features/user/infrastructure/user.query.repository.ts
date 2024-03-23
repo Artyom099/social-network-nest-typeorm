@@ -3,16 +3,14 @@ import { UsersPaginationInput } from '../../../infrastructure/models/pagination.
 import { SAUserViewModel } from '../api/models/view/sa.user.view.model';
 import { UserViewModel } from '../api/models/view/user.view.model';
 import { Pagination } from '../../../infrastructure/models/pagination';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Users } from '../entity/user.entity';
-import { Contract } from '../../../infrastructure/core/contract';
-import { InternalCode } from '../../../infrastructure/utils/enums';
 
 @Injectable()
 export class UserQueryRepository {
   constructor(
-    @InjectDataSource() private dataSource: DataSource,
+    private dataSource: DataSource,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
 
@@ -27,22 +25,6 @@ export class UserQueryRepository {
     );
 
     return user ? user : null;
-  }
-
-  async getUserLogin(
-    id: string,
-    manager: EntityManager,
-  ): Promise<Contract<string | null>> {
-    const user = await manager.findOneBy(Users, { id });
-
-    if (!user)
-      return new Contract(
-        InternalCode.NotFound,
-        null,
-        'user & userLogin not found',
-      );
-
-    return new Contract(InternalCode.Success, user.login);
   }
 
   async getUserById2(id: string): Promise<UserViewModel | null> {
@@ -61,6 +43,7 @@ export class UserQueryRepository {
       : null;
   }
 
+  //delete any type
   async getUserByIdSA(id: string): Promise<any | null> {
     const [user] = await this.dataSource.query(
       `
@@ -85,7 +68,6 @@ export class UserQueryRepository {
         }
       : null;
   }
-  //todo: delete any type!!
   async getUserByIdSA2(id: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')
@@ -166,6 +148,7 @@ export class UserQueryRepository {
       : null;
   }
 
+  //delete any type
   async getUserByRecoveryCode1(code: string): Promise<any | null> {
     const [user] = await this.dataSource.query(
       `
@@ -190,7 +173,6 @@ export class UserQueryRepository {
         }
       : null;
   }
-  //todo: delete any type!!
   async getUserByRecoveryCode(code: string): Promise<any | null> {
     const user = await this.usersRepo
       .createQueryBuilder('user')

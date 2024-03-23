@@ -1,14 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { UserViewModel } from '../api/models/view/user.view.model';
 import { SAUserViewModel } from '../api/models/view/sa.user.view.model';
 import { CreateUserDTO } from '../api/models/dto/create.user.dto';
 import { Users } from '../entity/user.entity';
+import { Contract } from '../../../infrastructure/core/contract';
+import { InternalCode } from '../../../infrastructure/utils/enums';
 
 @Injectable()
 export class UserRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) {}
+
+  async getUserLogin(
+    id: string,
+    manager: EntityManager,
+  ): Promise<Contract<string | null>> {
+    const user = await manager.findOneBy(Users, { id });
+
+    if (!user)
+      return new Contract(
+        InternalCode.NotFound,
+        null,
+        'user & userLogin not found',
+      );
+
+    return new Contract(InternalCode.Success, user.login);
+  }
 
   async createUserByAdmin(dto: CreateUserDTO): Promise<SAUserViewModel> {
     await this.dataSource
