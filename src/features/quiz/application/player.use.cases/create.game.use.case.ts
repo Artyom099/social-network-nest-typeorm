@@ -25,8 +25,8 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
     private dataSource: DataSource,
     private gameRepository: GameRepository,
     private quizRepository: QuizRepository,
-    private playerRepository: PlayerRepository,
     private userRepository: UserRepository,
+    private playerRepository: PlayerRepository,
   ) {}
 
   async execute(command: CreateGameCommand): Promise<Contract<any>> {
