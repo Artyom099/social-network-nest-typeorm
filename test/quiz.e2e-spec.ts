@@ -398,6 +398,7 @@ describe('QuizController (e2e)', () => {
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };
+
     const firstCreateResponse = await request(server)
       .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
@@ -435,6 +436,7 @@ describe('QuizController (e2e)', () => {
       password: 'qwerty2',
       email: 'artyom22222@gmaill.com',
     };
+
     const secondCreateResponse = await request(server)
       .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
