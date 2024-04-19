@@ -35,6 +35,7 @@ export class DevicesRepository {
 
     return device ? device : null;
   }
+
   async updateLastActiveDate(deviceId: string, date: Date) {
     return this.dataSource
       .createQueryBuilder()
@@ -52,6 +53,7 @@ export class DevicesRepository {
       .where('deviceId = :deviceId', { deviceId })
       .execute();
   }
+
   async deleteOtherDevices(deviceId: string, userId: string) {
     return this.dataSource
       .createQueryBuilder()
@@ -60,6 +62,7 @@ export class DevicesRepository {
       .where('deviceId != :deviceId and userId = :userId', { deviceId, userId })
       .execute();
   }
+
   async deleteAllDevices(userId: string) {
     return this.dataSource
       .createQueryBuilder()
