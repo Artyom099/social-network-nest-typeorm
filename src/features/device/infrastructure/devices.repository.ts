@@ -45,7 +45,7 @@ export class DevicesRepository {
       .execute();
   }
 
-  async deleteCurrentDevice(deviceId: string) {
+  async deleteDevice(deviceId: string) {
     return this.dataSource
       .createQueryBuilder()
       .delete()

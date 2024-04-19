@@ -58,10 +58,10 @@ export class DevicesController {
       payload.userId,
     );
 
-    if (!activeDevices.find((s) => s.deviceId === currentDevice.deviceId)) {
+    if (!activeDevices.find((d) => d.deviceId === currentDevice.deviceId)) {
       throw new ForbiddenException();
     } else {
-      return this.devicesService.deleteCurrentDevice(deviceId);
+      return this.devicesService.deleteDevice(deviceId);
     }
   }
 }

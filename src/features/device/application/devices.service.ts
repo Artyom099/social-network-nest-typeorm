@@ -18,8 +18,8 @@ export class DevicesService {
     return this.securityRepository.updateLastActiveDate(deviceId, date);
   }
 
-  async deleteCurrentDevice(deviceId: string) {
-    return this.securityRepository.deleteCurrentDevice(deviceId);
+  async deleteDevice(deviceId: string) {
+    return this.securityRepository.deleteDevice(deviceId);
   }
 
   async deleteOtherDevices(deviceId: string, userId: string) {
