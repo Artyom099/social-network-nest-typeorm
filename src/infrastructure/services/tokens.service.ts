@@ -22,11 +22,11 @@ export class TokensService {
     return {
       accessToken: await this.jwtService.signAsync(payload, {
         secret: jwtConstants.accessSecret,
-        expiresIn: '5m',
+        expiresIn: '6m',
       }),
       refreshToken: await this.jwtService.signAsync(payload, {
         secret: jwtConstants.refreshSecret,
-        expiresIn: '20s',
+        expiresIn: '100s',
       }),
     };
   }
@@ -36,11 +36,11 @@ export class TokensService {
     return {
       accessToken: await this.jwtService.signAsync(newPayload, {
         secret: jwtConstants.accessSecret,
-        expiresIn: '5m',
+        expiresIn: '6m',
       }),
       refreshToken: await this.jwtService.signAsync(newPayload, {
         secret: jwtConstants.refreshSecret,
-        expiresIn: '20s',
+        expiresIn: '100s',
       }),
     };
   }
