@@ -14,7 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
-import { DefaultPaginationInput } from '../../../infrastructure/models/pagination.input.models';
+import { DefaultPaginationInput } from '../../../infrastructure/pagination/pagination.input.models';
 import { PostsQueryRepository } from '../infrastructure/posts.query.repository';
 import { CommentsQueryRepository } from '../../comment/infrastructure/comments.query.repository';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { UsersPaginationInput } from '../../../infrastructure/models/pagination.input.models';
+import { UsersPaginationInput } from '../../../infrastructure/pagination/pagination.input.models';
 import { SAUserViewModel } from '../api/models/view/sa.user.view.model';
 import { UserViewModel } from '../api/models/view/user.view.model';
-import { Pagination } from '../../../infrastructure/models/pagination';
+import { Pagination } from '../../../infrastructure/pagination/pagination';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Users } from '../entity/user.entity';

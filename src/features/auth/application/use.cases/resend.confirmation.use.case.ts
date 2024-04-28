@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserRepository } from '../../../user/infrastructure/user.repository';
 import { randomUUID } from 'crypto';
-import { EmailManager } from '../../../../infrastructure/services/email.manager';
+import { EmailManager } from '../../../../infrastructure/email/email.manager';
 
 export class ResendConfirmationCommand {
   constructor(public email: string, public userId: string) {}

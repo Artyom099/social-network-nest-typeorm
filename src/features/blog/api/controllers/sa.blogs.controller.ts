@@ -20,7 +20,7 @@ import { BasicAuthGuard } from '../../../../infrastructure/guards/basic-auth.gua
 import {
   BlogsPaginationInput,
   DefaultPaginationInput,
-} from '../../../../infrastructure/models/pagination.input.models';
+} from '../../../../infrastructure/pagination/pagination.input.models';
 import { BanBlogCommand } from '../../application/sa.use.cases/ban.blog.use.case';
 import { CommandBus } from '@nestjs/cqrs';
 import { BanBlogInputModel } from '../../../user/api/models/input/ban.blog.input.model';

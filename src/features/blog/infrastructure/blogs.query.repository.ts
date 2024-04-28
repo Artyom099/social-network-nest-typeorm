@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { BlogsPaginationInput } from '../../../infrastructure/models/pagination.input.models';
+import { BlogsPaginationInput } from '../../../infrastructure/pagination/pagination.input.models';
 import { SABlogViewModel } from '../api/models/view/sa.blog.view.model';
 import { BlogViewModel } from '../api/models/view/blog.view.model';
 import { DataSource } from 'typeorm';
-import { Pagination } from '../../../infrastructure/models/pagination';
+import { Pagination } from '../../../infrastructure/pagination/pagination';
 
 @Injectable()
 export class BlogsQueryRepository {

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { GamePairPaginationInput } from '../../../infrastructure/models/pagination.input.models';
+import { GamePairPaginationInput } from '../../../infrastructure/pagination/pagination.input.models';
 import { Question } from '../entity/question.entity';
-import { Pagination } from '../../../infrastructure/models/pagination';
+import { Pagination } from '../../../infrastructure/pagination/pagination';
 import { QuestionViewModel } from '../api/models/view/question.view.model';
 
 @Injectable()

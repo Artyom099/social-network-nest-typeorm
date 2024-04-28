@@ -13,7 +13,7 @@ import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repositor
 import {
   BlogsPaginationInput,
   DefaultPaginationInput,
-} from '../../../../infrastructure/models/pagination.input.models';
+} from '../../../../infrastructure/pagination/pagination.input.models';
 import { CheckUserIdGuard } from '../../../../infrastructure/guards/check-userId.guard';
 import { PostsQueryRepository } from '../../../post/infrastructure/posts.query.repository';
 

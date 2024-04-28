@@ -1,6 +1,8 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+// декоратор достает userId из request, если ендпоинт защищен, и из токена, если ендпоинт публичный
+
 export const CurrentUserId = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
@@ -8,8 +10,8 @@ export const CurrentUserId = createParamDecorator(
 
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     if (type === 'Bearer') {
-      const decodedData = new JwtService().decode(token);
-      return (decodedData as { userId: string }).userId;
+      const tokenPayload = new JwtService().decode(token);
+      return (tokenPayload as { userId: string }).userId;
     }
   },
 );

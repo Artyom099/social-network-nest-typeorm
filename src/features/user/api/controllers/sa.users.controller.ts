@@ -19,7 +19,7 @@ import { BanUserCommand } from '../../application/sa.users.use.cases/ban.user.us
 import { CommandBus } from '@nestjs/cqrs';
 import { UnbanUserCommand } from '../../application/sa.users.use.cases/unban.user.use.case';
 import { DevicesService } from '../../../device/application/devices.service';
-import { UsersPaginationInput } from '../../../../infrastructure/models/pagination.input.models';
+import { UsersPaginationInput } from '../../../../infrastructure/pagination/pagination.input.models';
 import { DeleteUserCommand } from '../../application/sa.users.use.cases/delete.user.use.case';
 import { BanUserInputModel } from '../models/input/ban.user.input.model';
 import { CreateUserInputModel } from '../models/input/create.user.input.model';

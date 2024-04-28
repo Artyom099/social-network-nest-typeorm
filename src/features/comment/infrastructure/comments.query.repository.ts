@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DefaultPaginationInput } from '../../../infrastructure/models/pagination.input.models';
+import { DefaultPaginationInput } from '../../../infrastructure/pagination/pagination.input.models';
 import { LikeStatus } from '../../../infrastructure/utils/enums';
 import { CommentViewModel } from '../api/models/view/comment.view.model';
-import { Pagination } from '../../../infrastructure/models/pagination';
+import { Pagination } from '../../../infrastructure/pagination/pagination';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BLoggerCommentViewModel } from '../api/models/view/blogger.comment.view.model';

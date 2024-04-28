@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { BannedUsersPaginationInput } from '../../../infrastructure/models/pagination.input.models';
-import { Pagination } from '../../../infrastructure/models/pagination';
+import { BannedUsersPaginationInput } from '../../../infrastructure/pagination/pagination.input.models';
+import { Pagination } from '../../../infrastructure/pagination/pagination';
 import { BannedUserForBlogViewModel } from '../api/models/view/banned.user.for.blog.view.model';
 
 @Injectable()

@@ -37,7 +37,7 @@ import { BannedUsersForBlog } from './features/user/entity/banned.user.for.blog.
 import { Devices } from './features/device/entity/device.entity';
 import { Blogs } from './features/blog/entity/blog.entity';
 import { Posts } from './features/post/entity/post.entity';
-import { TypeOrmOptions } from './infrastructure/options/type.orm.options';
+import { TypeOrmOptions } from './infrastructure/db/type.orm.options';
 import { Comments } from './features/comment/entity/сomment.entity';
 import { CommentLikes } from './features/comment/entity/comment.likes.entity';
 import { PostLikes } from './features/post/entity/post.likes.entity';
@@ -63,8 +63,8 @@ import { BloggerUsersController } from './features/user/api/controllers/blogger.
 import { DevicesController } from './features/device/api/devices.controller';
 import { RequestService } from './infrastructure/services/request.service';
 import { TokensService } from './infrastructure/services/tokens.service';
-import { EmailAdapter } from './infrastructure/adapters/email.adapter';
-import { EmailManager } from './infrastructure/services/email.manager';
+import { EmailAdapter } from './infrastructure/email/email.adapter';
+import { EmailManager } from './infrastructure/email/email.manager';
 import { HashService } from './infrastructure/services/hash.service';
 import { UserRepository } from './features/user/infrastructure/user.repository';
 import { UserQueryRepository } from './features/user/infrastructure/user.query.repository';

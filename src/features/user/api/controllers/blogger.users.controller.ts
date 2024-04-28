@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { BannedUsersPaginationInput } from '../../../../infrastructure/models/pagination.input.models';
+import { BannedUsersPaginationInput } from '../../../../infrastructure/pagination/pagination.input.models';
 import { UserQueryRepository } from '../../infrastructure/user.query.repository';
 import { BanUserCurrentBlogInputModel } from '../models/input/ban.user.current.blog.input.model';
 import { BanUserForCurrentBlogCommand } from '../../application/blogger.users.use.cases/ban.user.for.current.blog.use.case';

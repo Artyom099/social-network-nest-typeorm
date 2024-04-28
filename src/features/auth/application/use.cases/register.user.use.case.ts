@@ -5,7 +5,7 @@ import { UserViewModel } from '../../../user/api/models/view/user.view.model';
 import { UserRepository } from '../../../user/infrastructure/user.repository';
 import add from 'date-fns/add';
 import { randomUUID } from 'crypto';
-import { EmailManager } from '../../../../infrastructure/services/email.manager';
+import { EmailManager } from '../../../../infrastructure/email/email.manager';
 import { CreateUserDTO } from '../../../user/api/models/dto/create.user.dto';
 
 export class RegisterUserCommand {
