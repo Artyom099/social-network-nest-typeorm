@@ -30,10 +30,15 @@ import { CreateDeviceDTO } from '../../device/api/models/create.device.dto';
 import { CheckCredentialsCommand } from '../application/use.cases/check.credentials.use.case';
 import { RefreshTokenCommand } from '../application/use.cases/refresh.token.use.case';
 import { RateLimitGuard } from '../../../infrastructure/guards/rate.limit/rate.limit.guard';
+import { CookieOptions } from 'express';
 
 @Controller('auth')
 export class AuthController {
   REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
+  private cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+  };
 
   constructor(
     private commandBus: CommandBus,
@@ -92,10 +97,11 @@ export class AuthController {
       };
       await this.devicesService.createDevise(dto);
 
-      res.cookie(this.REFRESH_TOKEN_COOKIE_NAME, token.refreshToken, {
-        httpOnly: true,
-        secure: true,
-      });
+      res.cookie(
+        this.REFRESH_TOKEN_COOKIE_NAME,
+        token.refreshToken,
+        this.cookieOptions,
+      );
       return { accessToken: token.accessToken };
     }
   }
@@ -110,10 +116,11 @@ export class AuthController {
 
     await this.devicesService.updateLastActiveDate(deviceId, lastActiveDate);
 
-    res.cookie(this.REFRESH_TOKEN_COOKIE_NAME, token.refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
+    res.cookie(
+      this.REFRESH_TOKEN_COOKIE_NAME,
+      token.refreshToken,
+      this.cookieOptions,
+    );
 
     return { accessToken: token.accessToken };
   }
@@ -153,11 +160,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   //todo -> для моих тестов статус OK, по документации NO_CONTENT
   async passwordRecovery(@Body() body: EmailInputModel) {
-    return {
-      recoveryCode: await this.commandBus.execute(
-        new SendRecoveryCodeCommand(body.email),
-      ),
-    };
+    const recoveryCode = await this.commandBus.execute(
+      new SendRecoveryCodeCommand(body.email),
+    );
+
+    return { recoveryCode };
   }
 
   @Post('registration')

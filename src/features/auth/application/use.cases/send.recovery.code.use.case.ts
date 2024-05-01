@@ -31,6 +31,7 @@ export class SendRecoveryCodeUseCase
     } catch (e) {
       return null;
     }
+
     return recoveryCode;
   }
 }
