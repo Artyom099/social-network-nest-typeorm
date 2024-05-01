@@ -1,7 +1,8 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-// декоратор достает userId из request, если ендпоинт защищен, и из токена, если ендпоинт публичный
+// декоратор достает userId из request, если ендпоинт защищен,
+// или из access токена, если ендпоинт публичный
 
 export const CurrentUserId = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {

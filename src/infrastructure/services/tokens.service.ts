@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from '../utils/settings';
 import { TokenPayloadModel } from '../../features/auth/api/models/token.payload.model';
 import { PayloadModel } from '../../features/auth/api/models/payload.model';
 import { TokenOutputModel } from '../../features/auth/api/models/token.output.model';
+import { AppConfig } from '../../config/app-config';
 
 @Injectable()
 export class TokensService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    @Inject(AppConfig.name) private appConfig: AppConfig,
+  ) {}
 
   async getTokenPayload(token: string): Promise<any | null> {
     try {

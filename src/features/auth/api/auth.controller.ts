@@ -34,6 +34,7 @@ import { RateLimitGuard } from '../../../infrastructure/guards/rate.limit/rate.l
 @Controller('auth')
 export class AuthController {
   REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
+
   constructor(
     private commandBus: CommandBus,
     private tokensService: TokensService,

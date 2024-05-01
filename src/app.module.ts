@@ -92,6 +92,7 @@ import { PublishQuestionUseCase } from './features/quiz/application/sa.use.cases
 import { GameQuestion } from './features/quiz/entity/game.question.entity';
 import { GameRepository } from './features/quiz/infrastructure/game.repository';
 import { PlayerRepository } from './features/quiz/infrastructure/player.repository';
+import { AppConfigModule } from './config/app-config.module';
 
 const entities = [
   Users,
@@ -213,6 +214,8 @@ const services = [
     CqrsModule,
     JwtModule.register({ global: true }),
     ConfigModule.forRoot({ isGlobal: true }),
+
+    AppConfigModule,
 
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

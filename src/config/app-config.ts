@@ -35,12 +35,10 @@ export class EnvironmentSettings {
 }
 
 export type SettingsType = {
-  storage: StorageSettings;
   origin: OriginSettings;
   port: ConnectionData;
   email: EmailSettings;
   jwt: JwtSettings;
-  // oauth: OauthSettings;
   backend: BackData;
   frontend: FrontData;
   i18n: I18nSettings;
@@ -51,16 +49,6 @@ export class OriginSettings {
 
   constructor(envVariables: EnvironmentVariable) {
     this.FRONTEND_URLS = envVariables.FRONTEND_URLS!;
-  }
-}
-
-export class StorageSettings {
-  BASE_URL: string;
-  STORAGE_TOKEN: string;
-
-  constructor(envVariables: EnvironmentVariable) {
-    this.BASE_URL = envVariables.STORAGE_BASE_URL!;
-    this.STORAGE_TOKEN = envVariables.STORAGE_TOKEN!;
   }
 }
 
@@ -158,7 +146,6 @@ const envSettings = new EnvironmentSettings(
 );
 
 const originSettings = new OriginSettings(process.env);
-const storageSettings = new StorageSettings(process.env);
 const connectionData = new ConnectionData(process.env);
 
 const emailSettings = new EmailSettings(process.env);
@@ -166,11 +153,9 @@ const jwtSettings = new JwtSettings(process.env);
 const backData = new BackData(process.env);
 const frontData = new FrontData(process.env);
 const i18nSettings = new I18nSettings(process.env);
-// const oauthSettings = new OauthSettings(process.env);
 
 export const appConfig = new AppConfig(envSettings, {
   origin: originSettings,
-  storage: storageSettings,
   port: connectionData,
   email: emailSettings,
   jwt: jwtSettings,

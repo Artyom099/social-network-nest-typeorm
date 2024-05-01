@@ -4,7 +4,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { LikeStatus } from '../src/infrastructure/utils/enums';
 import { appSettings } from '../src/infrastructure/settings/app.settings';
-import { getRefreshTokenByResponse } from '../src/infrastructure/utils/helpers';
+import { getRefreshTokenByResponse } from '../src/infrastructure/utils/handlers';
 
 describe('BlogsController (e2e)', () => {
   let app: INestApplication;

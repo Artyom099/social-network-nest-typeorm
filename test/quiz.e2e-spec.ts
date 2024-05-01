@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/infrastructure/settings/app.settings';
 import request from 'supertest';
-import { getRefreshTokenByResponse } from '../src/infrastructure/utils/helpers';
+import { getRefreshTokenByResponse } from '../src/infrastructure/utils/handlers';
 import { AnswerStatus, GameStatus } from '../src/infrastructure/utils/enums';
 
 const sleep = (seconds: number) =>

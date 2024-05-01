@@ -6,7 +6,7 @@ import { appSettings } from '../src/infrastructure/settings/app.settings';
 import {
   getRefreshTokenByResponse,
   getRefreshTokenByResponseWithTokenName,
-} from '../src/infrastructure/utils/helpers';
+} from '../src/infrastructure/utils/handlers';
 import { LikeStatus } from '../src/infrastructure/utils/enums';
 
 describe('UsersController (e2e)', () => {

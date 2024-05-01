@@ -6,7 +6,7 @@ import { appSettings } from '../src/infrastructure/settings/app.settings';
 import {
   getRefreshTokenByResponse,
   getRefreshTokenByResponseWithTokenName,
-} from '../src/infrastructure/utils/helpers';
+} from '../src/infrastructure/utils/handlers';
 
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));

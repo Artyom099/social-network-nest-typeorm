@@ -7,7 +7,7 @@ import { appSettings } from '../src/infrastructure/settings/app.settings';
 import {
   getRefreshTokenByResponse,
   getRefreshTokenByResponseWithTokenName,
-} from '../src/infrastructure/utils/helpers';
+} from '../src/infrastructure/utils/handlers';
 
 describe('CommentsController (e2e)', () => {
   let app: INestApplication;

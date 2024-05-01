@@ -1,49 +1,56 @@
 import nodemailer from 'nodemailer';
-import { settings } from '../utils/settings';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { AppConfig } from '../../config/app-config';
 
 @Injectable()
 export class EmailAdapter {
-  async sendEmail(email: string, subject: string, message: string) {
+  constructor(@Inject(AppConfig.name) private appConfig: AppConfig) {}
+
+  async sendViaEmail(email: string, subject: string, message: string) {
+    const { EMAIL_HOST, EMAIL_USER, EMAIL_PASSWORD } =
+      this.appConfig.settings.email;
+
     const transporter = nodemailer.createTransport({
-      host: 'smtp.mail.ru',
+      host: EMAIL_HOST,
       port: 465,
       secure: true,
       auth: {
-        user: settings.MAIL_LOGIN,
-        pass: settings.MAIL_PASSWORD,
+        user: EMAIL_USER,
+        pass: EMAIL_PASSWORD,
       },
     });
 
     return transporter.sendMail({
-      from: `"Fred Foo 👻" <${settings.MAIL_LOGIN}>`, // sender address
+      from: `Blog Platform <${EMAIL_USER}>`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
       html: message, // html body
     });
   }
 
-  async sendGmail(to: string, subject: string, message: string) {
+  async sendViaGmail(email: string, subject: string, message: string) {
+    const { EMAIL_HOST, EMAIL_USER, EMAIL_PASSWORD } =
+      this.appConfig.settings.email;
+
     try {
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        // host: 'smtp.gmail.com',
+        host: EMAIL_HOST,
         // port: 587,
         secure: true,
         auth: {
-          user: settings.GMAIL_LOGIN,
-          pass: settings.GMAIL_PASSWORD,
+          user: EMAIL_USER,
+          pass: EMAIL_PASSWORD,
         },
       });
 
-      return await transporter.sendMail({
-        from: `"Blog Platform" <${settings.GMAIL_LOGIN}>`,
-        to: to,
+      return transporter.sendMail({
+        from: `Blog Platform <${EMAIL_USER}>`,
+        to: email,
         subject: subject,
         html: message,
       });
     } catch (e) {
-      console.error('Mail sending failed - ', e);
+      console.error({ email_error: e });
     }
   }
 }
