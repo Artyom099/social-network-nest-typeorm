@@ -23,6 +23,7 @@ export class BearerAuthGuard implements CanActivate {
       });
       request.userId = payload.userId;
     } catch (e) {
+      console.log({ auth_guard_err: e });
       throw new UnauthorizedException();
     }
     return true;

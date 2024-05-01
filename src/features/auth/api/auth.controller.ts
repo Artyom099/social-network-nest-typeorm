@@ -33,6 +33,7 @@ import { RateLimitGuard } from '../../../infrastructure/guards/rate.limit/rate.l
 
 @Controller('auth')
 export class AuthController {
+  REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
   constructor(
     private commandBus: CommandBus,
     private tokensService: TokensService,
@@ -90,7 +91,7 @@ export class AuthController {
       };
       await this.devicesService.createDevise(dto);
 
-      res.cookie('refreshToken', token.refreshToken, {
+      res.cookie(this.REFRESH_TOKEN_COOKIE_NAME, token.refreshToken, {
         httpOnly: true,
         secure: true,
       });
@@ -108,7 +109,7 @@ export class AuthController {
 
     await this.devicesService.updateLastActiveDate(deviceId, lastActiveDate);
 
-    res.cookie('refreshToken', token.refreshToken, {
+    res.cookie(this.REFRESH_TOKEN_COOKIE_NAME, token.refreshToken, {
       httpOnly: true,
       secure: true,
     });
@@ -124,7 +125,7 @@ export class AuthController {
       req.cookies.refreshToken,
     );
 
-    return this.devicesService.deleteCurrentDevice(payload.deviceId);
+    return this.devicesService.deleteDevice(payload.deviceId);
   }
 
   @Post('new-password')
