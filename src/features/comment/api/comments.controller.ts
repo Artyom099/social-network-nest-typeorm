@@ -62,7 +62,7 @@ export class CommentsController {
   async updateComment(
     @Req() req: any,
     @Param('id') commentId: string,
-    @Body() InputModel: CommentInputModel,
+    @Body() body: CommentInputModel,
   ) {
     const comment = await this.commentsQueryRepository.getComment(
       commentId,
@@ -74,7 +74,7 @@ export class CommentsController {
       throw new ForbiddenException();
     } else {
       return this.commandBus.execute(
-        new UpdateCommentCommand(commentId, InputModel.content),
+        new UpdateCommentCommand(commentId, body.content),
       );
     }
   }
@@ -89,11 +89,10 @@ export class CommentsController {
     );
     if (!comment) throw new NotFoundException();
 
-    if (req.userId !== comment.commentatorInfo.userId) {
+    if (req.userId !== comment.commentatorInfo.userId)
       throw new ForbiddenException();
-    } else {
-      return this.commandBus.execute(new DeleteCommentCommand(commentId));
-    }
+
+    return this.commandBus.execute(new DeleteCommentCommand(commentId));
   }
 
   @Put(':id/like-status')
@@ -102,19 +101,13 @@ export class CommentsController {
   async updateLikeStatus(
     @Req() req: any,
     @Param('id') commentId: string,
-    @Body() inputModel: LikeStatusInputModel,
+    @Body() body: LikeStatusInputModel,
   ) {
     const comment = await this.commentsQueryRepository.getComment(commentId);
-    if (!comment) {
-      throw new NotFoundException();
-    } else {
-      return this.commandBus.execute(
-        new UpdateCommentLikesCommand(
-          commentId,
-          req.userId,
-          inputModel.likeStatus,
-        ),
-      );
-    }
+    if (!comment) throw new NotFoundException();
+
+    return this.commandBus.execute(
+      new UpdateCommentLikesCommand(commentId, req.userId, body.likeStatus),
+    );
   }
 }

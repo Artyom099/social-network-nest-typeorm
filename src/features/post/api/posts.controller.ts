@@ -88,7 +88,7 @@ export class PostsController {
   async createCommentCurrentPost(
     @Req() req: any,
     @Param('id') postId: string,
-    @Body() inputModel: CommentInputModel,
+    @Body() body: CommentInputModel,
   ) {
     const post = await this.postsQueryRepository.getPost(postId);
     const user = await this.usersQueryRepository.getUserById(req.userId);
@@ -104,7 +104,7 @@ export class PostsController {
     } else {
       const dto: CreateCommentDto = {
         postId,
-        content: inputModel.content,
+        content: body.content,
         userId: user.id,
       };
       return this.commandBus.execute(new CreateCommentCommand(dto));
@@ -117,7 +117,7 @@ export class PostsController {
   async updateLikeStatus(
     @Req() req: any,
     @Param('id') postId: string,
-    @Body() inputModel: LikeStatusInputModel,
+    @Body() body: LikeStatusInputModel,
   ) {
     const post = await this.postsQueryRepository.getPost(postId);
     if (!post) {
@@ -126,7 +126,7 @@ export class PostsController {
       return this.postsService.updatePostLikes(
         postId,
         req.userId,
-        inputModel.likeStatus,
+        body.likeStatus,
       );
     }
   }

@@ -52,8 +52,8 @@ export class SABlogsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Body() inputModel: BlogInputModel) {
-    return this.commandBus.execute(new CreateBlogCommand(inputModel));
+  async createBlog(@Body() body: BlogInputModel) {
+    return this.commandBus.execute(new CreateBlogCommand(body));
   }
 
   @Put(':id')
@@ -61,18 +61,20 @@ export class SABlogsController {
   async updateBlog(
     @Req() req: any,
     @Param('id') blogId: string,
-    @Body() inputModel: BlogInputModel,
+    @Body() body: BlogInputModel,
   ) {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
     if (!blog) throw new NotFoundException('blog not found');
-    return this.commandBus.execute(new UpdateBlogCommand(blogId, inputModel));
+
+    return this.commandBus.execute(new UpdateBlogCommand(blogId, body));
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Req() req: any, @Param('id') blogId: string) {
+  async deleteBlog(@Param('id') blogId: string) {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
     if (!blog) throw new NotFoundException('blog not found');
+
     return this.blogsService.deleteBlog(blogId);
   }
 
@@ -84,15 +86,13 @@ export class SABlogsController {
     @Query() query: DefaultPaginationInput,
   ) {
     const blog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!blog) {
-      throw new NotFoundException('blog not found');
-    } else {
-      return this.postsQueryRepository.getPostsCurrentBlogForBlogger(
-        req.userId,
-        blogId,
-        query,
-      );
-    }
+    if (!blog) throw new NotFoundException('blog not found');
+
+    return this.postsQueryRepository.getPostsCurrentBlogForBlogger(
+      req.userId,
+      blogId,
+      query,
+    );
   }
 
   @Post(':id/post')
@@ -100,23 +100,23 @@ export class SABlogsController {
   async createPostCurrentBlog(
     @Req() req: any,
     @Param('id') blogId: string,
-    @Body() inputModel: PostInputModel,
+    @Body() body: PostInputModel,
   ) {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
+
     if (!blog) {
       throw new NotFoundException('blog not found');
     } else {
-      return this.commandBus.execute(new CreatePostCommand(blog, inputModel));
+      return this.commandBus.execute(new CreatePostCommand(blog, body));
     }
   }
 
   @Put(':id/post/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @Req() req: any,
     @Param('id') blogId: string,
     @Param('postId') postId: string,
-    @Body() inputModel: PostInputModel,
+    @Body() body: PostInputModel,
   ) {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
     if (!blog) throw new NotFoundException('blog not found');
@@ -125,14 +125,13 @@ export class SABlogsController {
     if (!post) {
       throw new NotFoundException('post not found');
     } else {
-      return this.postsService.updatePost(postId, inputModel);
+      return this.postsService.updatePost(postId, body);
     }
   }
 
   @Delete(':id/post/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
-    @Req() req: any,
     @Param('id') blogId: string,
     @Param('postId') postId: string,
   ) {
@@ -165,15 +164,13 @@ export class SABlogsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlogBanStatus(
     @Param('id') blogId: string,
-    @Body() inputModel: BanBlogInputModel,
+    @Body() body: BanBlogInputModel,
   ) {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
     if (!blog) {
       throw new NotFoundException('blog not found');
     } else {
-      return this.commandBus.execute(
-        new BanBlogCommand(blogId, inputModel.isBanned),
-      );
+      return this.commandBus.execute(new BanBlogCommand(blogId, body.isBanned));
     }
   }
 }

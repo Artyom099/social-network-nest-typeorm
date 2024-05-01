@@ -34,7 +34,7 @@ import { CookieOptions } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
+  private REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
   private cookieOptions: CookieOptions = {
     httpOnly: true,
     secure: true,

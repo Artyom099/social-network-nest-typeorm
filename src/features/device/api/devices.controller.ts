@@ -30,6 +30,7 @@ export class DevicesController {
     const payload = await this.tokensService.getTokenPayload(
       req.cookies.refreshToken,
     );
+
     return this.devicesQueryRepository.getDevices(payload.userId);
   }
 
@@ -39,6 +40,7 @@ export class DevicesController {
     const payload = await this.tokensService.getTokenPayload(
       req.cookies.refreshToken,
     );
+
     return this.devicesService.deleteOtherDevices(
       payload.deviceId,
       payload.userId,
