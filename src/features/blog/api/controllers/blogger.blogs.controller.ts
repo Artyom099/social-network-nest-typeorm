@@ -53,7 +53,7 @@ export class BloggerBlogsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Req() req: any, @Body() body: BlogInputModel) {
-    return this.commandBus.execute(new CreateBlogCommand(req.userId, body));
+    // return this.commandBus.execute(new CreateBlogCommand(req.userId, body));
   }
 
   @Put(':id')
