@@ -15,6 +15,7 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
 
   async execute(command: CreateBlogCommand): Promise<BlogViewModel | null> {
     const { inputModel } = command;
+
     const dto: CreateBlogModel = {
       id: randomUUID(),
       inputModel,
@@ -25,6 +26,7 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
       isBanned: false,
       banDate: null,
     };
+
     return this.blogsRepository.createBlog(dto);
   }
 }

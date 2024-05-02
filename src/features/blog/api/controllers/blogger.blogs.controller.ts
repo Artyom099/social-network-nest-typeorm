@@ -29,7 +29,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreatePostCommand } from '../../../post/application/blogger.use.cases/create.post.use.case';
 import { UpdateBlogCommand } from '../../application/blogger.use.cases/update.blog.use.case';
 import { CommentsQueryRepository } from '../../../comment/infrastructure/comments.query.repository';
-import { CreateBlogCommand } from '../../application/blogger.use.cases/create.blog.use.case';
 
 @Controller('blogger/blog')
 @UseGuards(BearerAuthGuard)
