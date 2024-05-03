@@ -14,6 +14,7 @@ import { Contract } from '../../../../infrastructure/core/contract';
 import { GameRepository } from '../../infrastructure/game.repository';
 import { PlayerRepository } from '../../infrastructure/player.repository';
 import { UserRepository } from '../../../user/infrastructure/user.repository';
+import { Question } from '../../entity/question.entity';
 
 export class CreateGameCommand {
   constructor(public userId: string) {}
@@ -87,7 +88,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
 
         const questionsDto: AddQuestionsToGameDto = {
           gameId: pendingGame.payload.id,
-          questionsId: questionsId.map((q) => q.id),
+          questionsId: questionsId.map((q: Question) => q.id),
         };
         await this.quizRepository.createFiveGameQuestions(
           questionsDto,

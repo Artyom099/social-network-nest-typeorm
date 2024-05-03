@@ -93,6 +93,7 @@ import { GameQuestion } from './features/quiz/entity/game.question.entity';
 import { GameRepository } from './features/quiz/infrastructure/game.repository';
 import { PlayerRepository } from './features/quiz/infrastructure/player.repository';
 import { AppConfigModule } from './config/app-config.module';
+import { AppConfig } from './config/app-config';
 
 const entities = [
   Users,
@@ -212,8 +213,29 @@ const services = [
 @Module({
   imports: [
     CqrsModule,
-    JwtModule.register({ global: true }),
     ConfigModule.forRoot({ isGlobal: true }),
+
+    JwtModule.registerAsync({
+      useFactory: (appConfig: AppConfig) => {
+        const encryptionTypes = {
+          DEFAULT: { secret: appConfig.settings.jwt.SECRET },
+          ASYMMETRY: {
+            publicKey: appConfig.settings.jwt.PUBLIC_KEY,
+            privateKey: {
+              key: appConfig.settings.jwt.PRIVATE_KEY,
+              passphrase: appConfig.settings.jwt.PASSPHRASE,
+            },
+            signOptions: { algorithm: 'RS256' },
+            verifyOptions: { algorithms: ['RS256'] },
+          },
+        };
+        return {
+          global: true,
+          ...encryptionTypes[appConfig.settings.jwt.ENCRYPTION_TYPE],
+        };
+      },
+      inject: [AppConfig.name],
+    }),
 
     AppConfigModule,
 

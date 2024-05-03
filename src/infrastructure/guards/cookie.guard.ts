@@ -7,7 +7,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { DevicesQueryRepository } from '../../features/device/infrastructure/devices.query.repository';
-import { jwtConstants } from '../utils/settings';
 
 @Injectable()
 export class CookieGuard implements CanActivate {
@@ -24,9 +23,7 @@ export class CookieGuard implements CanActivate {
     if (!refreshToken) throw new UnauthorizedException();
 
     try {
-      const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: jwtConstants.refreshSecret,
-      });
+      const payload = await this.jwtService.verifyAsync(refreshToken);
 
       const tokenIssuedAt = new Date(
         payload.iat * this.MILLISECONDS,

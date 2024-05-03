@@ -167,6 +167,7 @@ export class QuizQueryRepository {
     `,
       [arrOfPlayersId, GameStatus.active, GameStatus.pending],
     );
+
     // Поиск значения в массиве - g."firstPlayerId" = any($1);
     if (!game)
       return new Contract(
@@ -267,5 +268,32 @@ export class QuizQueryRepository {
     );
 
     return player ? player.userId : null;
+  }
+
+  mapToView(game, questions, firstPlayerAnswers, secondPlayerAnswers) {
+    return {
+      id: game.id,
+      firstPlayerProgress: {
+        answers: firstPlayerAnswers,
+        player: {
+          id: game.firstPlayerId,
+          login: game.firstPlayerLogin,
+        },
+        score: game.firstPlayerScore,
+      },
+      secondPlayerProgress: {
+        answers: secondPlayerAnswers,
+        player: {
+          id: game.secondPlayerId,
+          login: game.secondPlayerLogin,
+        },
+        score: game.secondPlayerScore,
+      },
+      questions: questions,
+      status: game.status,
+      pairCreatedDate: game.pairCreatedDate,
+      startGameDate: game.startGameDate,
+      finishGameDate: game.finishGameDate,
+    };
   }
 }

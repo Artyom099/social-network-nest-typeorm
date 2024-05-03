@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from '../utils/settings';
 
 @Injectable()
 export class BearerAuthGuard implements CanActivate {
@@ -18,9 +17,7 @@ export class BearerAuthGuard implements CanActivate {
     if (!accessToken) throw new UnauthorizedException();
 
     try {
-      const payload = await this.jwtService.verifyAsync(accessToken, {
-        secret: jwtConstants.accessSecret,
-      });
+      const payload = await this.jwtService.verifyAsync(accessToken);
       request.userId = payload.userId;
     } catch (e) {
       console.log({ auth_guard_err: e });

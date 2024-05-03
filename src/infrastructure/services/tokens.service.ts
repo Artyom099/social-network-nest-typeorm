@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from '../utils/settings';
 import { TokenPayloadModel } from '../../features/auth/api/models/token.payload.model';
 import { PayloadModel } from '../../features/auth/api/models/payload.model';
 import { TokenOutputModel } from '../../features/auth/api/models/token.output.model';
-import { AppConfig } from '../../config/app-config';
+import { appConfig, AppConfig } from '../../config/app-config';
 
 @Injectable()
 export class TokensService {
@@ -25,12 +24,12 @@ export class TokensService {
   async createJWT(payload: PayloadModel): Promise<TokenOutputModel> {
     return {
       accessToken: await this.jwtService.signAsync(payload, {
-        secret: jwtConstants.accessSecret,
-        expiresIn: '60m',
+        // secret: jwtConstants.accessSecret,
+        expiresIn: appConfig.settings.jwt.ACCESS_TOKEN_LIFETIME_SECONDS,
       }),
       refreshToken: await this.jwtService.signAsync(payload, {
-        secret: jwtConstants.refreshSecret,
-        expiresIn: '100s',
+        // secret: jwtConstants.refreshSecret,
+        expiresIn: appConfig.settings.jwt.REFRESH_TOKEN_LIFETIME_SECONDS,
       }),
     };
   }
@@ -39,12 +38,12 @@ export class TokensService {
     const newPayload = { userId: payload.userId, deviceId: payload.deviceId };
     return {
       accessToken: await this.jwtService.signAsync(newPayload, {
-        secret: jwtConstants.accessSecret,
-        expiresIn: '60m',
+        // secret: jwtConstants.accessSecret,
+        expiresIn: appConfig.settings.jwt.ACCESS_TOKEN_LIFETIME_SECONDS,
       }),
       refreshToken: await this.jwtService.signAsync(newPayload, {
-        secret: jwtConstants.refreshSecret,
-        expiresIn: '100s',
+        // secret: jwtConstants.refreshSecret,
+        expiresIn: appConfig.settings.jwt.REFRESH_TOKEN_LIFETIME_SECONDS,
       }),
     };
   }

@@ -1,22 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { AppConfig } from '../../config/app-config';
 
 @Injectable()
 export class TypeOrmOptions implements TypeOrmOptionsFactory {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    @Inject(AppConfig.name) private appConfig: AppConfig,
+  ) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
     const nodeEnv = this.configService.getOrThrow<string>('NODE_ENV');
-    console.log({ nodeEnv: nodeEnv });
+
     if (
       (nodeEnv && nodeEnv.toUpperCase() === 'DEVELOPMENT') ||
       nodeEnv.toUpperCase() === 'TEST'
     ) {
-      console.log('dev');
+      console.log('use_dev_db');
       return this.getLocalDb();
     } else {
-      console.log('prod');
+      console.log('use_prod_db');
       return this.getRemoteDb();
     }
   }

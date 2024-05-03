@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { jwtConstants } from '../utils/settings';
 
 @Injectable()
 export class CheckUserIdGuard implements CanActivate {
@@ -14,9 +13,7 @@ export class CheckUserIdGuard implements CanActivate {
     if (!refreshToken) {
       request.userId = null;
     } else {
-      const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: jwtConstants.refreshSecret,
-      });
+      const payload = await this.jwtService.verifyAsync(refreshToken);
       console.log({ token_payload: payload });
       request.userId = payload.userId;
     }
