@@ -98,12 +98,11 @@ export class QuizRepository {
   async getFiveQuestionId(manager: EntityManager) {
     // достаем 5 случайнах вопросов
 
-    return manager.query(`
+    return await manager.query(`
     select "id"
     from question
     order by random()
     limit 5
-    offset random()
     `);
   }
 }

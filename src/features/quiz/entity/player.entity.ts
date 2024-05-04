@@ -20,6 +20,8 @@ export class Player {
   answersCount: number;
   @Column({ nullable: true })
   finishAnswersDate: Date;
+  @Column({ default: true })
+  isActive: boolean;
 
   @ManyToOne(() => Users, (u) => u.players, { onDelete: 'CASCADE' })
   @JoinColumn()
@@ -35,7 +37,7 @@ export class Player {
   @Column({ nullable: true })
   answersId: string[];
 
-  @OneToOne(() => Game, { nullable: true })
+  @OneToOne(() => Game, { nullable: true, onDelete: 'CASCADE' })
   game: Game;
   @Column({ nullable: true })
   gameId: string;

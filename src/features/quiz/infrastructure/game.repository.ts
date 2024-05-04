@@ -28,16 +28,20 @@ export class GameRepository {
     userId: string,
     manager: EntityManager,
   ): Promise<Contract<GameViewModel | null>> {
+    // достаем игрока по userId и isActive
     const [playerId] = await manager.query(
       `
     select p.id
     from player p 
     left join users u 
     on p."userId" = u.id
-    where u.id = $1
+    where u.id = $1 and p."isActive" = $2
     `,
-      [userId],
+      [userId, true],
     );
+
+    console.log({ playerId });
+
     if (!playerId)
       return new Contract(InternalCode.NotFound, null, 'playerId not found');
 
@@ -67,6 +71,7 @@ export class GameRepository {
     `,
       [playerId.id, GameStatus.active],
     );
+
     if (!game)
       return new Contract(InternalCode.NotFound, null, 'game not found');
 
@@ -198,52 +203,7 @@ export class GameRepository {
       .where('id = :id', { id: dto.id })
       .execute();
 
-    const [game] = await manager.query(
-      `
-    select *,
-    
-      (select pl."login" as "firstPlayerLogin"
-      from player pl 
-      where pl."id" = g."firstPlayerId"),
-
-      (select pl."login" as "secondPlayerLogin"
-      from player pl
-      where pl."id" = g."secondPlayerId")
-
-    from game g
-    where g."id" = $1
-    `,
-      [dto.id],
-    );
-
-    if (!game) return new Contract(InternalCode.Internal_Server);
-
-    const activeGameView = {
-      id: game.id,
-      firstPlayerProgress: {
-        answers: [],
-        player: {
-          id: game.firstPlayerId,
-          login: game.firstPlayerLogin,
-        },
-        score: 0,
-      },
-      secondPlayerProgress: {
-        answers: [],
-        player: {
-          id: game.secondPlayerId,
-          login: game.secondPlayerLogin,
-        },
-        score: 0,
-      },
-      questions: [],
-      status: game.status,
-      pairCreatedDate: game.pairCreatedDate,
-      startGameDate: game.startGameDate,
-      finishGameDate: game.finishGameDate,
-    };
-
-    return new Contract(InternalCode.Success, activeGameView);
+    return new Contract(InternalCode.Success);
   }
 
   async finishGame(id: string, manager: EntityManager): Promise<UpdateResult> {

@@ -9,12 +9,12 @@ export class GameQuestion {
   @Column()
   questionNumber: number;
 
-  @ManyToOne(() => Game)
+  @ManyToOne(() => Game, { onDelete: 'CASCADE' })
   game: Game;
   @Column()
   gameId: string;
 
-  @ManyToOne(() => Question)
+  @ManyToOne(() => Question, { onDelete: 'CASCADE' })
   question: Question;
   @Column({ nullable: true })
   questionId: string;

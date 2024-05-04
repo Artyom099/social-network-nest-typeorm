@@ -100,7 +100,9 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           id: pendingGame.payload.id,
           secondPlayerId: playerDTO.id,
         };
-        newGame = await this.gameRepository.addPlayerToGame(dto, manager);
+        await this.gameRepository.addPlayerToGame(dto, manager);
+
+        newGame = await this.gameRepository.getActiveGame(userId, manager);
       }
 
       // если никто не ждет пару, то
@@ -112,6 +114,7 @@ export class CreateGameUseCase implements ICommandHandler<CreateGameCommand> {
           pairCreatedDate: new Date(),
           firstPlayerId: playerDTO.id,
         };
+
         await this.playerRepository.updatePlayersGameId(
           playerDTO.id,
           dto.id,

@@ -25,7 +25,7 @@ import { BanUserInputModel } from '../models/input/ban.user.input.model';
 import { CreateUserInputModel } from '../models/input/create.user.input.model';
 
 @UseGuards(BasicAuthGuard)
-@Controller('sa/user')
+@Controller('sa/users')
 export class SaUsersController {
   constructor(
     private commandBus: CommandBus,

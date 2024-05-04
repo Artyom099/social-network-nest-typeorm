@@ -98,7 +98,7 @@ export class PlayerRepository {
     return manager
       .createQueryBuilder()
       .update(Player)
-      .set({ finishAnswersDate: new Date() })
+      .set({ finishAnswersDate: new Date(), isActive: false })
       .where('id = :id', { id })
       .execute();
   }

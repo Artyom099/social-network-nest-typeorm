@@ -29,7 +29,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       response.status(status).json({ errorsMessages });
     } else {
-      console.log({ exception, request });
+      // console.log({ exception, request });
 
       response.status(status).json({
         statusCode: status,

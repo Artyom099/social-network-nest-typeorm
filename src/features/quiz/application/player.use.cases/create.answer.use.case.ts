@@ -43,6 +43,7 @@ export class CreateAnswerUseCase
         userId,
         manager,
       );
+      console.log({ currentGame });
 
       if (currentGame.hasError() || !currentGame.payload) {
         console.log({ userId }, 'user have no active game');

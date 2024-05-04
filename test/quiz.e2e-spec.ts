@@ -660,7 +660,7 @@ describe('QuizController (e2e)', () => {
         },
         score: 0,
       },
-      questions: [],
+      questions: expect.any(Array),
       status: GameStatus.active,
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),

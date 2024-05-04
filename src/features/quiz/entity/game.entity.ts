@@ -24,7 +24,7 @@ export class Game {
   @Column({ nullable: true })
   finishGameDate: Date;
 
-  @OneToOne(() => Player, (pl) => pl.game)
+  @OneToOne(() => Player, (pl) => pl.game, { onDelete: 'CASCADE' })
   @JoinColumn()
   firstPlayer: Player;
   @Column()

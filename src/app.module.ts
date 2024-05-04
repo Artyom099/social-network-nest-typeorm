@@ -213,6 +213,8 @@ const services = [
 @Module({
   imports: [
     CqrsModule,
+    AppConfigModule,
+
     ConfigModule.forRoot({ isGlobal: true }),
 
     JwtModule.registerAsync({
@@ -236,8 +238,6 @@ const services = [
       },
       inject: [AppConfig.name],
     }),
-
-    AppConfigModule,
 
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

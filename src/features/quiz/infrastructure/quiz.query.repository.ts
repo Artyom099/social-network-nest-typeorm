@@ -14,11 +14,19 @@ export class QuizQueryRepository {
       `
     select *,
            
-      (select pl."login" as "firstPlayerLogin"
-      from player pl 
+      (select pl.login as "firstPlayerLogin"
+      from player pl
       where pl."id" = g."firstPlayerId"),
-
-      (select pl."login" as "secondPlayerLogin"
+      
+      (select pl.score as "firstPlayerScore"
+      from player pl
+      where pl."id" = g."firstPlayerId"),
+      
+      (select pl.login as "secondPlayerLogin"
+      from player pl 
+      where pl."id" = g."secondPlayerId"),
+      
+      (select pl.score as "secondPlayerScore"
       from player pl 
       where pl."id" = g."secondPlayerId")
     
@@ -59,23 +67,6 @@ export class QuizQueryRepository {
       [game.secondPlayerId],
     );
 
-    const [firstPlayerScore] = await this.dataSource.query(
-      `
-      select pl.score
-      from player pl 
-      where pl.id = $1
-    `,
-      [game.firstPlayerId],
-    );
-    const [secondPlayerScore] = await this.dataSource.query(
-      `
-      select pl.score
-      from player pl 
-      where pl.id = $1
-    `,
-      [game.secondPlayerId],
-    );
-
     if (!game.secondPlayerId) {
       return {
         id: game.id,
@@ -85,7 +76,7 @@ export class QuizQueryRepository {
             id: game.firstPlayerId,
             login: game.firstPlayerLogin,
           },
-          score: firstPlayerScore.score ? firstPlayerScore.score : 0,
+          score: game.firstPlayerScore,
         },
         secondPlayerProgress: null,
         questions: null,
@@ -97,49 +88,25 @@ export class QuizQueryRepository {
     }
 
     return game
-      ? {
-          id: game.id,
-          firstPlayerProgress: {
-            answers: firstPlayerAnswers,
-            player: {
-              id: game.firstPlayerId,
-              login: game.firstPlayerLogin,
-            },
-            score: firstPlayerScore.score ? firstPlayerScore.score : 0,
-          },
-          secondPlayerProgress: {
-            answers: secondPlayerAnswers,
-            player: {
-              id: game.secondPlayerId,
-              login: game.secondPlayerLogin,
-            },
-            score: secondPlayerScore.score ? secondPlayerScore.score : 0,
-          },
-          questions: questions,
-          status: game.status,
-          pairCreatedDate: game.pairCreatedDate,
-          startGameDate: game.startGameDate,
-          finishGameDate: game.finishGameDate,
-        }
+      ? this.mapToView(game, questions, firstPlayerAnswers, secondPlayerAnswers)
       : null;
   }
 
   async getActiveOrPendingGame(
     userId: string,
   ): Promise<Contract<GameViewModel | null>> {
-    const playersId = await this.dataSource.query(
+    const [player] = await this.dataSource.query(
       `
     select p.id
     from player p 
     left join users u 
     on p."userId" = u.id
-    where u.id = $1
+    where u.id = $1 and p."isActive" = $2
     `,
-      [userId],
+      [userId, true],
     );
 
-    if (!playersId) return new Contract(InternalCode.NotFound);
-    const arrOfPlayersId = playersId.map((pl) => pl.id);
+    if (!player) return new Contract(InternalCode.NotFound);
 
     const [game] = await this.dataSource.query(
       `
@@ -162,13 +129,13 @@ export class QuizQueryRepository {
       where pl."id" = g."secondPlayerId")
     
     from game g
-    where (g."firstPlayerId" = any($1) or g."secondPlayerId" = any($1))
+    where (g."firstPlayerId" = $1 or g."secondPlayerId" = $1)
     and ("status" = $2 or "status" = $3)
     `,
-      [arrOfPlayersId, GameStatus.active, GameStatus.pending],
+      [player.id, GameStatus.active, GameStatus.pending],
     );
 
-    // Поиск значения в массиве - g."firstPlayerId" = any($1);
+    // Поиск значения в массиве - g."firstPlayerId" = any($1) ) or g."secondPlayerId" = any($1);
     if (!game)
       return new Contract(
         InternalCode.NotFound,
@@ -226,30 +193,15 @@ export class QuizQueryRepository {
       });
 
     if (game) {
-      return new Contract(InternalCode.Success, {
-        id: game.id,
-        firstPlayerProgress: {
-          answers: firstPlayerAnswers,
-          player: {
-            id: game.firstPlayerId,
-            login: game.firstPlayerLogin,
-          },
-          score: game.firstPlayerScore,
-        },
-        secondPlayerProgress: {
-          answers: secondPlayerAnswers,
-          player: {
-            id: game.secondPlayerId,
-            login: game.secondPlayerLogin,
-          },
-          score: game.secondPlayerScore,
-        },
-        questions: questions,
-        status: game.status,
-        pairCreatedDate: game.pairCreatedDate,
-        startGameDate: game.startGameDate,
-        finishGameDate: game.finishGameDate,
-      });
+      return new Contract(
+        InternalCode.Success,
+        this.mapToView(
+          game,
+          questions,
+          firstPlayerAnswers,
+          secondPlayerAnswers,
+        ),
+      );
     } else {
       return new Contract(InternalCode.Internal_Server);
     }
@@ -270,7 +222,12 @@ export class QuizQueryRepository {
     return player ? player.userId : null;
   }
 
-  mapToView(game, questions, firstPlayerAnswers, secondPlayerAnswers) {
+  mapToView(
+    game,
+    questions,
+    firstPlayerAnswers,
+    secondPlayerAnswers,
+  ): GameViewModel {
     return {
       id: game.id,
       firstPlayerProgress: {
