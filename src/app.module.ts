@@ -79,7 +79,7 @@ import { Game } from './features/quiz/entity/game.entity';
 import { Player } from './features/quiz/entity/player.entity';
 import { SAQuizController } from './features/quiz/api/controllers/sa.quiz.controller';
 import { PlayerQuizController } from './features/quiz/api/controllers/player.quiz.controller';
-import { QuizQueryRepository } from './features/quiz/infrastructure/quiz.query.repository';
+import { GameQueryRepository } from './features/quiz/infrastructure/game.query.repository';
 import { QuizRepository } from './features/quiz/infrastructure/quiz.repository';
 import { SAQuizRepository } from './features/quiz/infrastructure/sa.quiz.repository';
 import { SAQuizQueryRepository } from './features/quiz/infrastructure/sa.quiz.query.repository';
@@ -152,7 +152,7 @@ const repositories = [
   SAQuizRepository,
   SAQuizQueryRepository,
   QuizRepository,
-  QuizQueryRepository,
+  GameQueryRepository,
   GameRepository,
   PlayerRepository,
 

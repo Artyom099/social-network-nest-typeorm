@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { BearerAuthGuard } from '../../../../infrastructure/guards/bearer-auth.guard';
-import { QuizQueryRepository } from '../../infrastructure/quiz.query.repository';
+import { GameQueryRepository } from '../../infrastructure/game.query.repository';
 import { AnswerInputModel } from '../models/input/answer.input.model';
 import { CreateGameCommand } from '../../application/player.use.cases/create.game.use.case';
 import { CreateAnswerCommand } from '../../application/player.use.cases/create.answer.use.case';
@@ -21,13 +21,15 @@ import { ExceptionResponseHandler } from '../../../../infrastructure/core/except
 import { ApproachType } from '../../../../infrastructure/utils/enums';
 import { GameViewModel } from '../models/view/game.view.model';
 import { CurrentUserId } from '../../../../infrastructure/decorators/current.user.id.decorator';
+import { PlayerRepository } from '../../infrastructure/player.repository';
 
 @Controller('pair-game-quiz/pairs')
 @UseGuards(BearerAuthGuard)
 export class PlayerQuizController extends ExceptionResponseHandler {
   constructor(
     private commandBus: CommandBus,
-    private playerQuizQueryRepository: QuizQueryRepository,
+    private playerRepository: PlayerRepository,
+    private gameQueryRepository: GameQueryRepository,
   ) {
     super(ApproachType.http);
   }
@@ -38,7 +40,7 @@ export class PlayerQuizController extends ExceptionResponseHandler {
     @CurrentUserId() userId: string,
   ): Promise<GameViewModel> {
     const currentGameResult =
-      await this.playerQuizQueryRepository.getActiveOrPendingGame(userId);
+      await this.gameQueryRepository.getActiveOrPendingGame(userId);
 
     return this.sendExceptionOrResponse(currentGameResult);
   }
@@ -49,20 +51,18 @@ export class PlayerQuizController extends ExceptionResponseHandler {
     @CurrentUserId() userId: string,
     @Param() param: GameIdInputModel,
   ) {
-    const game = await this.playerQuizQueryRepository.getGameById(param.gameId);
+    const game = await this.gameQueryRepository.getGameById(param.gameId);
     if (!game) throw new NotFoundException();
 
-    const firstPlayerUserId =
-      await this.playerQuizQueryRepository.getUserIdByPlayerId(
-        game.firstPlayerProgress.player.id,
-      );
+    const firstPlayerUserId = await this.playerRepository.getUserIdByPlayerId(
+      game.firstPlayerProgress.player.id,
+    );
 
     let secondPlayerUserId: string | null = null;
-    if (game.secondPlayerProgress && game.secondPlayerProgress.player.id) {
-      secondPlayerUserId =
-        await this.playerQuizQueryRepository.getUserIdByPlayerId(
-          game.secondPlayerProgress.player.id,
-        );
+    if (game.secondPlayerProgress?.player.id) {
+      secondPlayerUserId = await this.playerRepository.getUserIdByPlayerId(
+        game.secondPlayerProgress.player.id,
+      );
     }
 
     // если айди юзера не равно айди плеера1 и плеера2

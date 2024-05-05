@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { GameStatus, InternalCode } from '../../../infrastructure/utils/enums';
-import { GameViewModel } from '../api/models/view/game.view.model';
+import {
+  AnswersType,
+  GameViewModel,
+  questionsType,
+} from '../api/models/view/game.view.model';
 import { Contract } from '../../../infrastructure/core/contract';
 
 @Injectable()
-export class QuizQueryRepository {
+export class GameQueryRepository {
   constructor(private dataSource: DataSource) {}
 
-  // game
   async getGameById(id: string): Promise<GameViewModel | null> {
     const [game] = await this.dataSource.query(
       `
@@ -207,26 +210,11 @@ export class QuizQueryRepository {
     }
   }
 
-  // player
-
-  async getUserIdByPlayerId(id: string): Promise<string> {
-    const [player] = await this.dataSource.query(
-      `
-      select "userId"
-      from player
-      where id = $1
-    `,
-      [id],
-    );
-
-    return player ? player.userId : null;
-  }
-
   mapToView(
     game,
-    questions,
-    firstPlayerAnswers,
-    secondPlayerAnswers,
+    questions: questionsType[],
+    firstPlayerAnswers: AnswersType[],
+    secondPlayerAnswers: AnswersType[],
   ): GameViewModel {
     return {
       id: game.id,

@@ -1,10 +1,12 @@
-import { EntityManager, InsertResult, UpdateResult } from 'typeorm';
+import { DataSource, EntityManager, InsertResult, UpdateResult } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { CreatePlayerDTO } from '../api/models/dto/create.player.dto';
 import { Player } from '../entity/player.entity';
 
 @Injectable()
 export class PlayerRepository {
+  constructor(private dataSource: DataSource) {}
+
   async getPlayerIds(userId: string, manager: EntityManager) {
     const playerIds = await manager.query(
       `
@@ -125,5 +127,18 @@ export class PlayerRepository {
       .set({ answersCount: () => 'answersCount + 1' })
       .where('id = :id', { id })
       .execute();
+  }
+
+  async getUserIdByPlayerId(id: string): Promise<string> {
+    const [player] = await this.dataSource.query(
+      `
+      select "userId"
+      from player
+      where id = $1
+    `,
+      [id],
+    );
+
+    return player ? player.userId : null;
   }
 }

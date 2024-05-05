@@ -14,7 +14,7 @@ export type GameViewModel = {
   finishGameDate: Date;
 };
 
-type questionsType = {
+export type questionsType = {
   id: string;
   body: string;
 };
@@ -39,7 +39,7 @@ type secondPlayerType = {
   login: string | null;
 };
 
-type AnswersType = {
+export type AnswersType = {
   questionId: string;
   answerStatus: AnswerStatus;
   addedAt: Date | string;
