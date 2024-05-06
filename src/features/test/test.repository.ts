@@ -1,9 +1,12 @@
-import {Injectable} from '@nestjs/common';
-import {InjectModel} from '@nestjs/mongoose';
-import {Model} from 'mongoose';
-import {InjectDataSource} from '@nestjs/typeorm';
-import {DataSource} from 'typeorm';
-import {Request, RequestDocument} from '../../infrastructure/guards/rate.limit/request.schema';
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import {
+  Request,
+  RequestDocument,
+} from '../../infrastructure/guards/rate.limit/request.schema';
 
 @Injectable()
 export class TestRepository {
@@ -31,7 +34,7 @@ export class TestRepository {
       delete from "posts";
       delete from "blogs";
       delete from "users";
-      `)
+      `),
     ]);
   }
 }

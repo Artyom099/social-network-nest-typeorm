@@ -98,6 +98,7 @@ export class GameQueryRepository {
   async getActiveOrPendingGame(
     userId: string,
   ): Promise<Contract<GameViewModel | null>> {
+    // достаем активного игрока
     const [player] = await this.dataSource.query(
       `
     select p.id
@@ -111,6 +112,7 @@ export class GameQueryRepository {
 
     if (!player) return new Contract(InternalCode.NotFound);
 
+    // достаем игру активного игрока
     const [game] = await this.dataSource.query(
       `
     select *,

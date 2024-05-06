@@ -65,7 +65,7 @@ export class PlayerQuizController extends ExceptionResponseHandler {
       );
     }
 
-    // если айди юзера не равно айди плеера1 и плеера2
+    // если айди юзера не равно айди игрока1 и игрока2, то 403
     if (userId !== firstPlayerUserId && userId !== secondPlayerUserId) {
       throw new ForbiddenException();
     } else {
