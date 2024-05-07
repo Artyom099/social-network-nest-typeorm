@@ -54,7 +54,7 @@ export class CreateAnswerUseCase
         );
       }
 
-      const gameId = currentGame.payload?.id;
+      const gameId = currentGame.payload.id;
 
       // достаем игроков по userId и gameId
       const currentPlayer = await this.playerRepository.getCurrentPlayer(
