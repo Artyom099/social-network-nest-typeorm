@@ -1,4 +1,4 @@
 export type PayloadModel = {
-  userId: string,
-  deviceId: string,
-}
+  userId: string;
+  deviceId: string;
+};

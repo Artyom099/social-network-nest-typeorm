@@ -86,14 +86,14 @@ export class CreateAnswerUseCase
         manager,
       );
 
-      // есди такого вопроса нет, значит они закончились
+      // если такого вопроса нет, значит они закончились
       if (!question) {
         console.log({ userId }, 'questions is over');
         return new Contract(InternalCode.Forbidden, null, 'questions is over');
       }
 
       // проверяем правильность ответа
-      const answerStatus = this.getAnswerStatus(question, answer);
+      const answerStatus = this.checkAnswer(question, answer);
 
       // если ответ верный, добавляем игроку балл
       if (answerStatus === AnswerStatus.correct) {
@@ -150,7 +150,7 @@ export class CreateAnswerUseCase
       const dto: CreateAnswerDTO = {
         id: randomUUID(),
         answer,
-        answerStatus: answerStatus,
+        answerStatus,
         questionId: question.id,
         playerId: currentPlayer.id,
       };
@@ -172,7 +172,7 @@ export class CreateAnswerUseCase
     return new Contract(InternalCode.Success, answerResult.payload);
   }
 
-  getAnswerStatus(question: Question, answer: string): AnswerStatus {
+  checkAnswer(question: Question, answer: string): AnswerStatus {
     return question.correctAnswers.includes(answer)
       ? AnswerStatus.correct
       : AnswerStatus.incorrect;
