@@ -15,4 +15,4 @@ export const bootstrap = async () => {
     console.log('cant start', e);
   }
 };
-bootstrap();
+bootstrap().catch(console.error);
