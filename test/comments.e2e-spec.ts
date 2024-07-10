@@ -33,14 +33,16 @@ describe('CommentsController (e2e)', () => {
       email: 'artyomgolubev1@gmail.com',
     };
 
+    const payload = {
+      login: firstUser.login,
+      password: firstUser.password,
+      email: firstUser.email,
+    };
+
     const firstCreateResponse = await request(server)
       .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
-      .send({
-        login: firstUser.login,
-        password: firstUser.password,
-        email: firstUser.email,
-      })
+      .send(payload)
       .expect(HttpStatus.CREATED);
 
     const firstCreatedUser = firstCreateResponse.body;
